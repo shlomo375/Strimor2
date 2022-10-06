@@ -1,0 +1,13 @@
+function TreeArray = CreatTree(Length)
+    Tree = struct("Index",{cell(Length,1)}, ...
+                  "parent", {cell(Length,1)}, ...
+                  "Config",{cell(Length,1)}, ...
+                  "Movment",{cell(Length,1)}, ...
+                  "DecConfig",{cell(Length,2)});
+
+%    MemoryInfo = memory;
+%    ArrayLength = floor(MemoryInfo.MaxPossibleArrayBytes/5 / 2000);
+   
+   TreeArray(Length) = CreatRRT_Node(0, [], [], [],[],[]);
+   [TreeArray.Index] = deal(0);
+end

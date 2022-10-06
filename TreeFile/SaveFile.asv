@@ -1,0 +1,10 @@
+function SaveFile(FileName,Data)
+MaxConfigInFile = 5e5;
+for ii = 1:5e5:size(Data,1)
+    NewFileName = FileName + "_p"+string(ii);
+    if Data,1)>MaxConfigInFile
+    FileData = Data(1:MaxConfigInFile,:)
+end
+save(FileName,"Data");
+% delete(FileLock);
+end

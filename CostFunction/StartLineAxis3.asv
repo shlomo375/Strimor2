@@ -1,0 +1,9 @@
+function StartLineIDX = StartLineAxis3(Config,Type)
+    ConfigWidth = size(Config,2);
+    
+    StartLineIDX = ceil(ConfigWidth/2);
+    if Type(1,1) ~= 1 & ConfigWidth
+        StartLineIDX = StartLineIDX + 1;
+    end
+
+end
