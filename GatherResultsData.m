@@ -32,7 +32,7 @@ VariableType = {'double','double','double','string'};
 MeanData = table('Size',[numel(Names), 4],'VariableType',VariableType,'VariableNames',["NumberOfCOnfig","PathLength","N","name"])
 stdData = MeanData;
 for ii = 1:numel(Names)
-    NameLoc=matches(Data.TreeName,Names(ii)) & double(extractBetween(Data.ResultFileName,"tree_",".mat"))<=200;
+    NameLoc=matches(Data.TreeName,Names(ii)) & double(extractBetween(Data.ResultFileName,"tree_",".mat"))<=50;
     MeanData(ii,:) = table(mean(Data{NameLoc,"NumberOfCOnfig"}),...
                               mean(Data{NameLoc,"PathLength"}),...
                               double(string(extractBefore(Names(ii),"N"))),...
@@ -57,9 +57,28 @@ figure('Name','Mean')
 ResultPloter(MeanData, "PathLength",["uniform_1","uniform_3","normal_1"])
 % figure('Name','std')
 % ResultPloter(stdData, "PathLength",["uniform_1","uniform_3","normal_1"])
-
 figure('Name','Mean')
 ResultPloter(MeanData, "NumberOfCOnfig",["uniform_1","uniform_3","normal_1"])
+% figure('Name','std')
+% ResultPloter(stdData, "NumberOfCOnfig",["uniform_1","uniform_3","normal_1"])
+
+figure('Name','Mean')
+ResultPloter(MeanData, "PathLength",["uniform_3","uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"])
+% figure('Name','std')
+% ResultPloter(stdData, "PathLength",["uniform_1","uniform_3","normal_1"])
+
+figure('Name','Mean')
+ResultPloter(MeanData, "NumberOfCOnfig",["uniform_3","uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"])
+% figure('Name','std')
+% ResultPloter(stdData, "NumberOfCOnfig",["uniform_1","uniform_3","normal_1"])
+
+figure('Name','Mean')
+ResultPloter(MeanData, "PathLength",["uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"])
+% figure('Name','std')
+% ResultPloter(stdData, "PathLength",["uniform_1","uniform_3","normal_1"])
+
+figure('Name','Mean')
+ResultPloter(MeanData, "NumberOfCOnfig",["uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"])
 % figure('Name','std')
 % ResultPloter(stdData, "NumberOfCOnfig",["uniform_1","uniform_3","normal_1"])
 

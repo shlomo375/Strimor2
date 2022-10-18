@@ -16,7 +16,7 @@ for ii = 1:numel(StartDS.Files)
     File = read(StartDS);
     if TwoTree
         try
-        File(File.time > time,:) = [];
+            File(File.time > time,:) = [];
         end
     end
     NumberOfCOnfig = NumberOfCOnfig + size(File,1);
@@ -38,16 +38,30 @@ if TwoTree
 end
 
 if TwoTree
-    try
-    [OK, PathFromStart, PathLengthStart] = Scanner(StartDS,ConnectedOrTargetNode,"Path");
+    if isnan(Isomorphism)
+        try
+            [OK, PathFromStart, PathLengthStart] = Scanner(StartDS,ConnectedOrTargetNode,"Path");
+                
+            [OK2, PathFromTarget, PathLengthTarget] = Scanner(TargetDS,ConnectedOrTargetNode,"FlipAndPath");
+            
+            Path = [PathFromTarget(1:end-1,:); PathFromStart];
         
-    [OK2, PathFromTarget, PathLengthTarget] = Scanner(TargetDS,ConnectedOrTargetNode,"FlipAndPath");
-    
-    Path = [PathFromTarget(1:end-1,:); PathFromStart];
-
-    PathLength = PathLengthStart + PathLengthTarget + 2;
-    catch e
-        d=5
+            PathLength = PathLengthStart + PathLengthTarget + 2;
+        catch e
+            d=5
+        end
+    else
+        try
+            [OK, PathFromStart, PathLengthStart] = ScannerIsomorphism(StartDS,ConnectedOrTargetNode,"Path",Isomorphism);
+                
+            [OK2, PathFromTarget, PathLengthTarget] = ScannerIsomorphism(TargetDS,ConnectedOrTargetNode,"FlipAndPath",Isomorphism);
+            
+            Path = [PathFromTarget(1:end-1,:); PathFromStart];
+        
+            PathLength = PathLengthStart + PathLengthTarget + 2;
+        catch e
+            d=6
+        end
     end
 else
     [OK, Path, PathLength] = Scanner(StartDS,ConnectedOrTargetNode,"Path");

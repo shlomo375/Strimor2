@@ -1,19 +1,20 @@
 clear;
 % 
 % close all;
-
+  
 %% Creat Tree Dir for pair of config, one from start, one from target.
 ModuleRange = 16:23; % number of modules in the tree
 TreeType = ["normal_1","uniform_1","uniform_3","uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]; %mast to be unique names  "normal_1","uniform_1","uniform_3"
-TreeRange = 1:200;
+TreeRange = 1:75;
 %%
 
 
 SoftwareLocation = pwd;
 AddDirToPath;
 cd(SoftwareLocation);
-movefile(fullfile(SoftwareLocation,"RRTtree","Results","AllTreeResulte","*"),"AllTreeResulte");
-
+try
+    movefile(fullfile(SoftwareLocation,"RRTtree","Results","AllTreeResulte","*"),"AllTreeResulte");
+end
 try   
 mkdir("RRTtree\Results\TimeLog");
 q=[];
@@ -24,8 +25,8 @@ Info.RowNumData.parameter = 1;
 TreeFolder=[];
 AllResultFolder = fullfile(SoftwareLocation,"AllTreeResulte");
 
- delete(gcp('nocreate'));    
- p =  parpool(maxNumCompThreads);
+%  delete(gcp('nocreate'));    
+%  p =  parpool(maxNumCompThreads);
 
 TreesFolder = fullfile("RRTtree","Results");
 tbl = table();

@@ -2,9 +2,9 @@ clear;
 close all;
 % clear Taskmaster
 %% Creat Tree Dir for pair of config, one from start, one from target.
-ModuleRange = 10:20; % number of modules in the tree
-TreeType = ["uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%"normal_1","uniform_1","uniform_3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
-TreeIndexes = 1:200;
+ModuleRange = 16:20; % number of modules in the tree
+TreeType = ["uniform_IM1Axis__3"]%,"uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
+TreeIndexes = 1:50;
 %%
 
 
@@ -13,7 +13,7 @@ AddDirToPath;
 cd(SoftwareLocation);
 
 % OriginalOrBeckUp = "Results"%"Results"%"BeckupResults","BlankTree"
-for OriginalOrBeckUp = ["Results","BeckupResults","BlankTree"] %"Results",,"BlankTree"
+for OriginalOrBeckUp = ["BlankTree"]%,"Results","BeckupResults"]%,"BlankTree"] %"Results",,"BlankTree"
 % SuccessDir = fullfile(extractBefore(TreeFolder,digitsPattern+"N\"),"AllTreeResulte");
 mkdir(fullfile(SoftwareLocation,"RRTtree",OriginalOrBeckUp,"AllTreeResulte"));
 

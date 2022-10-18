@@ -27,7 +27,10 @@ if isempty(ConnectedNode)
 end
 
 [MinTime,MinNodeLoc] = min(ConnectedNode.time);
-ConnectedNode = ConnectedNode(MinNodeLoc(1),:);
+ConnectedNode(ConnectedNode.time>MinTime,:) = [];
+
+[MinLevel,MinLevelLoc] = min(ConnectedNode.Level);
+ConnectedNode = ConnectedNode(MinLevelLoc,:);
 
 
 
