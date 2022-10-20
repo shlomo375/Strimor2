@@ -38,19 +38,7 @@ if TwoTree
 end
 
 if TwoTree
-    if isnan(Isomorphism)
-        try
-            [OK, PathFromStart, PathLengthStart] = Scanner(StartDS,ConnectedOrTargetNode,"Path");
-                
-            [OK2, PathFromTarget, PathLengthTarget] = Scanner(TargetDS,ConnectedOrTargetNode,"FlipAndPath");
-            
-            Path = [PathFromTarget(1:end-1,:); PathFromStart];
-        
-            PathLength = PathLengthStart + PathLengthTarget + 2;
-        catch e
-            d=5
-        end
-    else
+    
         try
             [OK, PathFromStart, PathLengthStart] = ScannerIsomorphism(StartDS,ConnectedOrTargetNode,"Path",Isomorphism);
                 
@@ -62,7 +50,7 @@ if TwoTree
         catch e
             d=6
         end
-    end
+
 else
     [OK, Path, PathLength] = Scanner(StartDS,ConnectedOrTargetNode,"Path");
     OK2 = 1;

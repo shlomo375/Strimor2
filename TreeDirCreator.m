@@ -2,9 +2,9 @@ clear;
 close all;
 % clear Taskmaster
 %% Creat Tree Dir for pair of config, one from start, one from target.
-ModuleRange = 16:20; % number of modules in the tree
-TreeType = ["uniform_IM1Axis__3"]%,"uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
-TreeIndexes = 1:50;
+ModuleRange = 10:15; % number of modules in the tree
+TreeType = ["OneTree_IM1Axis"]%,"uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
+TreeIndexes = 1;
 %%
 
 

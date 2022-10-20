@@ -1,14 +1,18 @@
 clear
-SoftwareLocation = 'C:\Users\shlom\OneDrive - Ariel University\Documents\לימודים\תואר שני\תזה\triangles';
-% addpath(genpath(SoftwareLocation));
+SoftwareLocation = pwd;
+AddDirToPath;
 
-PairsNum = 1;
+PairsNum = 5;
 Stock = [];
 ConfigPairs = [];
-for AgentNum = 16
+for AgentNum = 40
     CP = GetConfigPairs(AgentNum,PairsNum);
-    load(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
-    ConfigPairs = [ConfigPairs,CP];
+    try
+        load(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+        ConfigPairs = [ConfigPairs,CP];
+    catch
+        ConfigPairs = CP;
+    end
     save(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
 end
 

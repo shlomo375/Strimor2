@@ -55,7 +55,7 @@ while true
         while tree.LastIndex < MaxConfigIter
             if LastIndex == tree.LastIndex
                 stackProgress = stackProgress +1;
-                if stackProgress==10
+                if stackProgress==tree.LastIndex*10+100
                     return
                 end
             else

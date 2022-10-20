@@ -1,46 +1,65 @@
 clear
-SoftwareLocation = 'C:\Users\shlom\OneDrive - Ariel University\Documents\לימודים\תואר שני\תזה\triangles';
-% addpath(genpath(SoftwareLocation));
+SoftwareLocation = pwd;
+AddDirToPath;
 Folder = fullfile("AllTreeResulte");
 fprintf("ds")
 ds = fileDatastore(Folder,"IncludeSubfolders",false,"ReadFcn",@load,'UniformRead',true);
 % 
 % 
 
-fprintf("readall");
-data = readall(ds,"UseParallel", true);%,"UseParallel", true
-Data = struct2table(data);
+% fprintf("readall");
+% data = readall(ds,"UseParallel", true);%,"UseParallel", true
+% Data = struct2table(data);
+% save("AllDataRAW.mat","Data");
+load("AllDataRAW.mat","Data");
+deleteRow = [];
+deleteTree = [];
+TreeLoc = [];
+for ii =1:size(Data,1)
+    if ~mod(ii,100)
+        ii
+    end
+    TreeLoc = [TreeLoc;double(string(extractBetween(Data.ResultFileName{ii},"tree_",".mat"))),double(string(extractBetween(Data.ResultFileName{ii},"Results-","N-")))];
+    if abs(Data.PathLength(ii))==1
+        
+        deleteTree = [deleteTree; double(string(extractBetween(Data.ResultFileName{ii},"tree_",".mat"))),double(string(extractBetween(Data.ResultFileName{ii},"Results-","N-")))];
+    else
+        if isempty(Data.PathLength(ii))
+            deleteTree = [deleteTree; double(string(extractBetween(Data.ResultFileName{ii},"tree_",".mat"))),double(string(extractBetween(Data.ResultFileName{ii},"Results-","N-")))];
+        end
+    
+    end
+end
+deleteRow = ismember(TreeLoc,deleteTree,'rows');
+Data(deleteRow,:)=[];
+
 fprintf("save");
     
-Data = [Data,table(string(extractBetween(ds.Files,"Results-","-tree","Boundaries","exclusive")),'variableNames',"TreeName"),...
-    table(double(string(extractBetween(ds.Files,"Results-","N-","Boundaries","exclusive"))),'VariableNames',"N"),...
-    table(string(extractBetween(ds.Files,"N-","-tree","Boundaries","exclusive")),'variableNames',"TreeType")];
-M = table(ones(size(Data,1),1),'VariableNames',"M");
-M(contains(Data.TreeName,"C2T"),"M")=table(double(extractAfter(Data.TreeName(contains(Data.TreeName,"C2T")),"_m")));
-Data = [Data,M];
-Data = [Data, table(Data.TreeType,'VariableNames',"type")];
-Data.type(contains(Data.TreeName,"C2T")) = "C2T";
+Data = [Data,table(string(extractBetween(Data.ResultFileName,"Results-","-tree","Boundaries","exclusive")),'variableNames',"TreeName"),...
+    table(double(string(extractBetween(Data.ResultFileName,"Results-","N-","Boundaries","exclusive"))),'VariableNames',"N"),...
+    table(string(extractBetween(Data.ResultFileName,"N-","-tree","Boundaries","exclusive")),'variableNames',"TreeType")];
+% Data = [Data, table(Data.TreeType,'VariableNames',"type")];
 
-% p = anovan(Data.PathLength,{Data.N Data.M Data.type},'model','interaction','varnames',{'N','M','type'})
-Data(abs(Data.PathLength)==1,:) = [];
 
-save("AllData.mat","Data");
-% load("AllData.mat","Data");
+% save("AllData.mat","Data");
+load("AllData.mat","Data");
 
 Names = unique(Data.TreeName);
-VariableType = {'double','double','double','string'};
-MeanData = table('Size',[numel(Names), 4],'VariableType',VariableType,'VariableNames',["NumberOfCOnfig","PathLength","N","name"])
+VariableType = {'double','double','double','string','double'};
+MeanData = table('Size',[numel(Names), 5],'VariableType',VariableType,'VariableNames',["NumberOfCOnfig","PathLength","N","name","NamberOfTrees"])
 stdData = MeanData;
 for ii = 1:numel(Names)
-    NameLoc=matches(Data.TreeName,Names(ii)) & double(extractBetween(Data.ResultFileName,"tree_",".mat"))<=50;
+    NameLoc=matches(Data.TreeName,Names(ii)) & double(extractBetween(Data.ResultFileName,"tree_",".mat"))<=55;
     MeanData(ii,:) = table(mean(Data{NameLoc,"NumberOfCOnfig"}),...
                               mean(Data{NameLoc,"PathLength"}),...
                               double(string(extractBefore(Names(ii),"N"))),...
-                              string(extractAfter(Names(ii),"N-")),'RowNames',Names(ii));
+                              string(extractAfter(Names(ii),"N-")),...
+                              size(Data{NameLoc,"NumberOfCOnfig"},1),'RowNames',Names(ii));
     stdData(ii,:) = table(std(Data{NameLoc,"NumberOfCOnfig"}),...
                               std(Data{NameLoc,"PathLength"}),...
                               double(string(extractBefore(Names(ii),"N"))),...
-                              string(extractAfter(Names(ii),"N-")),'RowNames',Names(ii));
+                              string(extractAfter(Names(ii),"N-")),...
+                              size(Data{NameLoc,"NumberOfCOnfig"},1),'RowNames',Names(ii));
 
 
 end
@@ -82,20 +101,20 @@ ResultPloter(MeanData, "NumberOfCOnfig",["uniform_IM1Axis__3","uniform_IM2Axis__
 % figure('Name','std')
 % ResultPloter(stdData, "NumberOfCOnfig",["uniform_1","uniform_3","normal_1"])
 
-figure('Name','Mean')
-ResultPloter(MeanData, "PathLength",["TwoTree","uniform_1"])
-% figure('Name','std')
-% ResultPloter(stdData, "PathLength",["TwoTree","OneTree"])
-
-figure('Name','Mean')
-ResultPloter(MeanData, "NumberOfCOnfig",["TwoTree","uniform_1"])
-% figure('Name','std')
-% ResultPloter(stdData, "NumberOfCOnfig",["TwoTree","OneTree"])
-
-figure('Name','Mean')
-ResultPloter(MeanData, "PathLength",["TwoTree","OneTree"])
-% figure('Name','std')
-% ResultPloter(stdData, "PathLength",["TwoTree","OneTree"])
-
-figure('Name','Mean')
-ResultPloter(MeanData, "NumberOfCOnfig",["TwoTree","OneTree"])
+% figure('Name','Mean')
+% ResultPloter(MeanData, "PathLength",["TwoTree","uniform_1"])
+% % figure('Name','std')
+% % ResultPloter(stdData, "PathLength",["TwoTree","OneTree"])
+% 
+% figure('Name','Mean')
+% ResultPloter(MeanData, "NumberOfCOnfig",["TwoTree","uniform_1"])
+% % figure('Name','std')
+% % ResultPloter(stdData, "NumberOfCOnfig",["TwoTree","OneTree"])
+% 
+% figure('Name','Mean')
+% ResultPloter(MeanData, "PathLength",["TwoTree","OneTree"])
+% % figure('Name','std')
+% % ResultPloter(stdData, "PathLength",["TwoTree","OneTree"])
+% 
+% figure('Name','Mean')
+% ResultPloter(MeanData, "NumberOfCOnfig",["TwoTree","OneTree"])
