@@ -35,31 +35,31 @@ if TwoTree
     end
     NumberOfCOnfig = NumberOfCOnfig + size(File,1);
     end
-end
-
-if TwoTree
     
-        try
-            [OK, PathFromStart, PathLengthStart] = ScannerIsomorphism(StartDS,ConnectedOrTargetNode,"Path",Isomorphism);
-                
-            [OK2, PathFromTarget, PathLengthTarget] = ScannerIsomorphism(TargetDS,ConnectedOrTargetNode,"FlipAndPath",Isomorphism);
+    try
+        [OK, PathFromStart, PathLengthStart] = ScannerIsomorphism(StartDS,ConnectedOrTargetNode,"Path",Isomorphism);
             
-            Path = [PathFromTarget(1:end-1,:); PathFromStart];
+        [OK2, PathFromTarget, PathLengthTarget] = ScannerIsomorphism(TargetDS,ConnectedOrTargetNode,"FlipAndPath",Isomorphism);
         
-            PathLength = PathLengthStart + PathLengthTarget + 2;
-        catch e
-            d=6
-        end
+        Path = [PathFromTarget(1:end-1,:); PathFromStart];
+    
+        PathLength = PathLengthStart + PathLengthTarget + 2;
+    catch e
+        d=6
+    end
 
 else
-    [OK, Path, PathLength] = Scanner(StartDS,ConnectedOrTargetNode,"Path");
+    PathLength = ConnectedOrTargetNode{1,"Level"}+1;
+    try
+        [OK, Path] = Scanner(StartDS,ConnectedOrTargetNode,"Path");
+    end
     OK2 = 1;
 end
 
 % PathLength = size(Path,1);
-
-if ~OK || ~OK2
-    PathLength = -1;
+try
+    if ~OK || ~OK2
+        PathLength = -1;
+    end
 end
-
 end

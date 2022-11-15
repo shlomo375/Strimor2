@@ -10,11 +10,14 @@ time = [];
 try        
     ds = fileDatastore(TreeFolder,"IncludeSubfolders",true,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
     if any(contains(ds.Files,"success"))
-        [NumberOfCOnfig, PathLength, ~, time] = ExtructTreeDataRepaire(TreeFolder);
+        try
+            [NumberOfCOnfig, PathLength] = ExtructTreeDataRepaire(TreeFolder);
+        end
         return
     end
 catch e
     e
+    
 end
 
 TreeProp(2) = TreeProperties(TreeFolder,"Target");
@@ -108,7 +111,7 @@ while true
         end
         
         if Connect
-%             for ConnectedNode_idx = 1:size(ConnectedNode,1)
+            for ConnectedNode_idx = 1:size(ConnectedNode,1)
                 if ~isnan(tree.NumOfIsomorphismAxis)
                     [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeDataIsomorphism(TreeFolder,ConnectedNode,tree.NumOfIsomorphismAxis);
                 else
@@ -123,7 +126,7 @@ while true
                 if PathLength ~= -1
 %                     break
                 end
-%             end
+            end
              
             return
         end

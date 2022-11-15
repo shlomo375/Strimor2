@@ -54,7 +54,8 @@ classdef WorkSpace
     
     methods
         
-        function WS = WorkSpace(Size,algoritem)
+        function WS = WorkSpace(Size,algoritem,Lite)
+            index = num2cell(1:prod(Size));
             WS.Space = WorkSpace.SpaceStructure(Size);
 %             [WS.Space.index] = index{:};
             WS.SpaceSize = Size;
@@ -301,16 +302,16 @@ classdef WorkSpace
             end
             
             if ~isempty(text)
-                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc')));
+                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc')),[],[],MoveNumText);
             else
-                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc));
+                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc),[],[],[],MoveNumText);
             end
            axis equal;
 %             xlim([])
         end
         
         function [WS, AgentLoc] = GetAgentFromUser(WS,Status)
-            PlotWorkSpace(WS,1);
+%             PlotWorkSpace(WS,1);
             exit = 1;
             AgentLoc = [];
             hold on
@@ -509,8 +510,6 @@ classdef WorkSpace
             end
         end
         
-        
-
         function ScannedAgent = ScanningAgents(WS, ScannedAgent, Agent)
             ScannedAgent(Agent) = 1;
 %             r = {WS.R1, WS.R2, WS.R3};

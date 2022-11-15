@@ -1,4 +1,6 @@
 function [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeDataRepaire(Folder)
+Path = [];
+time = [];
 Isomotphism = double(extractBetween(Folder,"_IM","Axis"));
 if ~contains(Folder,"OneTree")
     StartFolder = fullfile(Folder,"Start");

@@ -6,9 +6,9 @@ persistent ConfigNum
 if isstring(Data)
     VarType = {'string','double','double','double','double','string'};
     VarNames = {'Status','Loop','Config','MaxConfig','ConfigPerSec','ConfigNum'};
-    Data = [extractAfter(Data,"N\"),"Total"];
-    Table = table('Size',[5,6],'VariableTypes',VarType,'VariableNames',VarNames,...
-        'RowNames',Data);
+    Data = [extractAfter(Data,"Results\");"Total"];
+    Table = table('Size',[numel(Data),6],'VariableTypes',VarType,'VariableNames',VarNames,...
+        'RowNames',Data)
 else 
     if isnumeric(Data)
         if numel(Data)>1
@@ -27,7 +27,8 @@ else
             Table(TreeName,[1 3 4]) = Data(2:end);
         end
         
-            Table{"Total",3:end-2} = sum(Table{1:end-1,["Config","MaxConfig"]})
+            Table{"Total",3:end-2} = sum(Table{1:end-1,["Config","MaxConfig"]});
+            Table(contains(Table.Status,["search", "save"]),:)
        
     end
 end

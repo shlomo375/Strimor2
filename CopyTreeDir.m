@@ -3,11 +3,11 @@ SoftwareLocation = pwd;
 AddDirToPath;
 
 
-OriginalOrBeckUpBasic = "BlankTree";
+OriginalOrBeckUpBasic = "Results";
 TreeTypeBasic = "uniform_IM1Axis__3";
 TreeType = ["uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"];
-TreeIndexes = [1:50];
-OriginalOrBeckUp = ["BlankTree","Results","BeckupResults"];
+TreeIndexes = [1:200];
+OriginalOrBeckUp = ["Results","BeckupResults"];
 ModuleRange = [16:20];
 
 for Type = TreeType

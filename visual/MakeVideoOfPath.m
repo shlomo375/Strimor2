@@ -6,7 +6,7 @@ MoveNumber = [];
 Loc = [];
 C = [];
 Type = [];
-Path = flip(Path,1);
+% Path = flip(Path,1);
 NumberOfMove = size(Path,1);
 
 
@@ -83,7 +83,7 @@ MoveNumText.y = ylimit(2)-3;
 MoveNumText.value = MoveNumber(1);
 MoveNumText.handel = [];
 
-[p] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1));
+[p,~,MoveNumText] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1),[],[],[],MoveNumText);
 
 if nargin > 4
     saveas(p,stills+"1"+".png");
@@ -102,7 +102,7 @@ for j = 2:size(Loc,2)
 %     xlim([min(Loc(:,:,1),[],'all')-1-sqrt(3)/2, max(Loc(:,:,1),[],'all')+1+sqrt(3)/2]);
 %     ylim([min(Loc(:,:,2),[],'all')-1-sqrt(3)/2, max(Loc(:,:,2),[],'all')+1+sqrt(3)/2]);
     MoveNumText.value = MoveNumber(j);
-    [p] = PlotTriangle(permute(Loc(:,j,:),[1 3 2]), Type(:,j), C(:,j),[],p);
+    [p,~,MoveNumText] = PlotTriangle(permute(Loc(:,j,:),[1 3 2]), Type(:,j), C(:,j),[],p,[],MoveNumText);
 %     drawnow
 %     frames(j+video.FrameRate-1) = getframe;
     exportgraphics(gca,string(ImgIdx)+".jpg","Resolution",300)

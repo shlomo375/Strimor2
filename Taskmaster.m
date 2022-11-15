@@ -12,7 +12,7 @@ for ii = 1:numel(WorkerList)
         case "OneTree"
                     WorkerList(ii) = parfeval(@ExpendTree,5,FolderName, info);
 %             ExpendTree(FolderName, info);
-        case "OneTree_IM1Axis"
+        case "OneTree_IM3Axis"
             WorkerList(ii) = parfeval(@ExpendTree,5,FolderName, info);
     
         case "TwoTree"

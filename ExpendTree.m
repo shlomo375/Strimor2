@@ -9,16 +9,16 @@ load(fullfile(TreeFolder,"Target.mat"),"TargetConfig");
 ds = fileDatastore(TreeFolder,"IncludeSubfolders",false,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
 if any(contains(ds.Files,"success"))
 TreeFolder
-try
-     [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeData(TreeFolder,TargetConfig,false);
-catch e
-e
-end
-     save(TreeFolder+"\success.mat","time","Path","PathLength","NumberOfCOnfig");
-     SuccessDir = fullfile(extractBefore(TreeFolder,digitsPattern+"N\"),"AllTreeResulte");
-     mkdir(SuccessDir);
-     ResultFileName = replace(extractAfter(TreeFolder,"RRTtree\"),"\","-")+".mat";
-     save(fullfile(SuccessDir,ResultFileName),"ResultFileName","time","Path","PathLength","NumberOfCOnfig");
+    try
+         [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeData(TreeFolder,TargetConfig,false);
+    catch e
+    e
+    end
+    save(TreeFolder+"\success.mat","time","Path","PathLength","NumberOfCOnfig");
+    SuccessDir = fullfile(extractBefore(TreeFolder,digitsPattern+"N\"),"AllTreeResulte");
+    mkdir(SuccessDir);
+    ResultFileName = replace(extractAfter(TreeFolder,"RRTtree\"),"\","-")+".mat";
+    save(fullfile(SuccessDir,ResultFileName),"ResultFileName","time","Path","PathLength","NumberOfCOnfig");
     return
 end
 
@@ -55,7 +55,7 @@ while true
         while tree.LastIndex < MaxConfigIter
             if LastIndex == tree.LastIndex
                 stackProgress = stackProgress +1;
-                if stackProgress==tree.LastIndex*10+100
+                if stackProgress == tree.LastIndex*3+100
                     return
                 end
             else
@@ -76,7 +76,6 @@ while true
                 break
             end
         end
-        
         SaveTree2Files(tree);
         if success
             [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeData(TreeFolder,tree.EndConfig,false);

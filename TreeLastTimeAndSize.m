@@ -7,9 +7,9 @@ for Loc = 1:numel(FileLoc)
     File = subset(ds,FileLoc(Loc));
     try
     data = read(File);
-    end
+    
     Size = Size + size(data,1);
-    try
+    
     LastTime = max([LastTime;data.time(:)]);
     catch e
         e

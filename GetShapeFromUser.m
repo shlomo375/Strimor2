@@ -1,7 +1,10 @@
 %% get shape from user
-close all
+% close all
 clear
-N = 15;
+
+SoftwareLocation = pwd;
+AddDirToPath;
+N = 17;
 
 Size = [ceil(N/2), N];
 BasicWS = WorkSpace(Size,"RRT*");
@@ -9,6 +12,7 @@ BasicWS = WorkSpace(Size,"RRT*");
 figure(2)
 PlotWorkSpace(BasicWS,[]);
 [WSStart, ~] = GetAgentFromUser(BasicWS,1);
+PlotWorkSpace(WSStart,[]);
 [WSStart1, ~] = GetAgentFromUser(WSStart,2);
 Configuration = GetConfiguration(WSStart1);
 

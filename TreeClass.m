@@ -86,13 +86,20 @@ classdef TreeClass
         end
     
         function num = RandConfig(Tree,LastIndex,n)
+            
             if nargin ==2
                 visit = Tree.Visits(1:LastIndex);
-                Cost2Target = Tree.Cost2Target(1:LastIndex);
+                try
+                    Cost2Target = Tree.Cost2Target(1:LastIndex);
+                end
                 n=1;
             else
+                
                 visit = Tree.Visits;
-                Cost2Target = Tree.Cost2Target;
+                LastIndex = numel(visit);
+                try
+                    Cost2Target = Tree.Cost2Target;
+                end
             end
             visit(visit==0)=1;
 %%
@@ -111,7 +118,7 @@ classdef TreeClass
 %             end
  %%           
 %               num = randsrc(n,1,[1:size(prob,1);prob']);
-          num = randi(numel(prob),n,1);
+          num = randi(LastIndex,n,1);
 
             
         end
@@ -323,7 +330,7 @@ classdef TreeClass
            tree.N = n;
            tree.FolderName = folder;
            tree.DataLength = dataLength;
-           tree.NumOfIsomorphismAxis = double(extractBetween(folder,"uniform_IM","Axis"));
+           tree.NumOfIsomorphismAxis = double(extractBetween(folder,"_IM","Axis"));
            VarName = {'time','Index','ParentIndex','Type','Level','Cost', ...
                'Dir','Step','ConfigRow','ConfigCol','ParentRow','ParentCol',...
                'Visits','Cost2Target','ConfigStr','ParentStr','ConfigMat',...
@@ -336,7 +343,7 @@ classdef TreeClass
 
            tree.Data = table('Size',[dataLength,numel(VarName)],'VariableTypes',VarType,'VariableNames',VarName);
            
-           if numel(StartConfig)<size(tree.Data,2)
+           if numel(StartConfig)<size(tree.Data,2) || numel(size(StartConfig.IsomorphismMatrices1))<3
               try
                   StartConfigMat = StartConfig.ConfigMat{:};
                   Type = StartConfig.Type;
@@ -346,12 +353,25 @@ classdef TreeClass
               end
               ConfigFullType = GetFullType(StartConfigMat,Type);
                [StartConfigIsomorphism, StartConfigIsomorphismStr,IsomorpSizes] = CreatIsomorphismMetrices(StartConfigMat,ConfigFullType);
-               StartConfig = [StartConfig(1,1:end-1), table(StartConfigIsomorphism(1)...
-                   ,StartConfigIsomorphism(2),StartConfigIsomorphism(3),...
-                   StartConfigIsomorphismStr(1),StartConfigIsomorphismStr(2),StartConfigIsomorphismStr(3),IsomorpSizes(1,1),IsomorpSizes(1,2),IsomorpSizes(2,1),IsomorpSizes(2,2),IsomorpSizes(3,1),IsomorpSizes(3,2),...
-                   'VariableNames',{'IsomorphismMatrices1','IsomorphismMatrices2'...
-                   ,'IsomorphismMatrices3','IsomorphismStr1','IsomorphismStr2','IsomorphismStr3','IsoSiz1r','IsoSiz1c','IsoSiz2r','IsoSiz2c','IsoSiz3r','IsoSiz3c'})];
+               if numel(size(StartConfig.IsomorphismMatrices1))<3
+                    StartConfig(1,["IsomorphismMatrices1","IsomorphismMatrices2"...
+                       ,"IsomorphismMatrices3","IsomorphismStr1","IsomorphismStr2", ...
+                       "IsomorphismStr3","IsoSiz1r","IsoSiz1c","IsoSiz2r", ...
+                       "IsoSiz2c","IsoSiz3r","IsoSiz3c"]) = {StartConfigIsomorphism(1)...
+                       ,StartConfigIsomorphism(2),StartConfigIsomorphism(3),...
+                       StartConfigIsomorphismStr(1),StartConfigIsomorphismStr(2),...
+                       StartConfigIsomorphismStr(3),IsomorpSizes(1,1),IsomorpSizes(1,2),...
+                       IsomorpSizes(2,1),IsomorpSizes(2,2),IsomorpSizes(3,1),IsomorpSizes(3,2)};
+               else
+                   StartConfig = [StartConfig(1,1:end-1), table(StartConfigIsomorphism(1)...
+                       ,StartConfigIsomorphism(2),StartConfigIsomorphism(3),...
+                       StartConfigIsomorphismStr(1),StartConfigIsomorphismStr(2),StartConfigIsomorphismStr(3),IsomorpSizes(1,1),IsomorpSizes(1,2),IsomorpSizes(2,1),IsomorpSizes(2,2),IsomorpSizes(3,1),IsomorpSizes(3,2),...
+                       'VariableNames',{'IsomorphismMatrices1','IsomorphismMatrices2'...
+                       ,'IsomorphismMatrices3','IsomorphismStr1','IsomorphismStr2','IsomorphismStr3','IsoSiz1r','IsoSiz1c','IsoSiz2r','IsoSiz2c','IsoSiz3r','IsoSiz3c'})];
+               end
            end
+
+
            tree.Data(1,:) = StartConfig; %index,ConfigDec,parent,dir,step,agent*n
            
            if nargin >= 5
@@ -363,24 +383,18 @@ classdef TreeClass
                FullType = GetFullType(varargin{1}.ConfigMat{:},varargin{1}.Type);
                [tree.EndConfig_IsomorphismMetrices,tree.EndConfig_IsomorphismStr,tree.EndConfig_IsomorphismSizes] = CreatIsomorphismMetrices(varargin{1}.ConfigMat{:},FullType,tree.EndConfig_RotationMatrices);
            end
-%            tree.Data(:,tree.DataIndex.Visits) = ones(tree.DataLength,1);
-%            tree.LocInMainTree = zeros(tree.DataLength,1);
-%            if ~isempty(varargin)
-%                tree.StartConfig = varargin{1};
-%                tree = Set(tree, 1, ...
-%                             "Index" , 1                      , ...
-%                             "ConfigStr"   , tree.StartConfig.Str   , ...
-%                             "ConfigRow", tree.StartConfig.Row, ...
-%                             "ConfigCol", tree.StartConfig.Col, ...
-%                             "Type"  , tree.StartConfig.Type  , ...
-%                             "Parent", -1                     , ...
-%                             "ConfigMat", tree.StartConfig.Status, ...
-%                             "Visits", 2                      );
-%                if numel(varargin) == 2
-%                     tree.EndConfig = varargin{2};
-%                end
-%            end
+
            tree.StartTime = datetime;
+        end
+        
+        function tree = SetEndConfig(tree,NewConfig)
+            tree.EndConfig = NewConfig;
+            WSEndConfig = WorkSpace(size(NewConfig.ConfigMat{:}),"RRT*");
+
+           tree.EndConfig_RotationMatrices = {WSEndConfig.R1, WSEndConfig.R2, WSEndConfig.R3};
+            
+           FullType = GetFullType(NewConfig.ConfigMat{:},NewConfig.Type);
+           [tree.EndConfig_IsomorphismMetrices,tree.EndConfig_IsomorphismStr,tree.EndConfig_IsomorphismSizes] = CreatIsomorphismMetrices(NewConfig.ConfigMat{:},FullType,tree.EndConfig_RotationMatrices);
         end
 
         function tree = SaveTree(tree, varargin)
