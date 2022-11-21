@@ -11,7 +11,7 @@ IsomorphismMetrices = cell(1,3);
 [IsomorphismMetrices{1},GroupIndexes] = ConfigGroupSizes(ConfigMat,ConfigType);
 IsomorpSizes(1,1:2) = size(IsomorphismMetrices{1});
 
-IsomorphismMetrices{1}(:,:,2) = CreatGroupZoneMatrix(IsomorphismMetrices{1},GroupIndexes);
+IsomorphismMetrices{1}(:,:,2) = CreatGroupZoneMatrix2(IsomorphismMetrices{1},ConfigType,ConfigMat,GroupIndexes);
 
 
 IsomorphismStr(1) = join(string(IsomorphismMetrices{1}(:))',"");
@@ -21,7 +21,7 @@ for Axis = 2:3
     [IsomorphismMetrices{Axis},GroupIndexes] = ConfigGroupSizes(Temp,TempType);
     
     IsomorpSizes(Axis,1:2) = size(IsomorphismMetrices{Axis});
-    IsomorphismMetrices{Axis}(:,:,2) = CreatGroupZoneMatrix(IsomorphismMetrices{Axis},GroupIndexes);
+    IsomorphismMetrices{Axis}(:,:,2) = CreatGroupZoneMatrix2(IsomorphismMetrices{Axis},Temp,TempType,GroupIndexes);
     IsomorphismStr(Axis) = join(string(IsomorphismMetrices{Axis}(:))',"");
     
 end
