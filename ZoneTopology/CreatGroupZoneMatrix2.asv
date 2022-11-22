@@ -1,5 +1,6 @@
 function GroupZoneMatrix = CreatGroupZoneMatrix2(GroupMatrix,ConfigType,ConfigMat,GroupIndexes)
-GroupZoneMatrix = zeros(size(GroupMatrix));
+ConfigMat
+GroupZoneMatrix = zeros([size(GroupMatrix),2]);
 
 ConfigMat(ConfigMat~=0) = 1;
 HoleMat = ~ConfigMat;
@@ -21,31 +22,47 @@ for Line = 1:MaxLine
                 ConvMatrix(:,end) = [];
             end
             
-            switch Line
-                case 1
-                    Value = conv2(HoleMat(Line+1,:),flip(ConvMatrix(3,:)),'valid');
-                    ZoneLoc = find(Value == sum(abs(ConvMatrix(3,:))));
-                case MaxLine
-                    Value = conv2(HoleMat(Line-1,:),flip(ConvMatrix(1,:)),'valid');
-                    ZoneLoc = find(Value == sum(abs(ConvMatrix(1,:))));
-                otherwise
-                    Value = conv2(HoleMat(Line-1:Line+1,:),flip(flip(ConvMatrix),2),'valid');
-                    ZoneLoc = find(Value == sum(abs(ConvMatrix),'all'));
+            if Line ~= MaxLine
+                HoleVec = ConvMatrix(3,:);
+                if ~HoleVec(1)
+                    HoleVec(1) = [];
+                end
+                TopHoleValue = conv(HoleMat(Line+1,:),flip(HoleVec),'valid');
+                TopZoneLoc = find(TopHoleValue == sum(abs(HoleVec)));
+            else
+                TopZoneLoc = [];
             end
-            if isempty(ZoneLoc)
-                continue
+            if Line ~= 1
+                HoleVec = ConvMatrix(1,:);
+                if ~HoleVec(1)
+                    HoleVec(1) = [];
+                end
+                ButtomHoleValue = conv(HoleMat(Line-1,:),flip(HoleVec),'valid');
+                ButtomZoneLoc = find(ButtomHoleValue == sum(abs(HoleVec)));
+            else
+                ButtomZoneLoc = [];
             end
+%             switch Line
+%                 case 1
+%                     Value = conv2(HoleMat(Line+1,:),flip(ConvMatrix(3,:)),'valid');
+%                     ZoneLoc = find(Value == sum(abs(ConvMatrix(3,:))));
+%                 case MaxLine
+%                     Value = conv2(HoleMat(Line-1,:),flip(ConvMatrix(1,:)),'valid');
+%                     ZoneLoc = find(Value == sum(abs(ConvMatrix(1,:))));
+%                 otherwise
+%                     Value = conv2(HoleMat(Line-1:Line+1,:),flip(flip(ConvMatrix),2),'valid');
+%                     ZoneLoc = find(Value == sum(abs(ConvMatrix),'all'));
+%             end
+            
             %The gap index is of the left edge of the gap, so if the overlap is
             % less then the gap index, it means that it has reached the
             % area to the left of the gap
             GroupIndex = GroupIndexes{Line}{Col}';
-            [0, diff(ZoneLoc) == 2]
-            GroupZone = find(any((GroupIndex - ZoneLoc')<0,2),1);
 
-            if isempty(GroupZone)
-                GroupZone = numel(ZoneLoc)+1;
-            end
-            GroupZoneMatrix(Line,Col) = GroupZone;
+            GroupZoneMatrix(Line,Col,1) = GetZoneOfGroup(TopZoneLoc,GroupIndex);
+            GroupZoneMatrix(Line,Col,2) = GetZoneOfGroup(ButtomZoneLoc,GroupIndex);
+            
+
         else
             break
         end

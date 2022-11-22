@@ -71,17 +71,6 @@ while true
     
             WS = SetConfigurationOnSpace(BasicWS, Config);
             Parts =  AllSlidingParts(WS);
-%             [tree,success] = MovingEachIndividualPartPCDepth(tree, WS, Parts, NodeIndex);
-        
-%             if success
-%                 fprintf("success!!!\n");
-%                 SaveTree2Files(tree);
-% %                 Resulte = GetResulteData(TreeFolder);
-%                 Resulte = "success";
-%                 save(TreeProperty.Folder+"\success.mat","Resulte");
-%                 break
-%             end
-
 
             Combinations = MakeRandomPartsCombinations(Parts,Info.RowNumData);  
 
