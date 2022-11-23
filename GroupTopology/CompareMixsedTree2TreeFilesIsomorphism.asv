@@ -18,12 +18,14 @@ if any(FileConfigLoc)
     FilesConnectedNode = FileData(FileConfigLoc,:);
     TreeConnectedNode = Data(DataConfigLoc(DataConfigLoc>0),:);
     %
-    for idx = 1:size(ConnectedNode,1)
-        Match = CompareZoneInfMatrix(FilesConnectedNode{idx,MatrixLable(Axis)}{1}(:,:,2:3),ZoneMatrix2);
+    for idx = 1:size(FilesConnectedNode,1)
+        if CompareZoneInfMatrix(FilesConnectedNode{idx,MatrixLable(Axis)}{1},TreeConnectedNode{idx,MatrixLable(Axis)}{1});
+            TreeConnectedNode.time = max(FilesConnectedNode.time,TreeConnectedNode.time);
+            ConnectedNode = [ConnectedNode; TreeConnectedNode(idx,:)];
+        end
     end
     %
-    TreeConnectedNode.time = max(FilesConnectedNode.time,TreeConnectedNode.time);
-    ConnectedNode = [ConnectedNode; TreeConnectedNode];
+    
 end
 
 end
