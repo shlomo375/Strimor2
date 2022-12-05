@@ -21,7 +21,7 @@ if any(FileConfigLoc)
     for idx = 1:size(FilesConnectedNode,1)
         if CompareZoneInfMatrix(FilesConnectedNode{idx,MatrixLable(Axis)}{1},TreeConnectedNode{idx,MatrixLable(Axis)}{1});
             TreeConnectedNode.time = max(FilesConnectedNode.time,TreeConnectedNode.time);
-            ConnectedNode = [ConnectedNode; TreeConnectedNode];
+            ConnectedNode = [ConnectedNode; TreeConnectedNode(idx,:)];
         end
     end
     %

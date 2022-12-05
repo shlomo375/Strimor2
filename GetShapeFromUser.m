@@ -4,7 +4,7 @@ clear
 
 SoftwareLocation = pwd;
 AddDirToPath;
-N = 17;
+N = 9;
 
 Size = [ceil(N/2), N];
 BasicWS = WorkSpace(Size,"RRT*");

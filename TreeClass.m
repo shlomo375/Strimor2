@@ -498,8 +498,8 @@ classdef TreeClass
 %                     disp(parentExist)
 %                     ParentLoc = ree;
 %                 end
-            catch e
-                throw(e)
+            catch ME_UpdateTree
+                ME_UpdateTree
             end
         end
         

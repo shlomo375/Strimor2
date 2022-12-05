@@ -36,5 +36,5 @@ if ~isempty(Text)
     t = text(CenterLoc(:,1),CenterLoc(:,2),num2str(Text),'FontSize',9,'HorizontalAlignment','center');
 end
 
-
+set(gca, 'Visible', 'off')
 end

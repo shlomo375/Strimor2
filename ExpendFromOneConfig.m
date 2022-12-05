@@ -1,71 +1,72 @@
-function [TreeName, TotalTreeNode, ConfigPerSec] = ExpendFromOneConfig(TaskData,TreeFolder, Info)
-Q = TaskData{1};
+function [TreeName, TotalTreeNode, ConfigPerSec] = ExpendCompleteTree(TreeFolder, Info)
 TotalTreeNode = 0;
 ConfigPerSec = 0;
 
 TreeName = extractAfter(TreeFolder,"Results\"); 
-load(fullfile(TreeFolder,"Target.mat"),"TargetConfig");
-        
-ds = fileDatastore(TreeFolder,"IncludeSubfolders",false,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
+load(fullfile(TreeFolder,"CompleteTree","Target.mat"),"TargetConfig");
+
+ds = fileDatastore(fullfile(TreeFolder,"CompleteTree"),"IncludeSubfolders",false,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
 if any(contains(ds.Files,"success"))
     return
 end
 
-[Data,FileIndex] = GetVariablesFromDs(ds,["Visits","Cost2Target"]);
-data.Visits = Data(:,1);
-data.Cost2Target = Data(:,2);
+ds.Files(~contains("size")) = [];
 
-if numel(data.Visits)<Info.iteration
-    NodeIndex = TreeClass.RandConfig(data,[],numel(data.Visits));
-else
-    NodeIndex = TreeClass.RandConfig(data,[],Info.iteration);
-end
-RootConfig = GetVariablesFromDs(ds,[],sort(NodeIndex),FileIndex);
+RandomFileIdx = randi(numel(ds.Files));
+subDS = subset(ds,RandomFileIdx);
+FileData = read(subDS);
+RootConfig = FileData(randi(size(FileData,1)),:);
+
+algorithm ="RRT*"; 
+N = sum(logical(FileData(1,:).ConfigMat{:}),'all');
+tree = TreeClass(fullfile(TreeFolder,"CompleteTree"), N,Info.MaxConfig+500, RootConfig, TargetConfig);
+Size = [N, 2*N];
 
 
-ii=1;
-%for ii = 1:size(RootConfig,1)
-while TotalTreeNode < 1e6
-    MaxConfigIter = Info.MaxConfig + (1000*(randi(6,1)-3));
-    algorithm ="RRT*"; 
-    N = sum(logical(RootConfig(ii,:).ConfigMat{:}),'all');
-    Size = [N, 2*N];
-    tree = TreeClass(TreeFolder, N,MaxConfigIter+500, RootConfig(ii,:),TargetConfig);
+LastIndex = tree.LastIndex;
+stackProgress = 0;
+while tree.LastIndex < Info.MaxConfig
+    if LastIndex == tree.LastIndex
+        stackProgress = stackProgress +1;
+        if stackProgress>tree.LastIndex*3+100
+            return
+        end
+    else
+        LastIndex = tree.LastIndex;
+        stackProgress = 0;
+    end
+
+
     StartTime = tic;
     
     BasicWS = WorkSpace(Size,algorithm);
-    UpdateCostConfig = [];
+    UpdateCostConfig = [];%%
     
-        while tree.LastIndex < MaxConfigIter
-            NodeIndex = TreeClass.RandConfig(tree.Data,tree.LastIndex);
-            [tree, Config.Status, Config.Type] = Get(tree,NodeIndex,"ConfigMat","Type");
-    
-            WS = SetConfigurationOnSpace(BasicWS, Config);
-            Parts =  AllSlidingParts(WS);
-            [tree,success] = MovingEachIndividualPartPCDepth(tree, WS, Parts, NodeIndex);
-            if success
-                fprintf("success!!!");
-                SaveTree2Files(tree,UpdateCostConfig, TaskData);
+        
+    NodeIndex = TreeClass.RandConfig(tree.Data,tree.LastIndex);
+    [tree, Config.Status, Config.Type] = Get(tree,NodeIndex,"ConfigMat","Type");
+
+    WS = SetConfigurationOnSpace(BasicWS, Config);
+    Parts =  AllSlidingParts(WS);
+
+    Combinations = MakeRandomPartsCombinations(Parts,Info.RowNumData);  
+
+    [tree,success] = MovingEachIndividualPartPCDepth(tree, WS, Combinations, NodeIndex);
+
+
+    if success
+        fprintf("success!!!");
+        SaveTree2Files(tree);
 %                 Resulte = GetResulteData(TreeFolder);
-                Resulte = "success";
-                save(TreeFolder+"\success.mat","Resulte");
-                TotalTreeNode = TotalTreeNode + tree.LastIndex;
-                return
-            end
-    %         [Combinations, ~] = MakeRandomPartsCombinations(Parts,10+(Visits>2)*1000);
-%                     [Combinations, ~] = MakeRandomPartsCombinations(Parts,10);
-    
-%             [tree,success] = MovingEachIndividualPartPCDepth(tree, WS, Combinations, NodeIndex);
-            
-            ConfigPerSec = {tree.LastIndex./toc(StartTime)};
-%             send(Q,{TreeName,"search",ii,TotalTreeNode + tree.LastIndex,1e6,round(ConfigPerSec)});
-    
-        end
-        TotalTreeNode = TotalTreeNode + tree.LastIndex;
-    
-    
-    SaveTree2Files(tree,UpdateCostConfig, TaskData);
-%     send(Q,{TreeName,"finish",0,TotalTreeNode ,1e6,round(ConfigPerSec)})
+        Resulte = "success";
+        save(TreeProperty.Folder+"\success.mat","Resulte");
+        
+        break
+    end
+end
+
+SaveTree2Files(tree);
+
 end
 
 end
