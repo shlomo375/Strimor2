@@ -1,5 +1,5 @@
-function Tree = LoadTree(TreeName)
+function tree = LoadTree(TreeName)
 
-load(fullfile(TreeName,"FullTree.mat"),"Tree");
+load(fullfile(TreeName,"FullTree.mat"),"tree");
 
 end

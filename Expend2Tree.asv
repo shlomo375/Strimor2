@@ -20,7 +20,7 @@ catch e
     
 end
 
-TreeProp(2) = TreeProperties(TreeFolder,"Target");
+TreeProp(2) = TreeProperties(TreeFolder,"Target",1);
 TreeProp(1) = TreeProperties(TreeFolder,"Start"); 
 
 
@@ -37,55 +37,50 @@ while true
     
     
     for TargetIndex = 1:size(TreeProp(1).Target,1)
-        if TargetIndex <= size(TreeProp(1).Target,1)
-            Target = TreeProp(1).Target(TargetIndex,:);
-        else
-            Target = TreeProp(1).Target;
-        end
-        
-        TreeProp(1).tree = TreeClass(TreeProp(1).Folder, N,Info.MaxConfig+500, TreeProp(1).tree.Data,Target);
-        
         N = sum(logical(TreeProp(1).Target(1,:).ConfigMat{:}),'all');
         Size = [N, 2*N];
+        TreeProp(1).tree = UpdateTreeTarget(TreeProp(1).tree,TreeProp(1).Target(TargetIndex,:));
+        TreeProp(2) = TreeProperties(TreeFolder,"Target",TargetIndex);
+        
         
         TreeTurn = logical([1,0]);
         TreeProperty = TreeProp(TreeTurn);
         while true
 
-            tree.AddDuration = TreeProperty.FinalDuration;
+            TreeProperty.tree.AddDuration = TreeProperty.FinalDuration;
             
             BasicWS = WorkSpace(Size,algorithm);
-            MaxNumOfConfig = TreeProperty.TotalNodes/2+5;
+            MaxNumOfConfig = TreeProperty.TotalNodes/2+10;
             if MaxNumOfConfig > 1e5
                 MaxNumOfConfig = 1e5;
             end
             
             try
-                LastIndex = tree.LastIndex;
+                LastIndex = TreeProperty.tree.LastIndex;
                 stackProgress = 0;
-                while tree.LastIndex < MaxNumOfConfig
-                    if LastIndex == tree.LastIndex
+                while TreeProperty.tree.LastIndex < MaxNumOfConfig
+                    if LastIndex == TreeProperty.tree.LastIndex
                         stackProgress = stackProgress +1;
-                        if stackProgress>tree.LastIndex*3+100
+                        if stackProgress>TreeProperty.tree.LastIndex*3+100
                             return
                         end
                     else
-                        LastIndex = tree.LastIndex;
+                        LastIndex = TreeProperty.tree.LastIndex;
                         stackProgress = 0;
                     end
-                    NodeIndex = TreeClass.RandConfig(tree.Data,tree.LastIndex);
-                    [tree, Config.Status, Config.Type] = Get(tree,NodeIndex,"ConfigMat","Type");
+                    NodeIndex = TreeClass.RandConfig(TreeProperty.tree.Data,TreeProperty.tree.LastIndex,"VisitBasedRand");
+                    [TreeProperty.tree, Config.Status, Config.Type,ConfigVisits] = Get(TreeProperty.tree,NodeIndex,"ConfigMat","Type","Visits");
             
                     WS = SetConfigurationOnSpace(BasicWS, Config);
-                    Parts =  AllSlidingParts(WS);
+                    Parts =  AllSlidingParts(WS,N);
         
-                    Combinations = MakeRandomPartsCombinations(Parts,Info.RowNumData);  
+                    Combinations = MakeRandomPartsCombinations(Parts,ConfigVisits,"Partial");  
         
-                    [tree,success] = MovingEachIndividualPartPCDepth(tree, WS, Combinations, NodeIndex);
+                    [TreeProperty.tree,success] = MovingEachIndividualPartPCDepth(TreeProperty.tree, WS, Combinations, NodeIndex);
                                 
                     if success
                         fprintf("success!!!");
-                        SaveTree2Files(tree);
+                        SaveTree(TreeProperty.tree);
         %                 Resulte = GetResulteData(TreeFolder);
                         Resulte = "success";
                         save(TreeProperty.Folder+"\success.mat","Resulte");
@@ -99,25 +94,50 @@ while true
             end
                
 %             SaveTree2Files(tree);
-            SaveTree(tree);
+            if ~mod(TreeProperty.tree.LastIndex,10000)
+                SaveTree(TreeProperty.tree);
+            end
             
-            if ~isnan(tree.NumOfIsomorphismAxis)
-                [Connect, ConnectedNode] = CompareMixsedTree2TreeFilesIsomorphism(tree.Data,TreeProp(~TreeTurn).ds,tree.NumOfIsomorphismAxis);
+%             if TreeProperty.tree.LastIndex~=find(TreeProperty.tree.Data.Index,1,"last")
+%                 ss
+%             end
+
+            if ~isnan(TreeProperty.tree.NumOfIsomorphismAxis)
+                try
+                [Connect, TreeProperty.ConnectedNode,TreeProp(~TreeTurn).ConnectedNode] = CompareMixsedTree2TreeFilesIsomorphism(TreeProperty.tree.Data,TreeProp(~TreeTurn).tree.Data,TreeProperty.tree.NumOfIsomorphismAxis);
+
+                catch MEC
+                    MEC
+                end
             else
-                [Connect, ConnectedNode] = CompareMixsedTree2TreeFiles(tree.Data,TreeProp(~TreeTurn).ds);
+                error
+                [Connect, ConnectedNode] = CompareMixsedTree2TreeFiles(TreeProperty.tree.Data,TreeProp(~TreeTurn).tree.Data);
             end
             
             if Connect
-                for ConnectedNode_idx = 1:size(ConnectedNode,1)
-                    if ~isnan(tree.NumOfIsomorphismAxis)
-                        [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeDataIsomorphism(TreeFolder,ConnectedNode,tree.NumOfIsomorphismAxis);
+
+                TreeProperty.TotalNodes = TreeProperty.TotalNodes + TreeProperty.tree.LastIndex;
+                TreeProperty.FinalDuration = TreeProperty.tree.LastNodeTime;
+                TreeProp(TreeTurn) = TreeProperty;
+
+                SaveTree(TreeProp(1).tree);
+                SaveTree(TreeProp(2).tree);
+%                 if TreeProp(1).tree.LastIndex~=find(TreeProp(1).tree.Data.Index,1,"last")
+%                 ss
+%             end
+% if TreeProp(2).tree.LastIndex~=find(TreeProp(2).tree.Data.Index,1,"last")
+%                 ss
+%             end
+                for ConnectedNode_idx = 1:size(TreeProp(1).ConnectedNode,1)
+                    if ~isnan(TreeProperty.tree.NumOfIsomorphismAxis)
+                        [NumberOfCOnfig, PathLength, Path, time] = ExtructPathFromTrees(TreeProp(1).tree,TreeProp(2).tree,TreeProp(1).ConnectedNode(ConnectedNode_idx,:),TreeProp(2).ConnectedNode(ConnectedNode_idx,:));
                     else
-                        [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeData(TreeFolder,ConnectedNode(ConnectedNode_idx,:),true);
+                        [NumberOfCOnfig, PathLength, Path, time] = ExtructTreeData(TreeFolder,ConnectedNode1(ConnectedNode_idx,:),true);
                     end
-                    save(TreeFolder+"\success.mat","time","Path","PathLength","NumberOfCOnfig");
-                    SuccessDir = fullfile(extractBefore(TreeFolder,digitsPattern+"N\"),"AllTreeResulte");
+                    save(fullfile(TreeFolder,"Path_"+TargetIndex+".mat"),"time","Path","PathLength","NumberOfCOnfig");
+                    SuccessDir = fullfile(extractAfter(TreeFolder,"Results"),"AllTreeResulte");
                     mkdir(SuccessDir);
-                    ResultFileName = replace(extractAfter(TreeFolder,"RRTtree\"),"\","-")+".mat";
+                    ResultFileName = replace(extractAfter(TreeFolder,"RRTtree\"),"\","-")+"-Path_"+TargetIndex+".mat";
                     save(fullfile(SuccessDir,ResultFileName),"ResultFileName","time","Path","PathLength","NumberOfCOnfig");
         %             MakeVideoOfPath(Path, 8, 60, "try");
                     if PathLength ~= -1
@@ -125,11 +145,11 @@ while true
                     end
                 end
                  
-                return
+                break
             end
             
-            TreeProperty.TotalNodes = TreeProperty.TotalNodes + tree.LastIndex;
-            TreeProperty.FinalDuration = tree.LastNodeTime;
+            TreeProperty.TotalNodes = TreeProperty.TotalNodes + TreeProperty.tree.LastIndex;
+            TreeProperty.FinalDuration = TreeProperty.tree.LastNodeTime;
             TreeProp(TreeTurn) = TreeProperty;
     
             TreeTurn = ~TreeTurn;

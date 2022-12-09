@@ -1,5 +1,5 @@
-function [OK, tree] = MoveAgentGroup(WS,dir,Comb,step,Agent,tree,Parent)
-[OK, Configuration, Movment] = MakeAMove(WS,dir,step,Agent{dir}{Comb}');
+function [OK, tree] = MoveAgentGroup(WS,dir,step,Agent,tree,Parent)
+[OK, Configuration, Movement] = MakeAMove(WS,dir,step,Agent');
 if OK
     
     if WS.Algoritem == "RRT*"
@@ -8,7 +8,7 @@ if OK
 %         a = tree.Data{Parent,["Cost","Level"]};
 %         ParentCost = a(1);
 %         ParentLevel = a(2);
-        [Level, Cost] = CostFunction(Movment, ParentCost, ParentLevel);
+        [Level, Cost] = CostFunction(Movement, ParentCost, ParentLevel,tree.N);
 %% overlap cost target 
 %         CostToTarget = Cost2Target(Configuration.Status,Configuration.Type,tree.EndConfig.ConfigMat{:},tree.EndConfig.Type);
 %% group cost target
@@ -17,7 +17,7 @@ if OK
         CostToTarget = 1;
 %%
 try
-        [tree,~,ConfigIndex] = UpdateTree(tree, Parent, Configuration, Movment, Level, Cost,CostToTarget);
+        [tree,~,ConfigIndex] = UpdateTree(tree, Parent, Configuration, Movement, Level, Cost,CostToTarget);
 catch ME_UpdateTree
     ME_UpdateTree
     throw(ME_UpdateTree)

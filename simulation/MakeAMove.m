@@ -22,12 +22,7 @@ function [OK, Configuration, Movment, CollidingAgent] = MakeAMove(WS,dir,step, A
 %         fprintf('%s\n',toc(w)+" split   ");
         if OK
             Configuration = GetConfiguration(WS1);
-            if size(Configuration.Status,2)>35
-                Configuration.Status
-            end
-%             if GetNumOfAgent({Configuration.Status})<50
-%                 d=5;
-%             end
+
         end
     end
 end
