@@ -24,7 +24,7 @@ TreeProp(2) = TreeProperties(TreeFolder,"Target",1);
 TreeProp(1) = TreeProperties(TreeFolder,"Start"); 
 
 
-while true
+
 
 %     TreeProp(1).tree = LoadTree(TreeProp(2).Folder);
 %     TreeProp(2).tree = LoadTree(TreeFolder,"Start");
@@ -42,6 +42,8 @@ while true
         TreeProp(1).tree = UpdateTreeTarget(TreeProp(1).tree,TreeProp(1).Target(TargetIndex,:));
         TreeProp(2) = TreeProperties(TreeFolder,"Target",TargetIndex);
         
+
+        
         
         TreeTurn = logical([1,0]);
         TreeProperty = TreeProp(TreeTurn);
@@ -50,7 +52,7 @@ while true
             TreeProperty.tree.AddDuration = TreeProperty.FinalDuration;
             
             BasicWS = WorkSpace(Size,algorithm);
-            MaxNumOfConfig = TreeProperty.TotalNodes/2+10;
+            MaxNumOfConfig = TreeProperty.TotalNodes + TreeProperty.TotalNodes/2+10;
             if MaxNumOfConfig > 1e5
                 MaxNumOfConfig = 1e5;
             end
@@ -159,4 +161,3 @@ while true
 
 end
 
-end

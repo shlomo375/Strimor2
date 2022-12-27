@@ -3,8 +3,8 @@ clear;
 % close all;
   
 %% Creat Tree Dir for pair of config, one from start, one from target.
-ModuleRange = [10:23]; % number of modules in the tree
-TreeType = ["OneTree_IM3Axis","uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"normal_1","uniform_1","uniform_3"]; %mast to be unique names  "normal_1","uniform_1","uniform_3"
+ModuleRange = [16:22]; % number of modules in the tree
+TreeType = ["OptimalTree"]%,"normal_1","uniform_1","uniform_3"]; %mast to be unique names  "normal_1","uniform_1","uniform_3"
 TreeRange = 1:200;
 %%
 

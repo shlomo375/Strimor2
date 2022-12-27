@@ -1,23 +1,30 @@
-clear
-SoftwareLocation = 'C:\Users\shlom\OneDrive - Ariel University\Documents\לימודים\תואר שני\תזה\triangles';
-% addpath(genpath(SoftwareLocation));
+% clear
+SoftwareLocation = pwd;
+AddDirToPath;
+cd(SoftwareLocation);
 
-PairsNum = 1;
+PairsNum = 200;
 Stock = [];
 ConfigPairs = [];
-for AgentNum = 16
+for AgentNum = 39:40
     CP = GetConfigPairs(AgentNum,PairsNum);
-    load(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+    mkdir(fullfile(SoftwareLocation,"configuration\OptimalConfigPairs"));
+    try
+        load(strcat("configuration\OptimalConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+    catch
+        save(strcat("configuration\OptimalConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+    end
     ConfigPairs = [ConfigPairs,CP];
-    save(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+    save(strcat("configuration\OptimalConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
 end
 
 function ConfigPairs = GetConfigPairs(N,NumOfPairs)
     Stock = [];
     ConfigPairs = [];
+    WS = WorkSpace([N,N*2],"RRT*");
     while size(ConfigPairs,2) < NumOfPairs
         try    
-        Config = CreatShape(N);
+        Config = CreatShape(N,WS);
         flag2 = false;
         catch e
             e;
@@ -38,19 +45,24 @@ function ConfigPairs = GetConfigPairs(N,NumOfPairs)
                 end
             end
             
-            for ii = 1:size(Stock)
+            for ii = 1:numel(Stock)
+                try
                 if isequal(Config,Stock{ii})
                     break
                 end
+                catch eee
+                    eee
+                end
                 Cost = Cost2Target(Config.Status,Config.Type,Stock{ii}.Status,Stock{ii}.Type);
-                if Cost <=0.75*N
+                if Cost <=0.9*N
                     flag2 = true;
                 end
-                if Cost <= 0.6*N
+                if Cost <= 0.7*N
                     ConfigPairs{end+1} = {Config,Stock{ii}};
                     Stock(ii) = [];
-                    fprintf("N: " + N+"   pairs found: "+numel(ConfigPairs)+"\n");
+                    fprintf("N: " + N+"   pairs found: "+numel(ConfigPairs)+" stock size"+numel(Stock)+"\n");
                     flag2 = false;
+                    break
                 end
                 
             end
@@ -65,47 +77,70 @@ function ConfigPairs = GetConfigPairs(N,NumOfPairs)
 end
 
 
-function Config = CreatShape(N)
-    space = zeros(N,N*2);
-    space(N/2,N) = 1;
-    male = 1;
-    female = 0;
+function Config = CreatShape(N,BasicWS)
+    while 1
+        space = zeros(N,N*2);
+        space(ceil(N/2),N) = 1;
+        male = 1;
+        female = 0;
+       
+        NumAlpha = ceil(N/2);
+        NumBeta = floor(N/2);
+        space = AddAgent(space,1);
     
-    while (male<N/2) || (female<N/2)
-        type = randi(2,1);
-        switch type
-            case 1
-                if male<N/2
-                    space = AddAgent(space,-1);
-                end
-                
-            case 2
-                if female<N/2
-                    space = AddAgent(space,1);
-                end     
+        while (male<NumAlpha) || (female<NumBeta)
+            type = randi(2,1);
+            switch type
+                case 1
+                    if male<NumAlpha
+                        space = AddAgent(space,-1);
+                    end
+                    
+                case 2
+                    if female<NumBeta
+                        space = AddAgent(space,1);
+                    end     
+            end
+            male = sum(space==1,"all");
+            female = sum(space==-1,"all");
+        
         end
-        male = sum(space==1,"all");
-        female = sum(space==-1,"all");
-    
+        
+        RemoveNumAlpha = NumAlpha - ceil(N/2);
+        RemoveNumBeta = NumBeta - floor(N/2);
+    %     i=0
+        for idx = 1:20
+    %         sum(abs(space),"all")
+            NewSpace = RemoveAgent(space,1,RemoveNumAlpha);
+            NewSpace = RemoveAgent(NewSpace,-1,RemoveNumBeta);
+       
+            type = ones(size(NewSpace,1),1);
+            type(2:2:end) = -1;
+            temp = ones(1,size(NewSpace,2));
+            temp(2:2:end) = -1;
+            type = type.*temp;
+        
+            agent = find(NewSpace==1,1);
+            if type(agent) ~= NewSpace(agent)
+                type = -type;
+            end
+         
+            
+            Config.Status = double(logical(NewSpace));
+            Config.Type = type(find(Config.Status,1));
+            WS = SetConfigurationOnSpace(BasicWS,Config);
+            Config = GetConfiguration(WS);
+        %     PlotWorkSpace(WS,[]);
+        
+            OK = SplittingCheck(WS,find(WS.Space.Status,1));
+    %         i=i+1
+            if OK && sum(abs(WS.Space.Status),"all")==N
+                PlotWorkSpace(WS,[])
+                pause(0.1);
+                return
+            end
+        end
     end
-    
-    type = ones(size(space,1),1);
-    type(2:2:end) = -1;
-    temp = ones(1,size(space,2));
-    temp(2:2:end) = -1;
-    type = type.*temp;
-
-    agent = find(space==1,1);
-    if type(agent) ~= space(agent)
-        type = -type;
-    end
- 
-    WS = WorkSpace([N,N*2],"RRT*");
-    Config.Status = double(logical(space));
-    Config.Type = type(find(Config.Status,1));
-    WS = SetConfigurationOnSpace(WS,Config);
-    Config = GetConfiguration(WS);
-%     PlotWorkSpace(WS,[]);
 end
 
 function space = AddAgent(space,type)
@@ -132,5 +167,13 @@ function space = AddAgent(space,type)
             end
     end
 
+
+end
+
+function space = RemoveAgent(space,Type,num)
+
+Loc = find(space==Type);
+deleteLoc = Loc(randi(numel(Loc),num));
+space(deleteLoc) = 0;
 
 end
