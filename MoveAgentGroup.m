@@ -5,9 +5,7 @@ if OK
     if WS.Algoritem == "RRT*"
         
         [~, ParentCost, ParentLevel] = Get(tree,Parent,"Cost","Level");
-%         a = tree.Data{Parent,["Cost","Level"]};
-%         ParentCost = a(1);
-%         ParentLevel = a(2);
+
         [Level, Cost] = CostFunction(Movement, ParentCost, ParentLevel,tree.N);
 %% overlap cost target 
 %         CostToTarget = Cost2Target(Configuration.Status,Configuration.Type,tree.EndConfig.ConfigMat{:},tree.EndConfig.Type);
@@ -22,11 +20,7 @@ catch ME_UpdateTree
     ME_UpdateTree
     throw(ME_UpdateTree)
 end
-%         if tree.LastIndex > size(unique(tree.Data(1:tree.LastIndex,["ConfigStr","ConfigRow","ConfigCol"])),1)
-%             fprintf("Problem");
-%             d=5
-%         end
-        
+
         if ~isnan(tree.NumOfIsomorphismAxis)
             IsomorphisemStrs = tree.Data{ConfigIndex,["IsomorphismStr1","IsomorphismStr2","IsomorphismStr3"]};
             IsomorphisemMatrices = tree.Data{ConfigIndex,["IsomorphismMatrices1","IsomorphismMatrices2","IsomorphismMatrices3"]};

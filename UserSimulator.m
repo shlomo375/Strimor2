@@ -1,8 +1,12 @@
-SoftwareLocation = 'C:\Users\shlom\OneDrive - Ariel University\Documents\לימודים\תואר שני\תזה\triangles';
+
+SoftwareLocation = pwd;
+AddDirToPath;
+cd(SoftwareLocation);
+
 % addpath(genpath(SoftwareLocation));
 % clear
 % Path = TargetConfig;
-% load('CompletePath.mat', 'Path');
+load('CompletePath.mat', 'Path');
 % Path = P;
 % Path = flip(Path);
 close all

@@ -23,8 +23,10 @@ function [GroupsSizes,GroupIndexes] = ConfigGroupSizes(Config,ConfigType)
     func = @(x) accumarray(1+cumsum([0; (diff(x)~=1)]),x,[],@(y) {y});
     
     GroupIndexes = cellfun(func,GroupIndexes,'UniformOutput',false)';
-    Groups(StartLine:StartLine-1+numel(GroupIndexes)) = GroupIndexes;
     
+    Groups(StartLine:StartLine-1+numel(GroupIndexes)) = GroupIndexes;
+%     Groups = GroupIndexes;
+
     MaxGroup = max(cellfun(@numel,Groups));
     NumberOfLines = numel(Groups);
     

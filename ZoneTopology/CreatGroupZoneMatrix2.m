@@ -42,23 +42,15 @@ for Line = 1:MaxLine
             else
                 ButtomZoneLoc = [];
             end
-%             switch Line
-%                 case 1
-%                     Value = conv2(HoleMat(Line+1,:),flip(ConvMatrix(3,:)),'valid');
-%                     ZoneLoc = find(Value == sum(abs(ConvMatrix(3,:))));
-%                 case MaxLine
-%                     Value = conv2(HoleMat(Line-1,:),flip(ConvMatrix(1,:)),'valid');
-%                     ZoneLoc = find(Value == sum(abs(ConvMatrix(1,:))));
-%                 otherwise
-%                     Value = conv2(HoleMat(Line-1:Line+1,:),flip(flip(ConvMatrix),2),'valid');
-%                     ZoneLoc = find(Value == sum(abs(ConvMatrix),'all'));
-%             end
-            
+
             %The gap index is of the left edge of the gap, so if the overlap is
             % less then the gap index, it means that it has reached the
             % area to the left of the gap
+            try
             GroupIndex = GroupIndexes{Line}{Col}';
-
+            catch ee
+                ee
+            end
             GroupZoneMatrix(Line,Col,1) = GetZoneOfGroup(TopZoneLoc,GroupIndex);
             GroupZoneMatrix(Line,Col,2) = GetZoneOfGroup(ButtomZoneLoc,GroupIndex);
             

@@ -1,5 +1,5 @@
 classdef WorkSpace
-    properties (SetAccess = private)
+    properties (SetAccess = public)
         SpaceSize %{mustBeVector,mustBeNumeric,mustBePositive}
         Space
         R1
@@ -311,7 +311,7 @@ classdef WorkSpace
         end
         
         function [WS, AgentLoc] = GetAgentFromUser(WS,Status)
-%             PlotWorkSpace(WS,1);
+            PlotWorkSpace(WS,[]);
             exit = 1;
             AgentLoc = [];
             hold on
@@ -326,12 +326,12 @@ classdef WorkSpace
             end
             for i = AgentLoc
                 if Status == 1
-                    WS.Space.Agent(i) = Agent;
+                    WS.Space.Agent(i) = 1;
                 end
                 WS.Space.Status(i) = Status;
             end
             cla
-%             PlotWorkSpace(WS,1);
+            PlotWorkSpace(WS,[]);
         end
         
         function WS = SetConfiguration(WS, Status, Loc)

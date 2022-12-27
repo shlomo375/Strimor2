@@ -11,6 +11,8 @@ addpath(genpath(fullfile(SoftwareLocation,"visual")));
 addpath(genpath(fullfile(SoftwareLocation,"ZoneTopology")));
 addpath(genpath(fullfile(SoftwareLocation,"GroupTopology")));
 addpath(genpath(fullfile(SoftwareLocation,"CompleteTreeFunctions")));
+addpath(genpath(fullfile(SoftwareLocation,"LineFlatting")));
+
 
 % copyfile("Users\shlom\OneDrive - Ariel University\Documents\לימודים\תואר שני\תזה\STRIMOR","New folder","f")
 end

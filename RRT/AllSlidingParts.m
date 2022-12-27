@@ -1,4 +1,4 @@
-function GroupMatrix = AllSlidingParts(WS,N)
+function [GroupMatrix,CombSub] = AllSlidingParts(WS,~)
 % tic
     for dir = 3:-1:1
         switch abs(dir)
@@ -30,17 +30,17 @@ function GroupMatrix = AllSlidingParts(WS,N)
         end
         func = @(x) accumarray(1+cumsum([0; (diff(x)~=1)]),x,[],@(y) {y});
         
-        Comb = cellfun(func,Comb,'UniformOutput',false)';
+        CombSub = cellfun(func,Comb,'UniformOutput',false)';
         
         for Row = 1:size(Comb,2)
-            Comb(Row) = {cellfun( ...
+            CombInd(Row) = {cellfun( ...
                 @(Col) R(sub2ind(size(R),(ShiftRow+Row)*ones(size(Col)),ShiftCol+Col)), ...
-                Comb{Row},'UniformOutput',false)};
+                CombSub{Row},'UniformOutput',false)};
         end
 
-        for g_Loc = 1:numel(Comb)
-            GroupMatrix(1:numel(Comb{g_Loc}{1}),g_Loc,dir) = Comb{g_Loc}{:};
+        for g_Loc = 1:numel(CombInd)
+            GroupMatrix(1:numel(CombInd{g_Loc}{1}),g_Loc,dir) = CombInd{g_Loc}{:};
         end
-
+        
     end
 end
