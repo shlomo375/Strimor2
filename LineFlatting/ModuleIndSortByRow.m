@@ -1,4 +1,4 @@
-function GroupInd = ModuleIndSortByRow(ConfigMat)
+function GroupInd = ModuleIndSortByRow(ConfigMat,R)
 
 [row,col] = find(ConfigMat);
 GroupIndexes = accumarray(row,col,[],@(x) {x});
@@ -12,8 +12,12 @@ for Line_idx = 1:numel(GroupIndexes)
 end
 
 for Line = numel(GroupIndexes):-1:1%StartLine+numel(GroupIndexes)-1:-1:StartLine
-    GroupInd{Line} = sub2ind(size(ConfigMat),repmat(Line+StartLine-1,[numel(GroupIndexes{Line}),1]),GroupIndexes{Line})
-
+    if nargin == 2
+        GroupInd{Line} = R(sub2ind(size(ConfigMat),repmat(Line+StartLine-1,[numel(GroupIndexes{Line}),1]),GroupIndexes{Line}));
+    else
+        GroupInd{Line} = sub2ind(size(ConfigMat),repmat(Line+StartLine-1,[numel(GroupIndexes{Line}),1]),GroupIndexes{Line});
+    end
 end
+
 
 end

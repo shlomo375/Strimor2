@@ -1,0 +1,35 @@
+function [WS, tree, ParentInd, PrimaryModuleInd] = ManeuverStepProcess(WS,tree,ParentInd,PrimaryModuleInd, PrimaryAxis, PrimaryStep, SecondaryModuleInd, SecondaryAxis, SecondaryStep)
+% The function tries to perform a primary movement. 
+% If a movement is unsuccessful, she tries another movement.
+
+[OK, Configuration, Movement, WS1] = MakeAMove(WS,PrimaryAxis,PrimaryStep, PrimaryModuleInd);
+
+if OK
+    [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
+    if Exists
+        return
+    end
+    
+    WS = WS1;
+
+    PrimaryModuleInd = UpdateLinearIndex(WS.SpaceSize,PrimaryModuleInd,StepAxis,Step);
+else
+   if nargin > 6
+        [OK, Configuration, Movement, WS1] = MakeAMove(WS, SecondaryAxis, SecondaryStep, PrimaryModuleInd);
+    
+        if OK
+            [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
+            if Exists
+                return
+            end
+            
+            WS = WS1;
+        
+            PrimaryModuleInd = UpdateLinearIndex(WS.SpaceSize,PrimaryModuleInd,StepAxis,Step);
+
+            [WS, tree, ParentInd, PrimaryModuleInd] = ManeuverStepProcess(WS,tree,ParentInd,PrimaryModuleInd, PrimaryAxis, PrimaryStep);
+       end
+   end
+end
+
+end

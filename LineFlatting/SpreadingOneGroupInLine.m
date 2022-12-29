@@ -1,5 +1,5 @@
-function SpreadingOneGroupInLine(WS,Axis,Step,tree,ParentInd)
-GroupInd = ModuleIndSortByRow(WS.Space.Status);
+function [tree, WS, GroupInd] = SpreadingOneGroupInLine(WS,tree,GroupInd,Axis,Step,ParentInd)
+% GroupInd = ModuleIndSortByRow(WS.Space.Status);
 
 Lines = 2:numel(GroupInd);
 NotFinishLine = true(1,length(Lines));
@@ -13,20 +13,16 @@ while any(NotFinishLine)
     [OK, Configuration, Movement, NewWS] = MakeAMove(WS,Axis,Step,MoveingModules');
     
     if OK
-        PlotWorkSpace(NewWS,[]);
+%         figure(2)
+%         PlotWorkSpace(NewWS,[]);
         %% Update procedure
-        [~, ParentCost, ParentLevel] = Get(tree,ParentInd,"Cost","Level");
+        GroupInd{MoveLine} = UpdateLinearIndex(WS.SpaceSize,GroupInd{MoveLine},1,Step);
 
-        [Level, Cost] = CostFunction(Movement, ParentCost, ParentLevel,tree.N);
-
-        CostToTarget = 1;
-
-        [tree,~,ConfigInd] = UpdateTree(tree, ParentInd, Configuration, Movement, Level, Cost,CostToTarget);
-        %%
-        if ConfigInd ~= tree.LastIndex
+        [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
+        if Exists
             break
         end
-        
+
         NotFinishLine = true(1,length(Lines));
         
         NewWS.Space.Status(NewWS.Space.Status==2) = 1;

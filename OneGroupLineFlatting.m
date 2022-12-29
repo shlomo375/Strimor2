@@ -42,7 +42,15 @@ Tree = TreeClass("", N, 1e3, Config,Flat);
 
 
 %%
-SpreadingOneGroupInLine(WS,1,1,Tree,1)
+GroupInd = ModuleIndSortByRow(WS.Space.Status);
+
+[tree,WS, GroupInd] = SpreadingOneGroupInLine(WS,Tree,GroupInd,1,1,1);
+
+[WS,tree] = ReducingRowsOneGroupInLine(WS, tree, 1,1, GroupInd,tree.LastIndex);
+
+FlatteningSpecialLines(WS,tree,1);
+
+
 Parts =  AllSlidingParts(WS,N);
         
 Combinations = MakeRandomPartsCombinations(Parts,ConfigVisits,"Partial");  
