@@ -1,4 +1,4 @@
-function [WS,tree] = ReducingRowsOneGroupInLine(WS,tree,FlatAxis,SpreadingSide, GroupInd, ParentInd)
+function [WS,tree, ParentInd] = ReducingRowsOneGroupInLine(WS,tree,FlatAxis,SpreadingSide, GroupInd, ParentInd)
 Lables = ["IsomorphismMatrices1","IsomorphismMatrices2","IsomorphismMatrices3"];
 AllModuleInd = find(WS.Space.Status);
 GroupMatrix = tree.Data{tree.LastIndex,Lables(FlatAxis)}{1}(:,:,1);

@@ -1,4 +1,6 @@
-function [PrimaryOK, WS, tree, ParentInd, PrimaryModuleInd, SecondaryOK, SecondaryModuleInd] = ManeuverStepProcess(WS,tree,ParentInd,PrimaryModuleInd, PrimaryAxis, PrimaryStep, SecondaryModuleInd, SecondaryAxis, SecondaryStep)
+function [PrimaryOK, WS, tree, ParentInd, PrimaryModuleInd, SecondaryOK, SecondaryModuleInd]...
+    = ManeuverStepProcess(WS,tree,ParentInd,PrimaryModuleInd, PrimaryAxis,...
+    PrimaryStep, SecondaryModuleInd, SecondaryAxis, SecondaryStep)
 SecondaryOK = false;
 % The function tries to perform a primary movement. 
 % If a movement is unsuccessful, she tries another movement.
@@ -13,7 +15,7 @@ if PrimaryOK
     
     WS = WS1;
 
-    PrimaryModuleInd = UpdateLinearIndex(WS.SpaceSize,PrimaryModuleInd,StepAxis,Step);
+    PrimaryModuleInd = UpdateLinearIndex(WS.SpaceSize,PrimaryModuleInd,PrimaryAxis,PrimaryStep);
 else
    if nargin > 7
         [SecondaryOK, Configuration, Movement, WS1] = MakeAMove(WS, SecondaryAxis, SecondaryStep, SecondaryModuleInd);
@@ -26,7 +28,7 @@ else
             
             WS = WS1;
         
-            SecondaryModuleInd = UpdateLinearIndex(WS.SpaceSize,SecondaryModuleInd,StepAxis,Step);
+            SecondaryModuleInd = UpdateLinearIndex(WS.SpaceSize,SecondaryModuleInd,SecondaryAxis,SecondaryStep);
        end
    end
 end
