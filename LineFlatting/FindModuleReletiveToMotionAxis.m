@@ -1,10 +1,15 @@
-function [MovingModuleInd,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(R,ModuleInd,AllModuleInd,Axis,AboveModule)
+function [MovingModuleInd,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(R,ModuleInd,AllModuleInd,AboveModule,IncludeOrigin)
+DontIncludeOriginModule = 1;
+if nargin >= 5
+    DontIncludeOriginModule = 0;
+end
+
 
 [Row,~] = find(R == ModuleInd,1);
 if AboveModule
-    LineRange = (Row+1):size(R,1);
+    LineRange = (Row+DontIncludeOriginModule):size(R,1);
 else
-    LineRange = (1:Row-1);
+    LineRange = (1:Row-DontIncludeOriginModule);
 end
 MovingModuleLocInAllModuleInd = ismember(AllModuleInd,R(LineRange,:));
 MovingModuleInd = AllModuleInd(MovingModuleLocInAllModuleInd);

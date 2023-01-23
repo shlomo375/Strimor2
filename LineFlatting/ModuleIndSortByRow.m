@@ -1,4 +1,4 @@
-function GroupInd = ModuleIndSortByRow(ConfigMat,R)
+function [GroupInd, GroupIndexes] = ModuleIndSortByRow(ConfigMat,R)
 
 [row,col] = find(ConfigMat);
 GroupIndexes = accumarray(row,col,[],@(x) {x});

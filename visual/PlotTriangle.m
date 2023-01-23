@@ -23,6 +23,7 @@ if ~isempty(p)
 %     p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color, p);
     
 else
+    cla
     p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color,"LineWidth",1);
     if ~isempty(MoveNumText)
         MoveNumText.handel = text(MoveNumText.x,MoveNumText.y,num2str(MoveNumText.value),'FontSize',22,'FontWeight','bold','HorizontalAlignment','center');

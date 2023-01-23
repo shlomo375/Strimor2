@@ -40,20 +40,29 @@ WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
 
 Tree = TreeClass("", N, 1e3, Config,Flat);
 
-
+figure(1)
+PlotWorkSpace(WS,[],[]);
 %%
-GroupInd = ModuleIndSortByRow(WS.Space.Status);
+while 1
+% [GroupInd, GroupIndexes] = ModuleIndSortByRow(WS.Space.Status);
 
-[tree,WS, GroupInd] = SpreadingOneGroupInLine(WS,Tree,GroupInd,1,1,1);
+SpreadingDir = 1;
+ParentInd = 1;
+[tree, WS, ParentInd, GroupsSizes, GroupInd] = SpreadingAllAtOnes(WS,Tree,ParentInd,SpreadingDir);
+figure(2)
+PlotWorkSpace(WS,[],[]);
+% [tree,WS, GroupInd] = SpreadingOneGroupInLine(WS,Tree,GroupInd,1,1,1);
+% PlotWorkSpace(WS,[],[]);
 
-[WS,tree, ParentInd] = ReducingRowsOneGroupInLine(WS, tree, 1,1, GroupInd,tree.LastIndex);
+[WS,tree, ParentInd] = ReducingRowsOneGroupInLine(WS, tree, ParentInd, SpreadingDir, GroupsSizes, GroupInd);
+figure(3)
+PlotWorkSpace(WS,[],[]);
 
-FlatteningSpecialLines(WS,tree,1, ParentInd);
-
-
-Parts =  AllSlidingParts(WS,N);
-        
-Combinations = MakeRandomPartsCombinations(Parts,ConfigVisits,"Partial");  
-
-[TreeProperty.tree,success] = MovingEachIndividualPartPCDepth(TreeProperty.tree, WS, Combinations, NodeIndex);
-                           
+[WS,tree, ParentInd] = FlatteningSpecialLines(WS,tree, ParentInd);
+figure(4)
+PlotWorkSpace(WS,[],[]);
+[WS,tree, ParentInd] =  GroupsUnification(WS, tree, ParentInd);
+figure(5)
+PlotWorkSpace(WS,[],[]);
+end
+ f=5                          

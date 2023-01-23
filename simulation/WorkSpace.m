@@ -271,18 +271,25 @@ classdef WorkSpace
         
         function PlotWorkSpace(WS,text,Agent,c,MoveNumber)
             
-            
+            WS.Space.Status = logical(WS.Space.Status);
             map = WS.Space;
             Loc = true(size(map.Status));
             if nargin>2
 %                 map = WS.Space(Agent);
                 Loc = false(size(map.Status));
+                if isempty(Agent)
+                    WS.Space.Status = logical(WS.Space.Status);
+                    Agent = find(WS.Space.Status);
+                    c=1;
+                    hold off
+                end
                 Loc(Agent) = true;
                 Loc = Loc';
             end
 
             Status = map.Status;
             if nargin>2
+                Status = double(Status);
                     Status(Agent) = deal(c);
             end
             Status = Status';
@@ -513,12 +520,12 @@ classdef WorkSpace
         function [ScannedAgent, ModulesList] = ScanningAgents(WS, ScannedAgent, Agent, ModulesList)
             ScannedAgent(Agent) = true;
             ModulesList = [ModulesList; Agent];
-%             r = {WS.R1, WS.R2, WS.R3};
+            r = {WS.R1, WS.R2, WS.R3};
             i = 1;
-            for r = {WS.R1, WS.R2, WS.R3}
+            for r_idx = 1:length(r)%{WS.R1, WS.R2, WS.R3}
 %                 R = cell2mat(r);
-                R = r{:};
-%                 [row,col] = find(ismember(R,Agent),1);
+                R = r{r_idx};
+
                 [row,col] = find(R==Agent,1);
                 col = col+1-2*(i==1);
                 i = 2;
@@ -526,7 +533,9 @@ classdef WorkSpace
                     continue
                 end
                 try
-                NextAgent = R(sub2ind(size(R),row,col));
+                NextAgent = R((col-1)*size(R,1)+row);
+                
+                
                 catch e
                     d=5;
                 end
@@ -540,147 +549,52 @@ classdef WorkSpace
       
             end  
         end 
+        
 
-%         function approve = ScanningAgentsFast(WS, ScannedAgent)
-%             approve = true;
-% %             Agent = find(~ScannedAgent);
-% %             Agent = Agent(randperm(length(Agent),1));
-%             
-% %             ScannedAgent(Agent) = 1;
-%             group = {[]};
-% %             r = {WS.R1, WS.R2, WS.R3};
-%             while any(~ScannedAgent)
-%                 Agent = find(~ScannedAgent);
-%                 Agent = Agent(randperm(length(Agent),1));
-% 
-% 
-%                 Neighbors = [];
-%                 for r = {WS.R1, WS.R2, WS.R3}
-%                     R = cell2mat(r);
-%                     [row,~] = find(ismember(R,Agent),1);
-%                     NextLoc = R(sub2ind(size(R),row*ones(1,size(R,2)),1:size(R,2)));
-%                     NextLoc(NextLoc==0) = []; 
-%                     Populated = ~[WS.Space(NextLoc).Status];
-%                     
-%                     first = Populated(1:find(NextLoc==Agent));
-%                     last = Populated(size(first,2)+1:end);
-%                     Neighbors = [Neighbors, NextLoc(find(first,1,"last")+1:size(first,2))];
-%                     Neighbors = [Neighbors, NextLoc(size(first,2)+(1:find(last,1,"first")-1))];
-%                     
-%                 end
-%                 ScannedAgent(Neighbors) = 1;
-%                 AddToGroup = false;
-%                 for i=1:size(group,2)
-%                     
-%                     g = cell2mat(group(i));
-%                     if isempty(g)
-%                         group = {Neighbors};
-%                         AddToGroup = true; 
-%                         break
-%                     end
-%                     
-%                     if ~isempty(ismember(g,Neighbors))
-%                         group(i) = {unique([g,Neighbors])};
-%                         AddToGroup = true; 
-%                         break
-%                     end
-%                 end
-%                 if ~AddToGroup
-%                     group(end+1) = {Neighbors};
-%                 end
-%             end
-%                 if size(group,2)>1
-%                     approve = false;
-%                 end
-%                 
-%         end
-        
-%         function [Approve, Alert] = SplittingCheckSlow(WS)
-%             Approve = true;            
-%             space = logical(reshape([WS.Space.Status],size(WS.R1)));
-%             
-%             Size1 = size(WS.R1);
-%             Size2 = size(WS.R2);
-%             Size3 = size(WS.R3);
-%             MaxCol = max([Size1(2),Size2(2),Size3(2)]);
-%             MaxRow = Size1(1)+Size2(1)+Size3(1);
-%             
-%             R = zeros(MaxRow,MaxCol);
-%             ThreeSpace = R;
-%             R(1:Size1(1),1:Size1(2)) = WS.R1;
-%             R(Size1(1)+(1:Size2),1:Size2(2)) = WS.R2;
-%             R(Size1(1)+Size2(1)+(1:Size3),1:Size3(2)) = WS.R3;
-% 
-%             ThreeSpace(1:Size1(1),1:Size1(2)) = space;
-%             
-%             for dir = 2:3
-%                 switch abs(dir) 
-%                     case 2
-%                         r = WS.R2;
-%                     case 3
-%                         r = WS.R3;     
-%                 end
-%                 %     find number of row is chosen dir
-%                 tempInd = (r==1);
-%                 r(r==0) = 1;
-%                 Config = space(r);
-%                 r(r==1) = 0;
-%                 r(tempInd) = 1;
-%                 Config(r==0) = 0;    
-%                 
-%                 switch abs(dir) 
-%                     case 2
-%                         ThreeSpace(Size1(1)+(1:Size2),1:Size2(2)) = Config;
-%             
-%                     case 3
-%                         ThreeSpace(Size1(1)+Size2(1)+(1:Size3),1:Size3(2)) = Config;   
-%                 end
-%             end
-% %        %%%%%%%%%%%%%%%%         Config = logical(Space);
-%                 
-%                 
-% %                 dThreeSpace=diff([zeros(size(ThreeSpace,1),1),ThreeSpace],1,2);
-%                 dThreeSpace=[ThreeSpace,zeros(size(ThreeSpace,1),1)]-[zeros(size(ThreeSpace,1),1),ThreeSpace]; 
-%                 dThreeSpace(dThreeSpace~=1)=0;
-%                 Integral=cumsum(dThreeSpace,2);
-%             
-%                 Integral(~ThreeSpace)=0;
-%                 Number=cumsum(max(Integral,[],2));
-%                 Groups=Integral+[0;Number(1:end-1)];
-%                 Groups(~ThreeSpace) = 0;
-%   
-% %             i=1:max(z{1},[],"all");
-%             NumCounts = histcounts(Groups,max(Groups,[],"all")+1);
-%             [~,Num] = max(NumCounts(2:end));
-%             
-%             Agent = R(Groups==Num);
-%             GroupsNumberHistory = zeros(1,max(Groups,[],"all"));
-%             GroupsNumberHistory(Num) = 1;
-%             NumOfAgent = sum(space,'all');
-%             while numel(Agent) < NumOfAgent
-%                 AgentPosInGroups = ismember(R,Agent);
-%                 
-%                 GroupsNumber = unique(Groups(AgentPosInGroups));
-%                 GroupsNumber = setdiff(GroupsNumber,find(GroupsNumberHistory));
-%                 if isempty(GroupsNumber)
-%                     Approve = false;
-%                     break
-%                 end
-%                 
-%                 GroupsNumberHistory(GroupsNumber) = 1;
-%                 
-%                 NewAgentPosInR = ismember(Groups,GroupsNumber);
-%                 Agent = unique([Agent; R(NewAgentPosInR)]);
-%             end
-%         end
-        
-      
+        function [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, Agent, ModulesList,AgentType, Idx)
+            if nargin<4
+                ModulesList = zeros(sum(logical(WS.Space.Status),"all"),1);
+                AgentType = WS.Space.Type(Agent);
+                Idx = 1;
+            end
+            ScannedAgent(Agent) = true;
+            ModulesList(Idx) = Agent;
+            Idx = Idx +1;
+
+            NextAgent = Agent + WS.SpaceSize(1);
+            if NextAgent >= 1 || NextAgent <= numel(WS.Space.Status)
+                if ~ScannedAgent(NextAgent)
+                    [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, ModulesList,-AgentType, Idx);
+                end
+            end
+            
+            NextAgent = Agent - WS.SpaceSize(1);
+            if NextAgent >= 1 || NextAgent <= numel(WS.Space.Status)
+                if ~ScannedAgent(NextAgent)
+                    [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, ModulesList,-AgentType, Idx);
+                end
+            end
+            
+            NextAgent = Agent - AgentType;
+            if abs(mod(NextAgent,WS.SpaceSize(1))-mod(Agent,WS.SpaceSize(1)))<=1
+                if ~ScannedAgent(NextAgent)
+                        [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, ModulesList,-AgentType, Idx);
+                end
+            end
+
+            if Idx == 2
+                ModulesList(~ModulesList) = [];
+            end
+        end 
+
 
         function [Approve, Alert] = SplittingCheck(WS,Loc)
             Alert = "not spliting";
             Approve = true;
             ScannedAgent = ~WS.Space.Status(:);
             [ScannedAgent, ModulesList] = ScanningAgents(WS, ScannedAgent, Loc(1),[]);
+            ScannedAgent = ~WS.Space.Status(:);
+            [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, Loc(1));
 %             Approve = ScanningAgentsFast(WS, ScannedAgent);
             if any(~ScannedAgent)
                 Alert = "Some agents are not connected to the rest of the system";

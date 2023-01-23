@@ -1,24 +1,16 @@
-function [WS,tree, ParentInd] = ReducingRowsOneGroupInLine(WS,tree,FlatAxis,SpreadingSide, GroupInd, ParentInd)
-Lables = ["IsomorphismMatrices1","IsomorphismMatrices2","IsomorphismMatrices3"];
+function [WS,tree, ParentInd] = ReducingRowsOneGroupInLine(WS,tree, ParentInd, SpreadingSide,GroupsSizes, GroupInd)
+
 AllModuleInd = find(WS.Space.Status);
-GroupMatrix = tree.Data{tree.LastIndex,Lables(FlatAxis)}{1}(:,:,1);
-switch FlatAxis
-    case 1
-        R1 = WS.R1;
-        R2 = WS.R2;
-        R3 = WS.R3;
-    case 2
-        R2 = WS.R1;
-    case 3
-        R3 = WS.R3;
-end
 
 switch SpreadingSide
     case 1
-        LeadModuleType = sign(GroupMatrix(1:end-1));
-        LeadModuleType(~mod(GroupMatrix(1:end-1),2)) = LeadModuleType(~mod(GroupMatrix(1:end-1),2))*-1;
-        LeadModuleInd = cellfun(@(x)x(end),GroupInd(1:end-1))';
-        
+        LeadModuleType = sign(GroupsSizes(1:end-1));
+        LeadModuleType(~mod(GroupsSizes(1:end-1),2)) = LeadModuleType(~mod(GroupsSizes(1:end-1),2))*-1;
+        try
+            LeadModuleInd = cellfun(@(x)x{1}(end),GroupInd(1:end-1),UniformOutput=true)';
+        catch
+            LeadModuleInd = cellfun(@(x)x(end),GroupInd(1:end-1),UniformOutput=true)';
+        end
         for line = length(LeadModuleInd):-1:1
             if LeadModuleType(line)==1
 %                 [Row,~] = find(R2==LeadModuleInd(line),1);
@@ -29,7 +21,7 @@ switch SpreadingSide
                 Step = 1;
                 Axis = 2;
 
-                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(R2,LeadModuleInd(line),AllModuleInd,Axis,AboveModule);
+                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R2,LeadModuleInd(line),AllModuleInd,AboveModule);
                 
             else
 %                 [Row,~] = find(R3==LeadModuleInd(line),1);
@@ -40,7 +32,7 @@ switch SpreadingSide
                 Step = -1;
                 Axis = 3;
                 
-                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(R3,LeadModuleInd(line),AllModuleInd,Axis,AboveModule);
+                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R3,LeadModuleInd(line),AllModuleInd,AboveModule);
 
             end
             
@@ -61,7 +53,7 @@ switch SpreadingSide
         end
 
     case -1
-        LeadModuleType = sign(GroupMatrix(1:end-1));
+        LeadModuleType = sign(GroupsSizes(1:end-1));
         LeadModuleInd = cellfun(@(x)x(1),GroupInd(1:end-1))';
         
         for line = length(LeadModuleInd):-1:1
@@ -75,7 +67,7 @@ switch SpreadingSide
                 Step = -1;
                 Axis = 3;
 
-                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(R3,LeadModuleInd(line),AllModuleInd,Axis,AboveModule);
+                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R3,LeadModuleInd(line),AllModuleInd,AboveModule);
 
             else
 %                 [Row,~] = find(R2==LeadModuleInd(line),1);
@@ -86,7 +78,7 @@ switch SpreadingSide
                 Step = 1;
                 Axis = 2;
                 
-                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(R2,LeadModuleInd(line),AllModuleInd,Axis,AboveModule);
+                [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R2,LeadModuleInd(line),AllModuleInd,AboveModule);
 
             end
             
@@ -104,9 +96,9 @@ switch SpreadingSide
                     UpdateLinearIndex(size(WS.Space.Status),AllModuleInd(...
                     MovingModuleLocInAllModuleInd),Axis,Step);
             end
-        PlotWorkSpace(WS,[]);
+%         PlotWorkSpace(WS,[]);
         end
 end
 
-% PlotWorkSpace(WS,[]);
+% PlotWorkSpace(WS,[],[]);
 end

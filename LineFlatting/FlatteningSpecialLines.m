@@ -1,4 +1,4 @@
-function FlatteningSpecialLines(WS,tree,FlatAxis,ParentInd)
+function [WS,tree,ParentInd] = FlatteningSpecialLines(WS,tree,ParentInd)
 RotationMatrices = {WS.R1,WS.R2,WS.R3};
 ConfigMat2 = GetConfigProjection(WS.Space.Status,RotationMatrices,2);
 ConfigType2 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,2);
@@ -7,9 +7,9 @@ ConfigMat3 = GetConfigProjection(WS.Space.Status,RotationMatrices,3);
 ConfigType3 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,3);
 
 
-[GroupsSizes1,GroupIndexes1, GroupInd1] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
-[GroupsSizes2,GroupIndexes2, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,WS.R2);
-[GroupsSizes3,GroupIndexes3, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,WS.R3);
+[GroupsSizes1,~, GroupInd1] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+[GroupsSizes2,~, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,WS.R2);
+[GroupsSizes3,~, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,WS.R3);
 
 
 if size(GroupsSizes1,1)>2
@@ -24,8 +24,13 @@ if size(GroupsSizes1,1)>2
         
         ScannedAgent = ~WS.Space.Status;
         ScannedAgent(GroupInd1{1}{1}) = true;
-        [~, StraightLineModulesInd] = ScanningAgents(WS, ScannedAgent, ModulesInd(3), []); % for Left line i need to take the first module
-        
+%         [~, StraightLineModulesInd] = ScanningAgents(WS, ScannedAgent, ModulesInd(3), []); % for Left line i need to take the first module
+        [~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesInd(3));
+
+%         if ~isequal(sort(StraightLineModulesInd),sort(StraightLineModulesInd1))
+%             d=5
+%         end
+
         AllModuleBranchInd = unique([StraightLineModulesInd;ModulesInd]);
         if GroupsSizes3(StraightLineToRightLoc(StraightLine_idx))<0
             RowModuleLogical(:,2) = ismember(AllModuleBranchInd,ModulesInd(3:4));
@@ -36,7 +41,7 @@ if size(GroupsSizes1,1)>2
             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1));
         end
         
-        [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllModuleBranchInd,RowModuleLogical,"Simple");
+        [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllModuleBranchInd,RowModuleLogical,3,"Simple");
         
         % An attempt to move the branch
         if ~OK
@@ -57,11 +62,12 @@ if size(GroupsSizes1,1)>2
         
         ScannedAgent = ~WS.Space.Status;
         ScannedAgent(GroupInd1{1}{1}) = true;
-        [~, StraightLineModulesInd] = ScanningAgents(WS, ScannedAgent, ModulesInd(3), []); % for Left line i need to take the first module
-        
+%         [~, StraightLineModulesInd] = ScanningAgents(WS, ScannedAgent, ModulesInd(3), []); % for Left line i need to take the first module
+        [~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesInd(3));
+
         AllModuleBranchInd = unique([StraightLineModulesInd;ModulesInd]);
         GroupSize = GroupsSizes2(StraightLineToLeftLoc(StraightLine_idx));
-        if ~xor(sign(GroupSize)<0,mod(abs(GroupSize),2))
+        if ~EndIsAlpha(GroupSize)
             RowModuleLogical(:,2) = ismember(AllModuleBranchInd,ModulesInd(3:4));
             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1:2));
             
@@ -70,7 +76,7 @@ if size(GroupsSizes1,1)>2
             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1));
         end
         
-        [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllModuleBranchInd,RowModuleLogical,"Simple");
+        [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllModuleBranchInd,RowModuleLogical,2,"Simple");
         
         % An attempt to move the branch
         if ~OK

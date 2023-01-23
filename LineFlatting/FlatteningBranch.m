@@ -74,8 +74,8 @@ switch Version
             StartModule = UpdateLinearIndex(OldWS.SpaceSize,StartModule(1),1,0.5);
         end
 
-        [~, FrontPartModulesInd] = ScanningAgents(OldWS, ScannedAgent, StartModule, []); % for Left line i need to take the first module
-        
+%         [~, FrontPartModulesInd] = ScanningAgents(OldWS, ScannedAgent, StartModule, []); % for Left line i need to take the first module
+        [~, FrontPartModulesInd] = ScanningAgentsFast(OldWS, ScannedAgent, StartModule);
         Axis = 3;
         Step = 1;
         
@@ -90,8 +90,8 @@ switch Version
         ScannedAgent = ~OldWS.Space.Status;
         ScannedAgent(StraightLineModulesInd) = true; % ????? mistake?
         StartModule = ModulesInd(5);
-        [~, ShiftBranchPartModulesInd] = ScanningAgents(OldWS, ScannedAgent, StartModule, []); % for Left line i need to take the first module
-        
+%         [~, ShiftBranchPartModulesInd] = ScanningAgents(OldWS, ScannedAgent, StartModule, []); % for Left line i need to take the first module
+        [~, ShiftBranchPartModulesInd] = ScanningAgentsFast(OldWS, ScannedAgent, StartModule);
         Axis = 1;
         Step = 2;
         
