@@ -25,11 +25,6 @@ while true
             Axis = 2; %%%
             [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, GroupPairNum,Axis, GroupIndexes', GroupInd, ScannedAgent);
         end
-
-        if ~EndAlpha(GroupPairNum) && FirstAlpha(GroupPairNum+1)
-            Axis = 3; %%%
-            [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, GroupPairNum,Axis, GroupIndexes', GroupInd, ScannedAgent);
-        end
         %%
         if EndAlpha(GroupPairNum) && FirstAlpha(GroupPairNum+1)
                 GroupsEdges = [FirstAlpha(GroupPairNum), EndAlpha(GroupPairNum+1)];

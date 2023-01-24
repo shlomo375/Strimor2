@@ -43,7 +43,7 @@ tree = TreeClass("", N, 1e3, Config,Flat);
 figure(1)
 PlotWorkSpace(WS,[],[]);
 %%
-SpreadingDir = -1;
+SpreadingDir = 1;
 ParentInd = 1;
 while 1
 % [GroupInd, GroupIndexes] = ModuleIndSortByRow(WS.Space.Status);

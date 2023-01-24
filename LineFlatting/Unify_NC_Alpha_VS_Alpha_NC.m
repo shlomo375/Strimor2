@@ -38,8 +38,8 @@ switch Case
         OK = false;
         return
 end
-% figure(1)
-% PlotWorkSpace(WS,[],[]);
+figure(1)
+PlotWorkSpace(WS,[],[]);
 
 %%
 
@@ -52,8 +52,8 @@ end
 if ~ OK
     return
 end
-% figure(2)
-% PlotWorkSpace(NewWS,[],[]);
+figure(2)
+PlotWorkSpace(NewWS,[],[]);
 
 %%
 
@@ -67,8 +67,8 @@ if HorizenStep
     if ~ OK
         return
     end
-%     figure(3)
-%     PlotWorkSpace(NewWS,[],[]);
+    figure(3)
+    PlotWorkSpace(NewWS,[],[]);
 end
 
 %%
@@ -81,8 +81,8 @@ end
 if ~ OK
     return
 end
-% figure(4)
-% PlotWorkSpace(NewWS,[],[]);
+figure(4)
+PlotWorkSpace(NewWS,[],[]);
 
 %%
 
@@ -97,8 +97,8 @@ if HorizenStep
     if ~ OK
         return
     end
-%     figure(5)
-%     PlotWorkSpace(NewWS,[],[]);
+    figure(5)
+    PlotWorkSpace(NewWS,[],[]);
 end
 
 %%
@@ -113,8 +113,8 @@ end
 if ~ OK
     return
 end
-% figure(6)
-% PlotWorkSpace(NewWS,[],[]);
+figure(6)
+PlotWorkSpace(NewWS,[],[]);
 
 %%
 

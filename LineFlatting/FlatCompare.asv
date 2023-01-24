@@ -1,0 +1,30 @@
+function [WS,tree, ParentInd] = FlatCompare(FlatConfig, WS,tree, ParentInd)
+
+% more that one group in the second row, more tham one module in the first
+% group of the second row.
+if size(tree.Data(ParentInd,:).IsomorphismMatrices1{1},2) > 1 && abs(tree.Data(ParentInd,:).IsomorphismMatrices1{1}(2,1,1)) > 1
+    return
+end
+
+
+if tree.Data(ParentInd,:).IsomorphismMatrices1{1}(1,1,1) ~= FlatConfig.IsomorphismMatrices1{1}(1,1,1)
+
+    [WS,tree, ParentInd] = SwitchGroupSides(WS,tree, ParentInd);
+end
+
+if ~strcmp(tree.Data(ParentInd,:).IsomorphismStr1, FlatConfig.IsomorphismStr1)
+    SpreadingDir = 1;
+    [TempWS,TempTree, TempParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir);
+    
+    if ~strcmp(TempTree.Data(TempParentInd,:).IsomorphismStr1, FlatConfig.IsomorphismStr1)
+        SpreadingDir = -1;
+        [WS,tree, ParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir);
+    else
+        WS = TempWS;
+        
+    end
+    
+
+end
+
+end

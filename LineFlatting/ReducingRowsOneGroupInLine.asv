@@ -29,35 +29,25 @@ switch SpreadingSide
 
             end
             
-            [OK, NewWS, Newtree, NewParentInd, AllModuleInd(MovingModuleLocInAllModuleInd)] =...
-                ManeuverStepProcess(WS, tree, ParentInd, AllModuleInd(MovingModuleLocInAllModuleInd), Axis, Step);
+            [OK, Configuration, Movement, WS1] = MakeAMove(WS,Axis,Step, MovingModule);
             
-            if ~ OK
-                return
+            if OK
+                [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
+                if Exists
+                    break
+                end
+                
+                WS = WS1;
+                WS.Space.Status(WS.Space.Status==2) = 1;
+                AllModuleInd(MovingModuleLocInAllModuleInd) = ...
+                    UpdateLinearIndex(size(WS.Space.Status),AllModuleInd(...
+                    MovingModuleLocInAllModuleInd),Axis,Step);
             end
-            
-            WS = NewWS;
-            tree = Newtree;
-            ParentInd = NewParentInd;
-%             [OK, Configuration, Movement, WS1] = MakeAMove(WS,Axis,Step, MovingModule);
-%             
-%             if OK
-%                 [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
-%                 if Exists
-%                     break
-%                 end
-%                 
-%                 WS = WS1;
-%                 WS.Space.Status(WS.Space.Status==2) = 1;
-%                 AllModuleInd(MovingModuleLocInAllModuleInd) = ...
-%                     UpdateLinearIndex(size(WS.Space.Status),AllModuleInd(...
-%                     MovingModuleLocInAllModuleInd),Axis,Step);
-%             end
         end
 
     case -1
         LeadModuleType = sign(GroupsSizes(1:end-1));
-        LeadModuleInd = cellfun(@(x)x{1}(1),GroupInd(1:end-1))';
+        LeadModuleInd = cellfun(@(x)x(1),GroupInd(1:end-1))';
         
         for line = length(LeadModuleInd):-1:1
             if LeadModuleType(line)==1
@@ -85,31 +75,20 @@ switch SpreadingSide
 
             end
             
-            [OK, NewWS, Newtree, NewParentInd, AllModuleInd(MovingModuleLocInAllModuleInd)] =...
-                ManeuverStepProcess(WS, tree, ParentInd, AllModuleInd(MovingModuleLocInAllModuleInd), Axis, Step);
-            
-            if ~ OK
-                return
-            end
-            
-            WS = NewWS;
-            tree = Newtree;
-            ParentInd = NewParentInd;
+            [OK, Configuration, Movement, WS1] = MakeAMove(WS,Axis,Step, MovingModule);
+    
+            if OK
+                [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
+                if Exists
+                    break
+                end
+                
+                WS = WS1;
 
-%             [OK, Configuration, Movement, WS1] = MakeAMove(WS,Axis,Step, MovingModule);
-%     
-%             if OK
-%                 [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
-%                 if Exists
-%                     break
-%                 end
-%                 
-%                 WS = WS1;
-% 
-%                 AllModuleInd(MovingModuleLocInAllModuleInd) = ...
-%                     UpdateLinearIndex(size(WS.Space.Status),AllModuleInd(...
-%                     MovingModuleLocInAllModuleInd),Axis,Step);
-%             end
+                AllModuleInd(MovingModuleLocInAllModuleInd) = ...
+                    UpdateLinearIndex(size(WS.Space.Status),AllModuleInd(...
+                    MovingModuleLocInAllModuleInd),Axis,Step);
+            end
 %         PlotWorkSpace(WS,[]);
         end
 end

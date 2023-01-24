@@ -604,6 +604,9 @@ classdef WorkSpace
         end
 
         function WS = ChangeAgentLoc(WS,Ind,OldInd)
+            if isempty(Ind)
+                return
+            end
             status = 1;
             if nargin==3
                 WS.Space.Status(OldInd) = deal(0);
@@ -613,7 +616,7 @@ classdef WorkSpace
                 
             end
 
-                WS.Space.Status(Ind) = deal(status);
+            WS.Space.Status(Ind) = deal(status);
         end
 
         function [WS, NewInd] = SpaceCentering(WS)

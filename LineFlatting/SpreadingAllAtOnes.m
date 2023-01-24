@@ -1,9 +1,6 @@
-function [tree, WS,ParentInd, GroupsSizes,GroupInd] = SpreadingAllAtOnes(WS,tree,ParentInd,SpreadingDir)
+function [WS, tree, ParentInd, GroupsSizes,GroupInd] = SpreadingAllAtOnes(WS,tree,ParentInd,SpreadingDir)
 
 [GroupsSizes,GroupIndexes, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
-
-
-
 
 if SpreadingDir == 1
     [LastGroupInLine,Line] = find(diff(~[GroupsSizes,zeros(size(GroupsSizes,1),1)],1,2)',size(GroupsSizes,1));

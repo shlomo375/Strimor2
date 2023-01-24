@@ -9,16 +9,16 @@ switch Axis
         
         LeftGroupRightInd =  GroupInd{2}{PairLoc}(end);
         [Row,~] = find(R == LeftGroupRightInd,1);
-        GroupFrontLineInd = R(Row,:);
-        GroupFrontLineInd(GroupFrontLineInd==0) =[];
-        GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+        LeftGroupFrontLineInd = R(Row,:);
+        LeftGroupFrontLineInd(LeftGroupFrontLineInd==0) =[];
+        LeftGroupFrontLineInd(WS.Space.Status(LeftGroupFrontLineInd)==0) = [];
 
         LeftGroupRightCol =  GroupIndexes{2}{PairLoc}(end);
         RightGroupLeftCol = GroupIndexes{2}{PairLoc+1}(1)-1;
 
         Step(2) = (LeftGroupRightCol-RightGroupLeftCol)/2;
         
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1}(1));
+        [~, RightBranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1 - FlipOver}(1));
 
     case 3
         R = WS.R3;
@@ -26,17 +26,17 @@ switch Axis
         Step = [-1,0,1];
 
         RightGroupLeftInd =  GroupInd{2}{PairLoc+1}(1);
-        [Row,~] = find(R == RightGroupLeftInd,1);
-        GroupFrontLineInd = R(Row,:);
-        GroupFrontLineInd(GroupFrontLineInd==0) =[];
-        GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+        [Row,~] = find(R == LeftGroupRightInd,1);
+        LeftGroupFrontLineInd = R(Row,:);
+        LeftGroupFrontLineInd(LeftGroupFrontLineInd==0) =[];
+        LeftGroupFrontLineInd(WS.Space.Status(LeftGroupFrontLineInd)==0) = [];
 
-        RightGroupLeftCol =  GroupIndexes{2}{PairLoc+1}(1);
-        LeftGroupRightCol = GroupIndexes{2}{PairLoc}(end)+1;
+        LeftGroupRightCol =  GroupIndexes{2}{PairLoc}(end);
+        RightGroupLeftCol = GroupIndexes{2}{PairLoc+1}(1)-1;
 
-        Step(2) = (RightGroupLeftCol-LeftGroupRightCol)/2;
+        Step(2) = (LeftGroupRightCol-RightGroupLeftCol)/2;
         
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc}(end));
+        [~, RightBranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1 - FlipOver}(1));
 
 
 end
@@ -47,8 +47,8 @@ end
     
 %MovingModule = LeftBranchInd;
 
-[OK, NewWS, Newtree, NewParentInd, GroupFrontLineInd] =...
-    ManeuverStepProcess(WS,tree,ParentInd,GroupFrontLineInd, Axis(1), Step(1));
+[OK, NewWS, Newtree, NewParentInd, LeftGroupFrontLineInd] =...
+    ManeuverStepProcess(WS,tree,ParentInd,LeftGroupFrontLineInd, Axis(1), Step(1));
 
 if ~ OK
     return
@@ -61,8 +61,8 @@ end
 
 % [~, RightBranchInd] = ScanningAgents(WS, ScannedAgent, GroupInd{2}{PairLoc+1 - FlipOver}(1), []);
 
-[OK, NewWS, Newtree, NewParentInd, BranchInd] =...
-    ManeuverStepProcess(NewWS,Newtree,NewParentInd,BranchInd, Axis(2), Step(2));
+[OK, NewWS, Newtree, NewParentInd, RightBranchInd] =...
+    ManeuverStepProcess(NewWS,Newtree,NewParentInd,RightBranchInd, Axis(2), Step(2));
 
 if ~ OK
     return
@@ -73,8 +73,8 @@ end
 
 % Axis = 2;
 % Step = -1;
-[OK, NewWS, Newtree, NewParentInd, GroupFrontLineInd] =...
-    ManeuverStepProcess(NewWS,Newtree,NewParentInd,GroupFrontLineInd, Axis(3), Step(3));
+[OK, NewWS, Newtree, NewParentInd, LeftGroupFrontLineInd] =...
+    ManeuverStepProcess(NewWS,Newtree,NewParentInd,LeftGroupFrontLineInd, Axis(3), Step(3));
 
 if ~ OK
     return
