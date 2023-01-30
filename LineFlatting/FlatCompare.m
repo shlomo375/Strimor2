@@ -17,22 +17,18 @@ end
 if ~strcmp(tree.Data(ParentInd,:).ConfigStr, FlatConfig.ConfigStr)
     SpreadingDir = 1;
     [TempWS,TempTree, TempParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir);
-    figure(8)
-    PlotWorkSpace(TempWS,[],[]);
     if ~strcmp(TempTree.Data(TempParentInd,:).ConfigStr, FlatConfig.ConfigStr)
         SpreadingDir = -1;
-        [WS,tree, ParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir);
-        figure(9)
-        PlotWorkSpace(WS,[],[]);
+        [WS,tree, ParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir); 
     else
         WS = TempWS;
         tree = TempTree;
         ParentInd = TempParentInd;
     end
-    
+
 end
 
-if ~strcmp(tree.Data(ParentInd,:).ConfigStr, FlatConfig.ConfigStr)
+if strcmp(tree.Data(ParentInd,:).ConfigStr, FlatConfig.ConfigStr)
     Finish = true;
 end
 

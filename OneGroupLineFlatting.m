@@ -25,13 +25,7 @@ cd(SoftwareLocation);
 load(fullfile('TestCase','OneGroupInRow.mat'),"Config","Flat");
 N = sum(logical(Config.ConfigMat{:}),"all");
 
-ConfigStruct.Status = Config.ConfigMat{:};
-ConfigStruct.Type = Config.Type;
-
-WsSize = size(Config.ConfigMat{:})+[5,9];
-BasicWS = WorkSpace(WsSize,"RRT*");
-
-WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
+ConfigStruct = Node2ConfigStruct(Config);
 % PlotWorkSpace(WS,[]);
 WsSize = [N, 2*N];
 BasicWS = WorkSpace(WsSize,"RRT*");
@@ -40,37 +34,38 @@ WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
 
 tree = TreeClass("", N, 1e3, Config,Flat);
 
-figure(1)
-PlotWorkSpace(WS,[],[]);
+% figure(1)
+% PlotWorkSpace(WS,[],[]);
 %%
 SpreadingDir = -1;
 ParentInd = 1;
 while 1
-% [GroupInd, GroupIndexes] = ModuleIndSortByRow(WS.Space.Status);
-
 
 [WS, tree,  ParentInd, GroupsSizes, GroupInd] = SpreadingAllAtOnes(WS,tree,ParentInd,SpreadingDir);
-figure(2)
-PlotWorkSpace(WS,[],[]);
+% figure(2)
+% PlotWorkSpace(WS,[],[]);
 % [tree,WS, GroupInd] = SpreadingOneGroupInLine(WS,Tree,GroupInd,1,1,1);
 % PlotWorkSpace(WS,[],[]);
 
 [WS,tree, ParentInd] = ReducingRowsOneGroupInLine(WS, tree, ParentInd, SpreadingDir, GroupsSizes, GroupInd);
-figure(3)
-PlotWorkSpace(WS,[],[]);
+% figure(3)
+% PlotWorkSpace(WS,[],[]);
 
 [WS,tree, ParentInd] = FlatteningSpecialLines(WS,tree, ParentInd);
-figure(4)
-PlotWorkSpace(WS,[],[]);
+% figure(4)
+% PlotWorkSpace(WS,[],[]);
 
 [WS,tree, ParentInd] =  GroupsUnification(WS, tree, ParentInd);
-figure(5)
-PlotWorkSpace(WS,[],[]);
+% figure(5)
+% PlotWorkSpace(WS,[],[]);
 
 [WS,tree, ParentInd, Finish] = FlatCompare(Flat, WS,tree, ParentInd);
 if Finish
     break
 end
-
+% figure(6)
+% PlotWorkSpace(WS,[],[]);
 SpreadingDir = -SpreadingDir;
 end                     
+% figure(2)
+% PlotWorkSpace(WS,[],[]);

@@ -22,7 +22,7 @@ end
 MoveingModules = [];
 for line = numel(StepsNeeded):-1:2
     GroupIndStartLoc = length(MoveingModules)+1;
-    if SpreadingDir
+    if SpreadingDir == 1
         MoveingModules = [MoveingModules; GroupInd{line}{end}];
     else
         MoveingModules = [MoveingModules; GroupInd{line}{1}];

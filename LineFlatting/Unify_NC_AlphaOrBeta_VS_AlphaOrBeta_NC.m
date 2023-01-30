@@ -7,11 +7,18 @@ switch Axis
         Axis = [2;1;2];
         Step = [1,0,-1];
         
-        LeftGroupRightInd =  GroupInd{2}{PairLoc}(end);
-        [Row,~] = find(R == LeftGroupRightInd,1);
-        GroupFrontLineInd = R(Row,:);
-        GroupFrontLineInd(GroupFrontLineInd==0) =[];
-        GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+        if numel(GroupInd{2}{PairLoc}) ~= 1
+            LeftGroupRightInd =  GroupInd{2}{PairLoc}(end);
+            [Row,~] = find(R == LeftGroupRightInd,1);
+            GroupFrontLineInd = R(Row,:);
+            GroupFrontLineInd(GroupFrontLineInd==0) =[];
+            GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+        
+        else
+            
+            AllModuleInd = find(WS.Space.Status,tree.N);
+            GroupFrontLineInd = FindModuleReletiveToMotionAxis(R,GroupInd{2}{PairLoc}(1),AllModuleInd,false,true);
+        end
 
         LeftGroupRightCol =  GroupIndexes{2}{PairLoc}(end);
         RightGroupLeftCol = GroupIndexes{2}{PairLoc+1}(1)-1;
@@ -24,12 +31,18 @@ switch Axis
         R = WS.R3;
         Axis = [3;1;3];
         Step = [-1,0,1];
-
-        RightGroupLeftInd =  GroupInd{2}{PairLoc+1}(1);
-        [Row,~] = find(R == RightGroupLeftInd,1);
-        GroupFrontLineInd = R(Row,:);
-        GroupFrontLineInd(GroupFrontLineInd==0) =[];
-        GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+        
+        if numel(GroupInd{2}{PairLoc+1}) ~= 1
+            RightGroupLeftInd =  GroupInd{2}{PairLoc+1}(1);
+            [Row,~] = find(R == RightGroupLeftInd,1);
+            GroupFrontLineInd = R(Row,:);
+            GroupFrontLineInd(GroupFrontLineInd==0) =[];
+            GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+        else
+%             Axis = [2;1;2];
+            AllModuleInd = find(WS.Space.Status,tree.N);
+            [GroupFrontLineInd] = FindModuleReletiveToMotionAxis(R,GroupInd{2}{PairLoc+1}(1),AllModuleInd,true,true);
+        end
 
         RightGroupLeftCol =  GroupIndexes{2}{PairLoc+1}(1);
         LeftGroupRightCol = GroupIndexes{2}{PairLoc}(end)+1;
@@ -40,6 +53,7 @@ switch Axis
 
 
 end
+
 
 % figure(1)
 % PlotWorkSpace(WS,[],[]);
@@ -61,7 +75,7 @@ end
 
 % [~, RightBranchInd] = ScanningAgents(WS, ScannedAgent, GroupInd{2}{PairLoc+1 - FlipOver}(1), []);
 
-[OK, NewWS, Newtree, NewParentInd, BranchInd] =...
+[OK, NewWS, Newtree, NewParentInd] =...
     ManeuverStepProcess(NewWS,Newtree,NewParentInd,BranchInd, Axis(2), Step(2));
 
 if ~ OK
@@ -73,7 +87,7 @@ end
 
 % Axis = 2;
 % Step = -1;
-[OK, NewWS, Newtree, NewParentInd, GroupFrontLineInd] =...
+[OK, NewWS, Newtree, NewParentInd] =...
     ManeuverStepProcess(NewWS,Newtree,NewParentInd,GroupFrontLineInd, Axis(3), Step(3));
 
 if ~ OK

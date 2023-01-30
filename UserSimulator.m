@@ -6,7 +6,7 @@ cd(SoftwareLocation);
 % addpath(genpath(SoftwareLocation));
 % clear
 % Path = TargetConfig;
-load('CompletePath.mat', 'Path');
+% load('CompletePath.mat', 'Path');
 % Path = P;
 % Path = flip(Path);
 close all

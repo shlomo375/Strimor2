@@ -11,6 +11,7 @@ if AboveModule
 else
     LineRange = (1:Row-DontIncludeOriginModule);
 end
+
 MovingModuleLocInAllModuleInd = ismember(AllModuleInd,R(LineRange,:));
 MovingModuleInd = AllModuleInd(MovingModuleLocInAllModuleInd);
 

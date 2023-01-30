@@ -37,8 +37,8 @@ else
     Axis = [1,1,3,2,3];
 
 end
-figure(1)
-PlotWorkSpace(WS,[],[]);
+% figure(1)
+% PlotWorkSpace(WS,[],[]);
 
 % Algorithm for merging 2 alpha modules, the modules are numbered from the
 % outer edge of the bottom row inward, the two modules in the top row are
@@ -54,8 +54,8 @@ PlotWorkSpace(WS,[],[]);
         return
     end
 
-figure(1)
-PlotWorkSpace(NewWS,[],[]);
+% figure(1)
+% PlotWorkSpace(NewWS,[],[]);
 %%
 % 2) Moving the rear module in the top row in the same direction until it
 % attaches to the front module.
@@ -65,8 +65,8 @@ PlotWorkSpace(NewWS,[],[]);
     if ~ OK
         return
     end
-figure(1)
-PlotWorkSpace(NewWS,[],[]);
+% figure(1)
+% PlotWorkSpace(NewWS,[],[]);
 %%
 % 3) Download front module and modules 1,2,3,4 one line down
 [OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3,4,5])] =...
@@ -75,8 +75,8 @@ PlotWorkSpace(NewWS,[],[]);
     if ~ OK
         return
     end
-figure(1)
-PlotWorkSpace(NewWS,[],[]);
+% figure(1)
+% PlotWorkSpace(NewWS,[],[]);
 %%
 % 4) Move module 1 two lines up.
 [OK, NewWS, Newtree, NewParentInd, AllModuleInd(1)] =...
@@ -85,8 +85,8 @@ PlotWorkSpace(NewWS,[],[]);
     if ~ OK
         return
     end
-figure(1)
-PlotWorkSpace(NewWS,[],[]);
+% figure(1)
+% PlotWorkSpace(NewWS,[],[]);
 %%
 % 5) Raising the front module and 2,3,4 one row up.
 [OK, NewWS, Newtree, NewParentInd, AllModuleInd([2,3,4,5])] =...
@@ -96,8 +96,8 @@ PlotWorkSpace(NewWS,[],[]);
         return
     end
 
-figure(1)
-PlotWorkSpace(NewWS,[],[]);
+% figure(1)
+% PlotWorkSpace(NewWS,[],[]);
 
 WS = NewWS;
 tree = Newtree;

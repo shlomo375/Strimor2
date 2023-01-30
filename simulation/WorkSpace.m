@@ -562,14 +562,14 @@ classdef WorkSpace
             Idx = Idx +1;
 
             NextAgent = Agent + WS.SpaceSize(1);
-            if NextAgent >= 1 || NextAgent <= numel(WS.Space.Status)
+            if NextAgent >= 1 && NextAgent <= numel(WS.Space.Status)
                 if ~ScannedAgent(NextAgent)
                     [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, ModulesList,-AgentType, Idx);
                 end
             end
             
             NextAgent = Agent - WS.SpaceSize(1);
-            if NextAgent >= 1 || NextAgent <= numel(WS.Space.Status)
+            if NextAgent >= 1 && NextAgent <= numel(WS.Space.Status)
                 if ~ScannedAgent(NextAgent)
                     [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, ModulesList,-AgentType, Idx);
                 end
@@ -591,8 +591,8 @@ classdef WorkSpace
         function [Approve, Alert] = SplittingCheck(WS,Loc)
             Alert = "not spliting";
             Approve = true;
-            ScannedAgent = ~WS.Space.Status(:);
-            [ScannedAgent, ModulesList] = ScanningAgents(WS, ScannedAgent, Loc(1),[]);
+%             ScannedAgent = ~WS.Space.Status(:);
+%             [ScannedAgent, ModulesList] = ScanningAgents(WS, ScannedAgent, Loc(1),[]);
             ScannedAgent = ~WS.Space.Status(:);
             [ScannedAgent, ModulesList] = ScanningAgentsFast(WS, ScannedAgent, Loc(1));
 %             Approve = ScanningAgentsFast(WS, ScannedAgent);

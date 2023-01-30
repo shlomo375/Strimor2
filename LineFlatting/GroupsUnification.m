@@ -1,6 +1,8 @@
 function [WS,tree, ParentInd] =  GroupsUnification(WS, tree, ParentInd)
 try
-
+if size(tree.Data{ParentInd,"IsomorphismMatrices1"}{1},2) < 2
+    return
+end
 % load("GroupsUnificatin.mat");
 [GroupsSizes,GroupIndexes, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
 
