@@ -2,7 +2,9 @@
 
 clear
 close all
-
+SoftwareLocation = pwd;
+AddDirToPath;
+cd(SoftwareLocation);
 load("Problems18.mat","TotalProblem","Solutions","Flat");
 
 N = sum(TotalProblem{1,"ConfigMat"}{:},"all");

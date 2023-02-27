@@ -1,0 +1,1 @@
+GroupZoneMatrix = CreatGroupZoneMatrix(GroupMatrix,GroupIndexes);
