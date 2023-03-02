@@ -25,7 +25,7 @@ switch Axis
 
         Step(2) = (LeftGroupRightCol-RightGroupLeftCol)/2;
         
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1}(1));
+        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1}(1),true);
 
     case 3
         R = WS.R3;
@@ -49,7 +49,7 @@ switch Axis
 
         Step(2) = (RightGroupLeftCol-LeftGroupRightCol)/2;
         
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc}(end));
+        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc}(end),true);
 
 
 end

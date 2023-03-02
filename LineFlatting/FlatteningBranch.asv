@@ -75,7 +75,7 @@ switch Version
         end
 
 %         [~, FrontPartModulesInd] = ScanningAgents(OldWS, ScannedAgent, StartModule, []); % for Left line i need to take the first module
-        [~, FrontPartModulesInd] = ScanningAgentsFast(OldWS, ScannedAgent, StartModule);
+        [~, FrontPartModulesInd] = ScanningAgentsFast(OldWS, ScannedAgent, StartModule,true);
         Axis = 3;
         Step = 1;
         
@@ -91,7 +91,7 @@ switch Version
         ScannedAgent(StraightLineModulesInd) = true; % ????? mistake?
         StartModule = ModulesInd(5);
 %         [~, ShiftBranchPartModulesInd] = ScanningAgents(OldWS, ScannedAgent, StartModule, []); % for Left line i need to take the first module
-        [~, ShiftBranchPartModulesInd] = ScanningAgentsFast(OldWS, ScannedAgent, StartModule);
+        [~, ShiftBranchPartModulesInd] = ScanningAgentsFast(OldWS, ScannedAgent, StartModule,true);
         Axis = 1;
         Step = 2;
         

@@ -34,8 +34,8 @@ while 1
                     
                 end
                 
-                for L = (length(GroupInd):-1:line+1)
-                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,cat(1,GroupInd{L}{:}));
+                for L = (length(LeadModuleInd):-1:line)+1
+                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,GroupInd{L}{end});
                 end
                 
                 MovingModuleLocInAllModuleInd = all([MovingModuleLocInAllModuleInd,any(ModuleAboveInd,2)],2);
@@ -85,8 +85,8 @@ while 1
                 end
                 
             
-                for L = (length(GroupInd):-1:line+1)
-                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,cat(1,GroupInd{L}{:}));
+                for L = (length(LeadModuleInd):-1:line)+1
+                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,GroupInd{L}{1});
                 end
                 MovingModuleLocInAllModuleInd = all([MovingModuleLocInAllModuleInd,any(ModuleAboveInd,2)],2);
                 

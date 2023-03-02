@@ -23,7 +23,7 @@ ParentInd = 1;
 OldWS = WS;
 Break = 0;
 while 1
-try
+
 [WS, Tree,  ParentInd] = SpreadingAllAtOnes(WS,Tree,ParentInd,SpreadingDir);
 % figure(2)
 % PlotWorkSpace(WS,[]);
@@ -35,7 +35,6 @@ try
 % PlotWorkSpace(WS,[]);
 
 [WS,Tree, ParentInd] = FlatteningSpecialLines(WS,Tree, ParentInd);
-
 % figure(4)
 % PlotWorkSpace(WS,[]);
 
@@ -59,9 +58,6 @@ end
 % figure(6)
 % PlotWorkSpace(WS,[]);
 SpreadingDir = -SpreadingDir;
-catch eee
-    eee
-end
 end
 
 Path = Tree.Data(1:Tree.LastIndex,:);

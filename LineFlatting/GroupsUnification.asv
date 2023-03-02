@@ -17,13 +17,8 @@ ScannedAgent = ~WS.Space.Status;
 ScannedAgent(GroupInd{1}{1}) = true;
 GroupPairNum = 1;
 while true
-    if any(isnan(FirstAlpha(GroupPairNum:GroupPairNum+1)))
+    if isnan(FirstAlpha(GroupPairNum:GroupPairNum+1))
         GroupPairNum = GroupPairNum +1;
-        if GroupPairNum >= length(FirstAlpha)
-            break
-        end
-        continue
-    end
     %% Only Alpha vs Alpha Case, without Beta in any of the groups
     if ItsOnlyAlphaGroup
         [OK, WS,tree,ParentInd] = Unify_Only_Alpha_VS_Alpha_group(WS,tree,ParentInd, GroupPairNum, GroupIndexes, GroupInd);
