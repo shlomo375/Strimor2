@@ -10,7 +10,7 @@ while 1
             LeadModuleType = sign(GroupsSizes(1:end-1,:));
             LeadModuleType(~mod(GroupsSizes(1:end-1,:),2)) = LeadModuleType(~mod(GroupsSizes(1:end-1,:),2))*-1;
             try
-                LeadModuleInd = cellfun(@(x)x{1}(end),GroupInd(1:end-1),UniformOutput=true)';
+                LeadModuleInd = cellfun(@(x)x{end}(end),GroupInd(1:end-1),UniformOutput=true)';
             catch
                 LeadModuleInd = cellfun(@(x)x(end),GroupInd(1:end-1,:),UniformOutput=true)';
             end
@@ -34,8 +34,8 @@ while 1
                     
                 end
                 
-                for L = (length(LeadModuleInd):-1:line)+1
-                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,GroupInd{L}{end});
+                for L = (length(GroupInd):-1:line+1)
+                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,cat(1,GroupInd{L}{:}));
                 end
                 
                 MovingModuleLocInAllModuleInd = all([MovingModuleLocInAllModuleInd,any(ModuleAboveInd,2)],2);
@@ -61,7 +61,7 @@ while 1
             end
     
         case -1
-            LeadModuleType = sign(GroupsSizes(1:end-1));
+            LeadModuleType = sign(GroupsSizes(1:end-1,:));
             LeadModuleInd = cellfun(@(x)x{1}(1),GroupInd(1:end-1))';
             
             for line = length(LeadModuleInd):-1:1
@@ -72,7 +72,8 @@ while 1
                     Step = -1;
                     Axis = 3;
     
-                    [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R3,LeadModuleInd(line),AllModuleInd,AboveModule);
+                    [MovingModule,MovingModuleLocInAllModuleInd] = ...
+                        FindModuleReletiveToMotionAxis(WS.R3,LeadModuleInd(line),AllModuleInd,AboveModule);
     
                 else
     
@@ -80,13 +81,14 @@ while 1
                     Step = 1;
                     Axis = 2;
                     
-                    [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R2,LeadModuleInd(line),AllModuleInd,AboveModule);
+                    [MovingModule,MovingModuleLocInAllModuleInd] = ...
+                        FindModuleReletiveToMotionAxis(WS.R2,LeadModuleInd(line),AllModuleInd,AboveModule);
     
                 end
                 
             
-                for L = (length(LeadModuleInd):-1:line)+1
-                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,GroupInd{L}{1});
+                for L = (length(GroupInd):-1:line+1)
+                        ModuleAboveInd(:,L-line) = ismember(AllModuleInd,cat(1,GroupInd{L}{:}));
                 end
                 MovingModuleLocInAllModuleInd = all([MovingModuleLocInAllModuleInd,any(ModuleAboveInd,2)],2);
                 
