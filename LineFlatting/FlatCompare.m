@@ -15,11 +15,13 @@ if tree.Data(ParentInd,:).IsomorphismMatrices1{1}(1,1,1) ~= FlatConfig.Isomorphi
 end
 
 if ~strcmp(tree.Data(ParentInd,:).ConfigStr, FlatConfig.ConfigStr)
-    SpreadingDir = 1;
-    [TempWS,TempTree, TempParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir);
+    SpreadingDir = "Left";
+    [TempWS,TempTree, TempParentInd] = SpreadAndReduce(WS,tree, ParentInd,SpreadingDir);
+%     [TempWS,TempTree, TempParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir);
     if ~strcmp(TempTree.Data(TempParentInd,:).ConfigStr, FlatConfig.ConfigStr)
-        SpreadingDir = -1;
-        [WS,tree, ParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir); 
+        SpreadingDir = "Right";
+        [WS,tree, ParentInd] = SpreadAndReduce(WS,tree, ParentInd,SpreadingDir);
+%         [WS,tree, ParentInd] = SpreadingAllAtOnes(WS,tree, ParentInd, SpreadingDir); 
     else
         WS = TempWS;
         tree = TempTree;

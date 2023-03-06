@@ -25,12 +25,12 @@ for line = numel(GroupInd):-1:2
     else
         GroupsNum = length(GroupInd{line}):-1:1;
     end
-    if numel(GroupsNum)>1
-        d=5
-    end
+%     if numel(GroupsNum)>1
+%         d=5
+%     end
     for group = GroupsNum
     %     GroupIndStartLoc = length(MoveingModules)+1;
-        [MoveingModules, Step] = Get_BranchModuleInd(WS,GroupInd,GroupInd{line}{group}(1),line,SpreadingDir);
+        [MoveingModules, Step] = Get_BranchModuleInd(WS,GroupInd,GroupInd{line}{group}(1),line,"BRANCH_AND_MAX_STEP",Dir=SpreadingDir);
 
         if ~Step
             continue

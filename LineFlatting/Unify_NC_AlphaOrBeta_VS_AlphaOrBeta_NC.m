@@ -32,24 +32,29 @@ switch Axis
         Axis = [3;1;3];
         Step = [-1,0,1];
         
+        RightGroupLeftCol =  GroupIndexes{2}{PairLoc+1}(1);
+        LeftGroupRightCol = GroupIndexes{2}{PairLoc}(end)+1;
         if numel(GroupInd{2}{PairLoc+1}) ~= 1
             RightGroupLeftInd =  GroupInd{2}{PairLoc+1}(1);
             [Row,~] = find(R == RightGroupLeftInd,1);
             GroupFrontLineInd = R(Row,:);
             GroupFrontLineInd(GroupFrontLineInd==0) =[];
             GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+            [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc}(end),true);
+            Step(2) = (RightGroupLeftCol-LeftGroupRightCol)/2;
         else
 %             Axis = [2;1;2];
             AllModuleInd = find(WS.Space.Status,tree.N);
-            [GroupFrontLineInd] = FindModuleReletiveToMotionAxis(R,GroupInd{2}{PairLoc+1}(1),AllModuleInd,true,true);
+            [GroupFrontLineInd] = FindModuleReletiveToMotionAxis(R,GroupInd{2}{PairLoc}(1),AllModuleInd,true,true);
+            [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1}(end),true);
+            Step(2) = (LeftGroupRightCol-RightGroupLeftCol)/2;
         end
 
-        RightGroupLeftCol =  GroupIndexes{2}{PairLoc+1}(1);
-        LeftGroupRightCol = GroupIndexes{2}{PairLoc}(end)+1;
-
-        Step(2) = (RightGroupLeftCol-LeftGroupRightCol)/2;
         
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc}(end),true);
+
+        
+        
+        
 
 
 end

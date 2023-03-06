@@ -18,10 +18,9 @@ Flat = ConfigStruct2Node(Config);
 Flat = AddIsomorphismMatToConfig(Flat);
 disp("start")
 StartFrom = find(cellfun(@isempty,Solutions),1);
-for idx = 1223:1057:numel(Solutions)
+for idx = 1001:3257:numel(Solutions)
     
-    idx = 10736 
-
+    idx = 7515
     t = tic;
     [Problem.Sucsses, Problem.Path] = OneGroupLineFlatteningAlgorithm(TotalProblem(idx,:),Flat);
     Problem.Runtime = toc(t);

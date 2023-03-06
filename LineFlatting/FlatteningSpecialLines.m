@@ -23,48 +23,27 @@ if size(GroupsSizes1,1)>2
 
         GroupSize = GroupsSizes3(StraightLineToRightLoc(StraightLine_idx));
 
-        [AllModuleBranchInd, ModuleLogForEachStep] = Get_ModuleLogForEachStep(WS,3,GroupInd3,GroupInd1,StraightLineToRightLoc(StraightLine_idx),GroupSize);
+        [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,3,GroupInd3,GroupInd1,StraightLineToRightLoc(StraightLine_idx),GroupSize);
         
+        AttaceDir = Get_EdgeOfAttaceDir(OnlyEdgeOfAttaceModulesInd,OnlyBranchModulesInd);
         
-        
-        %         try
-%         ModulesInd = GroupInd3{StraightLineToRightLoc(StraightLine_idx)}{1};
-%         catch ee2e
-%             ee2e
-%         end
-%         ScannedAgent = ~WS.Space.Status;
-%         ScannedAgent(GroupInd1{1}{1}) = true;
-% %         StraightLineModulesInd = ScanningAgents(WS, ScannedAgent, ModulesInd(3), []); % for Left line i need to take the first module
-% %         try
-%         [~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesInd(3),true);
-%         
-% %         catch ee
-% %             ee
-% %         end
-% %         if ~isequal(sort(StraightLineModulesInd),sort(StraightLineModulesInd1))
-% %             d=5
-% %         end
-% 
-%         AllModuleBranchInd = unique([StraightLineModulesInd;ModulesInd]);
-%         if GroupsSizes3(StraightLineToRightLoc(StraightLine_idx))<0
-%             RowModuleLogical(:,2) = ismember(AllModuleBranchInd,ModulesInd(3:4));
-%             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1:2));
-%             
-%         else
-%             RowModuleLogical(:,2) = ismember(AllModuleBranchInd,ModulesInd(2:3));
-%             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1));
-%         end
-        
-        [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllModuleBranchInd,ModuleLogForEachStep,3,"Simple");
-        
-        % An attempt to move the branch
-        if ~OK
-            Axis = 1;
-            Step = 1;
-        
-%             [RepairOK, WS, tree, ParentInd, AllModuleBranchInd] =...
-%             ManeuverStepProcess(WS,tree,ParentInd,AllModuleBranchInd(~RowModuleLogical(:,1)), Axis, Step);
+        OK = false;
+        while ~OK
+            [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllMovingModuleInd,ModuleLogForEachStep,3,"Simple");
             
+            % An attempt to move the branch
+            if ~OK
+                Axis = 1;
+                Step = 1;
+                
+                [Repair_OK, WS, tree, ParentInd, OnlyBranchModulesInd] =...
+                    ManeuverStepProcess(WS,tree,ParentInd,OnlyBranchModulesInd, Axis, Step);
+                if ~Repair_OK
+                    break
+                else
+                    AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
+                end
+            end
         end
         
 
@@ -75,39 +54,26 @@ if size(GroupsSizes1,1)>2
         
         GroupSize = GroupsSizes2(StraightLineToLeftLoc(StraightLine_idx));
 
-        [AllModuleBranchInd, ModuleLogForEachStep] = Get_ModuleLogForEachStep(WS,2,GroupInd2,GroupInd1,StraightLineToLeftLoc(StraightLine_idx),GroupSize);
+        [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,2,GroupInd2,GroupInd1,StraightLineToLeftLoc(StraightLine_idx),GroupSize);
         
-%         try
-%         ModulesInd = GroupInd2{StraightLineToLeftLoc(StraightLine_idx)}{1};
-%         catch rrr
-%             rrr
-%         end
-%         ScannedAgent = ~WS.Space.Status;
-%         ScannedAgent(GroupInd1{1}{1}) = true;
-% %         [~, StraightLineModulesInd] = ScanningAgents(WS, ScannedAgent, ModulesInd(3), []); % for Left line i need to take the first module
-%         [~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesInd(3),true);
-% 
-%         AllModuleBranchInd = unique([StraightLineModulesInd;ModulesInd]);
-%         
-%         if ~EndIsAlpha(GroupSize)
-%             RowModuleLogical(:,2) = ismember(AllModuleBranchInd,ModulesInd(3:4));
-%             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1:2));
-%             
-%         else
-%             RowModuleLogical(:,2) = ismember(AllModuleBranchInd,ModulesInd(2:3));
-%             RowModuleLogical(:,1) = ismember(AllModuleBranchInd,ModulesInd(1));
-%         end
-%         צריך לכתוב מחדש את מציאת המודולים עבור הפונקציה הזאת
-        [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllModuleBranchInd,ModuleLogForEachStep,2,"Simple");
-        
-        % An attempt to move the branch
-        if ~OK
-            Axis = 1;
-            Step = 1;
-        
-%             [RepairOK, WS, tree, ParentInd, AllModuleBranchInd] =...
-%             ManeuverStepProcess(WS,tree,ParentInd,AllModuleBranchInd(RowModuleLogical(:,1)), Axis, Step);
+        AttaceDir = Get_EdgeOfAttaceDir(OnlyEdgeOfAttaceModulesInd,OnlyBranchModulesInd);
+        OK = false;
+        while ~OK
+             [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllMovingModuleInd,ModuleLogForEachStep,2,"Simple");
             
+            % An attempt to move the branch
+            if ~OK
+                Axis = 1;
+                Step = -1;
+                
+                [Repair_OK, WS, tree, ParentInd, OnlyBranchModulesInd] =...
+                    ManeuverStepProcess(WS,tree,ParentInd,OnlyBranchModulesInd, Axis, Step);
+                if ~Repair_OK
+                    break
+                else
+                    AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
+                end
+            end
         end
         
 
@@ -117,20 +83,32 @@ end
 
 end
 
+function AttaceDir = Get_EdgeOfAttaceDir(ModulesGroupInd,StraightLineModuleInd)
+
+EdgeOfAttaceLog = ismember(StraightLineModuleInd,ModulesGroupInd);
+EdgeOfAttace = StraightLineModuleInd(EdgeOfAttaceLog);
+RestOfModule = StraightLineModuleInd(~EdgeOfAttaceLog);
+
+if min(EdgeOfAttace) < min(RestOfModule)
+    AttaceDir = "Left";
+else
+    AttaceDir = "Right";
+end
+end
 
 
-function [AllModuleBranchInd,ModuleLogForEachStep] = Get_ModuleLogForEachStep(WS,Axis,AxisGroupInd,GroupInd1,StraightLineLoc,GroupSize)
+function [AllModuleBranchInd,ModuleLogForEachStep,StraightLineModulesInd,ModulesGroupInd] = Get_ModuleLogForEachStep(WS,Axis,AxisGroupInd,GroupInd1,StraightLineLoc,GroupSize)
 
 try
-ModulesInd = AxisGroupInd{StraightLineLoc}{1};
+ModulesGroupInd = AxisGroupInd{StraightLineLoc}{1};
 catch rrr
     rrr
 end
 ScannedAgent = ~WS.Space.Status;
 ScannedAgent(GroupInd1{1}{1}) = true;
-[~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesInd(3),true);
+[~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesGroupInd(3),true);
 
-AllModuleBranchInd = unique([StraightLineModulesInd;ModulesInd]);
+AllModuleBranchInd = unique([StraightLineModulesInd;ModulesGroupInd]);
 
 ModuleLogForEachStep = false(length(AllModuleBranchInd),1);
 
@@ -145,25 +123,29 @@ end
 
 try
     if Axis == 2
-        InsideModuleExist = abs(AxisGroupInd{StraightLineLoc+1}{end-1} - AxisGroupInd{StraightLineLoc+1}{end}) <= 3;
+        [~,Col_Branch] = find(WS.R2==AxisGroupInd{StraightLineLoc+1}{end-1}(end));
+        [~,Col_Base]   = find(WS.R2 == AxisGroupInd{StraightLineLoc+1}{end}(1));
+        InsideModuleExist = abs(Col_Branch - Col_Base) <= 3;
     else
-        InsideModuleExist = abs(AxisGroupInd{StraightLineLoc-1}{2} - AxisGroupInd{StraightLineLoc-1}{1}) <= 3;
+        [~,Col_Branch] = find(WS.R3==AxisGroupInd{StraightLineLoc+1}{2}(1));
+        [~,Col_Base]   = find(WS.R3 == AxisGroupInd{StraightLineLoc+1}{1}(end));
+        InsideModuleExist = abs(Col_Branch - Col_Base) <= 3;
     end
-catch
+catch e4
     InsideModuleExist = false;
 end
 
 if ~InsideModuleExist
     ModuleLogForEachStep(:,1) = true;
 else
-    ModuleLogForEachStep(:,1) = ismember(AllModuleBranchInd,ModulesInd);
-    try
-        TestThisOption
-    catch Test
-        Test
-        fprintf("FlatteningSpecialLines")
-        pause
-    end
+    ModuleLogForEachStep(:,1) = ismember(AllModuleBranchInd,ModulesGroupInd);
+%     try
+%         TestThisOption
+%     catch Test
+%         Test
+%         fprintf("FlatteningSpecialLines")
+%         pause
+%     end
 end
 
 end
@@ -180,9 +162,15 @@ switch BranchAxis
     case 2
         Axis = [2;1;2];
         Step = [1;1;-1];
+%         if matches(AttaceDirection,"Left")
+%             Step(2) = -1;
+%         end
     case 3
         Axis = [3;1;3];
         Step = [-1;-1;1];
+%         if matches(AttaceDirection,"Right")
+%             Step(2) = 1;
+%         end
 end
 
 switch Version

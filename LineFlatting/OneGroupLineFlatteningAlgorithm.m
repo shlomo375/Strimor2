@@ -18,21 +18,21 @@ Tree = TreeClass("", N, 1e3, Config,Flat);
 % figure(1)
 % PlotWorkSpace(WS,[]);
 %%
-SpreadingDir = -1;
+SpreadingDir = "Left";
 ParentInd = 1;
 OldWS = WS;
 Break = 0;
 while 1
 try
-[WS, Tree,  ParentInd] = SpreadingAllAtOnes(WS,Tree,ParentInd,SpreadingDir);
+% [WS, Tree,  ParentInd] = SpreadingAllAtOnes(WS,Tree,ParentInd,SpreadingDir);
 % figure(2)
 % PlotWorkSpace(WS,[]);
-% [tree,WS, GroupInd] = SpreadingOneGroupInLine(WS,Tree,GroupInd,1,1,1);
-% PlotWorkSpace(WS,[]);
 
-[WS,Tree, ParentInd] = ReducingRowsOneGroupInLine(WS, Tree, ParentInd, SpreadingDir);
+% [WS,Tree, ParentInd] = ReducingRowsOneGroupInLine(WS, Tree, ParentInd, SpreadingDir);
 % figure(3)
 % PlotWorkSpace(WS,[]);
+
+[WS,Tree, ParentInd] = SpreadAndReduce(WS,Tree, ParentInd,SpreadingDir);
 
 [WS,Tree, ParentInd] = FlatteningSpecialLines(WS,Tree, ParentInd);
 
@@ -58,7 +58,7 @@ if isequal(WS.Space.Status,OldWS.Space.Status)
 end
 % figure(6)
 % PlotWorkSpace(WS,[]);
-SpreadingDir = -SpreadingDir;
+SpreadingDir = setdiff(["Left","Right"],SpreadingDir);
 catch eee
     eee
 end

@@ -4,27 +4,31 @@ AllModuleInd = find(WS.Space.Status,tree.N);
 
 Case = sum(GroupsEdges.*[2,1]);
 if Case == 3
-    AlphaInRightGroup = length(GroupInd{2}{GroupsPairLoc}) >= length(GroupInd{2}{GroupsPairLoc+1});
-    if AlphaInRightGroup
-        Case = 1;
-        if length(GroupIndexes{2}) > 2
-            if abs(GroupIndexes{2}{GroupsPairLoc+2}(1) - GroupIndexes{2}{GroupsPairLoc+1}(end)) < 3
-                Case = 2;
-                if abs(GroupIndexes{2}{GroupsPairLoc}(1) - GroupIndexes{2}{GroupsPairLoc-1}(end)) < 3
-                    OK = false;
-                    return
-                end   
-            end
-        end
-    else
+    if GroupsPairLoc == 1
         Case = 2;
-        if length(GroupIndexes{2}) > 2
-            if abs(GroupIndexes{2}{GroupsPairLoc-1}(end) - GroupIndexes{2}{GroupsPairLo1}(1)) < 3
-                Case = 1;
-                if abs(GroupIndexes{2}{GroupsPairLoc+1}(1) - GroupIndexes{2}{GroupsPairLoc}(end)) < 3
-                    OK = false;
-                    return
-                end   
+    else
+        AlphaInRightGroup = length(GroupInd{2}{GroupsPairLoc}) >= length(GroupInd{2}{GroupsPairLoc+1});
+        if AlphaInRightGroup
+            Case = 1;
+            if length(GroupIndexes{2}) > 2
+                if abs(GroupIndexes{2}{GroupsPairLoc+2}(1) - GroupIndexes{2}{GroupsPairLoc+1}(end)) < 3
+                    Case = 2;
+                    if abs(GroupIndexes{2}{GroupsPairLoc}(1) - GroupIndexes{2}{GroupsPairLoc-1}(end)) < 3
+                        OK = false;
+                        return
+                    end   
+                end
+            end
+        else
+            Case = 2;
+            if length(GroupIndexes{2}) > 2
+                if abs(GroupIndexes{2}{GroupsPairLoc-1}(end) - GroupIndexes{2}{GroupsPairLo1}(1)) < 3
+                    Case = 1;
+                    if abs(GroupIndexes{2}{GroupsPairLoc+1}(1) - GroupIndexes{2}{GroupsPairLoc}(end)) < 3
+                        OK = false;
+                        return
+                    end   
+                end
             end
         end
     end

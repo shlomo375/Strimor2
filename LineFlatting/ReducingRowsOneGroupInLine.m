@@ -6,7 +6,7 @@ while 1
     AllModuleInd = find(WS.Space.Status);
     try
     switch SpreadingSide
-        case 1
+        case "Right"
             LeadModuleType = sign(GroupsSizes(1:end-1));
             LeadModuleType(~mod(GroupsSizes(1:end-1,:),2)) = LeadModuleType(~mod(GroupsSizes(1:end-1,:),2))*-1;
             try
@@ -60,7 +60,7 @@ while 1
                 [~,~, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
             end
     
-        case -1
+        case "Left"
             LeadModuleType = sign(GroupsSizes(1:end-1));
             LeadModuleInd = cellfun(@(x)x{1}(1),GroupInd(1:end-1))';
             

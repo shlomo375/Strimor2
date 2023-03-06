@@ -16,7 +16,7 @@ switch Case
         AboveModule = true;
         MovingHalfInd = FindModuleReletiveToMotionAxis(WS.R2,GroupInd{2}{GroupsPairLoc}(end),AllModuleInd,AboveModule);
         OuterBeta = GroupInd{2}{GroupsPairLoc}(1);
-        HorizenStep = (GroupIndexes{2}{GroupsPairLoc}(end) - GroupIndexes{2}{GroupsPairLoc+1}(1))/2 +1;
+        HorizenStep = (GroupIndexes{2}{GroupsPairLoc}(1)+1 - GroupIndexes{2}{GroupsPairLoc+1}(1))/2 +1;
 %         [~, BranchInd] = ScanningAgents(WS, ScannedAgent, GroupInd{2}{GroupsPairLoc +1}(1), []);
         [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{GroupsPairLoc +1}(1),true);
         BranchIndInMovingHalf = ismember(MovingHalfInd,BranchInd);
@@ -33,7 +33,7 @@ switch Case
         AboveModule = true;
         MovingHalfInd = FindModuleReletiveToMotionAxis(WS.R3,GroupInd{2}{GroupsPairLoc+1}(1),AllModuleInd,AboveModule);
         OuterBeta = GroupInd{2}{GroupsPairLoc+1}(end);
-        HorizenStep = -(GroupIndexes{2}{GroupsPairLoc}(end) - GroupIndexes{2}{GroupsPairLoc+1}(1))/2 -1; %length(GroupInd{2}{GroupsPairLoc})/2 -1;
+        HorizenStep = (GroupIndexes{2}{GroupsPairLoc+1}(end)- GroupIndexes{2}{GroupsPairLoc}(end)-1)/2 -1; %length(GroupInd{2}{GroupsPairLoc})/2 -1;
 %         [~, BranchInd] = ScanningAgents(WS, ScannedAgent, GroupInd{2}{GroupsPairLoc}(1), []);
         [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{GroupsPairLoc}(1),true);
         BranchIndInMovingHalf = ismember(MovingHalfInd,BranchInd);

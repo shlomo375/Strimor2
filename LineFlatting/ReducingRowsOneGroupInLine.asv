@@ -7,7 +7,7 @@ while 1
     try
     switch SpreadingSide
         case 1
-            LeadModuleType = sign(GroupsSizes(1:end-1,:));
+            LeadModuleType = sign(GroupsSizes(1:end-1));
             LeadModuleType(~mod(GroupsSizes(1:end-1,:),2)) = LeadModuleType(~mod(GroupsSizes(1:end-1,:),2))*-1;
             try
                 LeadModuleInd = cellfun(@(x)x{end}(end),GroupInd(1:end-1),UniformOutput=true)';
@@ -23,14 +23,14 @@ while 1
                     Step = 1;
                     Axis = 2;
     
-                    [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R2,LeadModuleInd(line),AllModuleInd,AboveModule);
+                    [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS,LeadModuleInd(line),AllModuleInd,Axis);
                     
                 else
                     AboveModule = false;
                     Step = -1;
                     Axis = 3;
                     
-                    [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS.R3,LeadModuleInd(line),AllModuleInd,AboveModule);
+                    [MovingModule,MovingModuleLocInAllModuleInd] = FindModuleReletiveToMotionAxis(WS,LeadModuleInd(line),AllModuleInd,Axis);
                     
                 end
                 
@@ -61,7 +61,7 @@ while 1
             end
     
         case -1
-            LeadModuleType = sign(GroupsSizes(1:end-1,:));
+            LeadModuleType = sign(GroupsSizes(1:end-1));
             LeadModuleInd = cellfun(@(x)x{1}(1),GroupInd(1:end-1))';
             
             for line = length(LeadModuleInd):-1:1
