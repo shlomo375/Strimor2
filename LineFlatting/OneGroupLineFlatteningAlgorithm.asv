@@ -8,7 +8,7 @@ N = sum(logical(Config.ConfigMat{:}),"all");
 
 ConfigStruct = Node2ConfigStruct(Config);
 % PlotWorkSpace(WS);
-WsSize = [N, 2*N];
+WsSize = [N, 4*N];
 BasicWS = WorkSpace(WsSize,"RRT*");
 WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
 %%
@@ -18,7 +18,7 @@ Tree = TreeClass("", N, 1e3, Config,Flat);
 % figure(1)
 % PlotWorkSpace(WS,[]);
 %%
-SpreadingDir = "Left";
+% SpreadingDir = "Right";
 ParentInd = 1;
 OldWS = WS;
 Break = 0;
@@ -31,8 +31,9 @@ try
 % [WS,Tree, ParentInd] = ReducingRowsOneGroupInLine(WS, Tree, ParentInd, SpreadingDir);
 % figure(3)
 % PlotWorkSpace(WS,[]);
+[WS,Tree, ParentInd] = SpreadAndReduce(WS,Tree, ParentInd);
 
-[WS,Tree, ParentInd] = SpreadAndReduce(WS,Tree, ParentInd,SpreadingDir);
+[WS,Tree, ParentInd] = Expend(WS,Tree, ParentInd);
 
 [WS,Tree, ParentInd] = FlatteningSpecialLines(WS,Tree, ParentInd);
 
@@ -58,7 +59,7 @@ if isequal(WS.Space.Status,OldWS.Space.Status)
 end
 % figure(6)
 % PlotWorkSpace(WS,[]);
-SpreadingDir = setdiff(["Left","Right"],SpreadingDir);
+% SpreadingDir = setdiff(["Left","Right"],SpreadingDir);
 catch eee
     eee
 end

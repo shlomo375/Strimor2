@@ -437,8 +437,7 @@ classdef WorkSpace
             MoveAgent2Ind = [];
 
             if ~all(WS.Space.Status(Movment.Agent))
-                OK = false;
-                return
+                error("the ind to move arn't a module location");
             end
 
 

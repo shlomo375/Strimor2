@@ -1,0 +1,11 @@
+function [WorkZoneInd, WorkZoneSub] = Get_WorkZone(WS,BranchModulesInd)
+WorkZoneCol = [-3,-2,-1,0,1,2,3];
+WorkZoneRow = zeros(1,7);
+R = {WS.R1, WS.R2, WS.R3};
+
+for Axis = numel(R)
+    [Row,Col] = ind2sub(size(R{Axis}),find(ismember(R{Axis},BranchModulesInd),numel(BranchModulesInd)));
+
+    ZoneIndInR = sub2ind(size(R{Axis}),Row+WorkZoneRow,Col+WorkZoneCol);
+    WorkZoneInd = R{Axis}(ZoneIndInR);
+end

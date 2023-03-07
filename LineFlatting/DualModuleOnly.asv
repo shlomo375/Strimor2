@@ -3,7 +3,7 @@ function [WS,tree, ParentInd] =  DualModuleOnly(WS, tree, ParentInd)
 [GroupsSizes,GroupIndexes, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
 
 % GroupSizes = tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
-if size(GroupsSizes,2) > 1 || size(GroupsSizes,1) > 2  || sign(GroupsSizes(2,1)) ~= sign(GroupsSizes(1,1)) || abs(GroupsSizes(2,1))~=2
+if size(GroupsSizes,2) > 1 || size(GroupsSizes,1) > 2  || sign(GroupsSizes(2,1)) ~= sign(GroupsSizes(1,1)) || absGroupsSizes(2,1)~=2
     return
 end
 
