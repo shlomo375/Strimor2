@@ -37,7 +37,19 @@ if size(GroupsSizes1,1)>2
                 if ~Repair_OK
                     break
                 else
-                    AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
+                    ConfigMat3 = GetConfigProjection(WS.Space.Status,RotationMatrices,3);
+                    ConfigType3 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,3);
+                    
+                    
+                    [GroupsSizes1,~, GroupInd1] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+                    [GroupsSizes3,~, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,WS.R3);
+%                     AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
+                    StraightLineToRightLoc = find(abs(GroupsSizes3(:,1)) >= 5 | GroupsSizes3(:,1) == 4);
+                    GroupSize = GroupsSizes3(StraightLineToRightLoc(StraightLine_idx));
+
+                    [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,3,GroupInd3,GroupInd1,StraightLineToRightLoc(StraightLine_idx),GroupSize);
+        
+                
                 end
             else
                 return
@@ -77,7 +89,17 @@ if size(GroupsSizes1,1)>2
                 if ~Repair_OK
                     break
                 else
-                    AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
+%                     AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
+                    ConfigMat2 = GetConfigProjection(WS.Space.Status,RotationMatrices,2);
+                    ConfigType2 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,2);
+                    
+                    
+                    [~,~, GroupInd1] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+                    [GroupsSizes2,~, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,WS.R2);
+                    StraightLineToLeftLog = abs(GroupsSizes2) >= 5 | GroupsSizes2 == -4;
+                    StraightLineToLeftLoc = find(StraightLineToLeftLog & ~[GroupsSizes2(:,2:end),zeros(size(GroupsSizes2,1),1)]);
+                    GroupSize = GroupsSizes2(StraightLineToLeftLoc(StraightLine_idx));
+                    [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,2,GroupInd2,GroupInd1,StraightLineToLeftLoc(StraightLine_idx),GroupSize);
                 end
             else
                 return

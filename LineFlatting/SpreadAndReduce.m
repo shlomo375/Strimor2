@@ -20,7 +20,9 @@ while row > 1
     OldWS = WS;
     
     for col = 1:numel(GroupsInd{row})
-        
+%         if col==1 & row == 2
+%             d=5
+%         end
         switch SpreadingDir
             case "Left"
                 [WS,tree, ParentInd, GroupsInd] = SpreadAndReduce_SingleGroup(WS, ...
@@ -71,7 +73,6 @@ end
 function [WS,tree, ParentInd, GroupsIndexes] = SpreadAndReduce_SingleGroup(WS,tree, ParentInd,GroupsIndexes,GroupSubLoc, SpreadingDir)
 % Output_WS.Space.Status = [];
 OnlySpread = true;
-
 while OnlySpread%isequal(logical(Output_WS.Space.Status),logical(WS.Space.Status))
     try
     OneModuleInd = GroupsIndexes{GroupSubLoc(1)}{GroupSubLoc(2)}(1);

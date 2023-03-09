@@ -45,39 +45,21 @@ if matches(FunctionMethod,["BRANCH_AND_MAX_STEP","BRANCH_MAX_STEP_REDUCE"])
             case "Left"
                 varargout{1} = (min(BaseModuleEdgeLocCol(BaseModulesIndType==-1)) - max(MovingModuleEdgeLocCol(TopLineModulesType==1)))/2;
         end
-        if matches(FunctionMethod,["BRANCH_MAX_STEP_REDUCE","BRANCH_MAX_STEP_EDGE"])
+        if matches(FunctionMethod,"BRANCH_MAX_STEP_REDUCE")
             % compute Module to reduce
             NewModuleInd = UpdateLinearIndex(WS.SpaceSize,BranchModulesInd,1,varargout{1});
             switch P.Dir
                 case "Right"
-                    [EdgeModuleCol, EdgeModuleLoc] = max(BaseModuleEdgeLocCol);
-                    EdgeModuleType = BaseModulesIndType(EdgeModuleLoc);
-                    ModuleInd = BaseModulesInd(EdgeModuleLoc);
-                    
-                    if EdgeModuleType == 1
-                        [MovingModuleInd,MovingModuleLocInAllModuleInd_New] = FindModuleReletiveToMotionAxis(WS.R2,ModuleInd,NewModuleInd,true);
-                        varargout{3} = 2;% Axis
-                    else
-                        [MovingModuleInd,MovingModuleLocInAllModuleInd_New] = FindModuleReletiveToMotionAxis(WS.R3,ModuleInd,NewModuleInd,false);
-                        varargout{3} = 3;% Axis
-                    end
-                    varargout{2} = MovingModuleInd;
+                    [~, EdgeModuleLoc] = max(BaseModuleEdgeLocCol);
                 case "Left"
-                    [EdgeModuleCol, EdgeModuleLoc] = min(BaseModuleEdgeLocCol);
-                    EdgeModuleType = BaseModulesIndType(EdgeModuleLoc);
-                    ModuleInd = BaseModulesInd(EdgeModuleLoc);
-                    
-                    if EdgeModuleType == 1
-                        [MovingModuleInd,MovingModuleLocInAllModuleInd_New] = FindModuleReletiveToMotionAxis(WS.R3,ModuleInd,NewModuleInd,true);
-                        
-                        varargout{3} = 3;% Axis
-                    else
-                        [MovingModuleInd,MovingModuleLocInAllModuleInd_New] = FindModuleReletiveToMotionAxis(WS.R2,ModuleInd,NewModuleInd,false);
-                        varargout{3} = 2;% Axis
-                    end
-                    varargout{2} = MovingModuleInd;
-                    
+                    [~, EdgeModuleLoc] = min(BaseModuleEdgeLocCol);
             end
+            EdgeModuleType = BaseModulesIndType(EdgeModuleLoc);
+            EdgeInd = BaseModulesInd(EdgeModuleLoc);
+            
+            [varargout{2},varargout{3}] = FindModuleConnectedToEdgeToReduce(WS,EdgeInd,EdgeModuleType,NewModuleInd,P.Dir);
+%                     varargout{2} = MovingModuleInd;
+                    
         end
 end
 

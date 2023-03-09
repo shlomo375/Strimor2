@@ -370,7 +370,7 @@ classdef WorkSpace
             end
             
             if GeneralPlot.Plot_CellInd
-                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc')),[],[],MoveNumText);
+                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc)),[],[],MoveNumText);
             else
                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc),[],[],[],MoveNumText);
             end
@@ -555,7 +555,11 @@ classdef WorkSpace
             catch e
                 e
             end
+            try
             PartnerAgent = [PartnerAgentUpIndLoc; PartnerAgentDownIndLoc];
+            catch qwe
+                qwe
+            end
             try
             PartnerAgentInSpace = R(PartnerAgent);
             zeroLoc = (PartnerAgentInSpace == 0);

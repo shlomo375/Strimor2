@@ -45,8 +45,8 @@ switch Axis
         else
 %             Axis = [2;1;2];
             AllModuleInd = find(WS.Space.Status,tree.N);
-            [GroupFrontLineInd] = FindModuleReletiveToMotionAxis(R,GroupInd{2}{PairLoc}(1),AllModuleInd,true,true);
-            [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1}(end),true);
+            [GroupFrontLineInd] = FindModuleReletiveToMotionAxis(R,GroupInd{2}{PairLoc}(end),AllModuleInd,true,true);
+            [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc+1}(1),true);
             Step(2) = (LeftGroupRightCol-RightGroupLeftCol)/2;
         end
 

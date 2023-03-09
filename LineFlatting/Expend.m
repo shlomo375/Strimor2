@@ -54,7 +54,7 @@ if isempty(Previous_WorkZoneInd)
         BaseEdgeType = WS.Space.Type(max(GroupsInds{1}{1}));
         GroupEdgeType = WS.Space.Type(max(GroupModulesInd));
 
-        StepApproved = ((BaseEdgeCol-(BaseEdgeType>0))-(GroupEdgeCol+(GroupEdgeType<0)))/2 -1;
+        StepApproved = ((BaseEdgeCol-(BaseEdgeType>0))-(GroupEdgeCol+(GroupEdgeType<0)))/2 ;%-1;
     else
 
         [~,BaseEdgeCol] = ind2sub(WS.SpaceSize,min(GroupsInds{1}{1}));
@@ -63,7 +63,7 @@ if isempty(Previous_WorkZoneInd)
         BaseEdgeType = WS.Space.Type(min(GroupsInds{1}{1}));
         GroupEdgeType = WS.Space.Type(min(GroupModulesInd));
 
-        StepApproved = (((BaseEdgeCol-(BaseEdgeType>0))-(GroupEdgeCol+(GroupEdgeType<0)))/2 +1);
+        StepApproved = (((BaseEdgeCol-(BaseEdgeType>0))-(GroupEdgeCol+(GroupEdgeType<0)))/2);% +1);
     end
     WorkZoneInd = UpdateLinearIndex(WS.SpaceSize,WorkZoneInd,1,StepApproved);
 else
