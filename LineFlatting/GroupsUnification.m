@@ -9,6 +9,21 @@ while GroupConnected
     % load("GroupsUnificatin.mat");
     [GroupsSizes,GroupIndexes, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
     
+    RotationMatrices = {WS.R1,WS.R2,WS.R3};
+
+    ConfigMat2 = GetConfigProjection(WS.Space.Status,RotationMatrices,2);
+    ConfigType2 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,2);
+
+    [GroupsSizes2,~, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,WS.R2);
+
+    ConfigMat3 = GetConfigProjection(WS.Space.Status,RotationMatrices,3);
+    ConfigType3 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,3);
+
+    [GroupsSizes3,~, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,WS.R3);
+    
+%     [GroupsSizes2,GroupIndexes2, GroupInd2] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R2);
+%     [GroupsSizes3,GroupIndexes3, GroupInd3] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R3);
+    
     EndAlpha = EndIsAlpha(GroupsSizes(2,:));
     FirstAlpha = FirstIsAlpha(GroupsSizes(2,:));
     
@@ -34,12 +49,12 @@ while GroupConnected
             %%
             if EndAlpha(GroupPairNum) && ~FirstAlpha(GroupPairNum+1)
                 Axis = 2; %%%
-                [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, GroupPairNum,Axis, GroupIndexes', GroupInd, ScannedAgent);
+                [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, GroupPairNum,Axis, GroupIndexes', GroupInd,GroupInd2,GroupInd3, ScannedAgent);
             end
     
             if ~EndAlpha(GroupPairNum) && FirstAlpha(GroupPairNum+1)
                 Axis = 3; %%%
-                [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, GroupPairNum,Axis, GroupIndexes', GroupInd, ScannedAgent);
+                [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, GroupPairNum,Axis, GroupIndexes', GroupInd,GroupInd2,GroupInd3, ScannedAgent);
             end
             %%
             if EndAlpha(GroupPairNum) && FirstAlpha(GroupPairNum+1)

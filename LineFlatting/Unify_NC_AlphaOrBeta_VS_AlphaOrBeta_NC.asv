@@ -1,4 +1,4 @@
-function [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, PairLoc,Axis, GroupIndexes, GroupInd,AxisGroupInd2,AxisGroupInd3, ScannedAgent)
+function [OK, WS,tree,ParentInd] = Unify_NC_AlphaOrBeta_VS_AlphaOrBeta_NC(WS,tree,ParentInd, PairLoc,Axis, GroupIndexes, GroupInd,AxisGroupInd, ScannedAgent)
 
 %%
 switch Axis
@@ -13,7 +13,7 @@ switch Axis
             GroupFrontLineInd = R(Row,:);
             GroupFrontLineInd(GroupFrontLineInd==0) =[];
             GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
-            GroupFrontLineInd = GetFrontLine(GroupInd{2}{PairLoc}(end),AxisGroupInd2,2);
+        
         else
             
             AllModuleInd = find(WS.Space.Status,tree.N);
@@ -35,14 +35,13 @@ switch Axis
         RightGroupLeftCol =  GroupIndexes{2}{PairLoc+1}(1);
         LeftGroupRightCol = GroupIndexes{2}{PairLoc}(end)+1;
         if numel(GroupInd{2}{PairLoc+1}) ~= 1
-%             RightGroupLeftInd =  GroupInd{2}{PairLoc+1}(1);
-%             [Row,~] = find(R == RightGroupLeftInd,1);
-%             GroupFrontLineInd = R(Row,:);
-%             GroupFrontLineInd(GroupFrontLineInd==0) =[];
-%             GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
-% 
-%             GroupFrontLineLogical = cellfun(@(Line) any(Line{1}==RightGroupLeftInd) ,AxisGroupInd)
-            GroupFrontLineInd = GetFrontLine(GroupInd{2}{PairLoc+1}(1),AxisGroupInd3,3);
+            RightGroupLeftInd =  GroupInd{2}{PairLoc+1}(1);
+            [Row,~] = find(R == RightGroupLeftInd,1);
+            GroupFrontLineInd = R(Row,:);
+            GroupFrontLineInd(GroupFrontLineInd==0) =[];
+            GroupFrontLineInd(WS.Space.Status(GroupFrontLineInd)==0) = [];
+
+            GroupFrontLineLogical = cellfun(@(Line) any(Line{1}==RightGroupLeftInd) ,AxisGroupInd)
             [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, GroupInd{2}{PairLoc}(end),true);
             Step(2) = (RightGroupLeftCol-LeftGroupRightCol)/2;
         else
@@ -106,22 +105,17 @@ ParentInd = NewParentInd;
 end
 
 
-function FrontLineModule = GetFrontLine(StartModule,GroupInd,Axis)
-FrontLineModule = [];
+function FronLineModule = GetFrontLine(StartModule,GroupInd,Axis)
+
 if Axis == 3
     for Line = 1:numel(GroupInd)
-        if any(GroupInd{Line}{1} == StartModule)
-            FrontLineModule = GroupInd{Line}{1};
+        if GroupInd{Line}{1} == StartModule
+            FronLineModule = GroupInd{Line}{1};
             break
         end
     end
 else
-   for Line = 1:numel(GroupInd)
-        if any(GroupInd{Line}{end} == StartModule)
-            FrontLineModule = GroupInd{Line}{end};
-            break
-        end
-    end 
+    
 end
 
 end
