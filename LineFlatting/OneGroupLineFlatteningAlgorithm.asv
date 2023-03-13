@@ -1,17 +1,8 @@
 %% Line flattening algorithm
 
 
-function [Sucsses, Path] = OneGroupLineFlatteningAlgorithm(Config,Flat,TimeOut,TimerON)
+function [Sucsses, Path] = OneGroupLineFlatteningAlgorithm(Config,Flat)
 %%
-
-arguments 
-    Config
-    Flat
-    TimeOut
-    TimerON = true;
-end
-
-
 Sucsses = true;
 N = sum(logical(Config.ConfigMat{:}),"all");
 
@@ -31,21 +22,20 @@ SpreadingDir = "Left_Right";
 ParentInd = 1;
 OldWS = WS;
 Break = 0;
-
-TimeOut_Clock = tic;
 while 1
 try
-if toc(TimeOut_Clock) > TimeOut && TimerON
-    Sucsses = false;
-    Path = Tree.Data(1:Tree.LastIndex,:);
-    return
-end
+% [WS, Tree,  ParentInd] = SpreadingAllAtOnes(WS,Tree,ParentInd,SpreadingDir);
+% figure(2)
+% PlotWorkSpace(WS,[]);
+
+% [WS,Tree, ParentInd] = ReducingRowsOneGroupInLine(WS, Tree, ParentInd, SpreadingDir);
 % figure(3)
 % PlotWorkSpace(WS,[]);
 [WS,Tree, ParentInd] = SpreadAndReduce(WS,Tree, ParentInd,SpreadingDir);
 % PlotWorkSpace(WS,"Plot_CellInd",true)
 [WS,Tree, ParentInd] = Expend(WS,Tree, ParentInd,SpreadingDir);
-
+f = figure(66)
+f.DockControls = "on"
 [WS,Tree, ParentInd] = FlatteningSpecialLines(WS,Tree, ParentInd);
 
 % figure(4)

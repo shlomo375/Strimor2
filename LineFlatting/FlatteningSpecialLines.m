@@ -45,6 +45,10 @@ if size(GroupsSizes1,1)>2
                     [GroupsSizes3,~, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,WS.R3);
 %                     AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
                     StraightLineToRightLoc = find(abs(GroupsSizes3(:,1)) >= 5 | GroupsSizes3(:,1) == 4);
+                    
+                    if isempty(StraightLineToRightLoc)
+                        break
+                    end
                     GroupSize = GroupsSizes3(StraightLineToRightLoc(StraightLine_idx));
 
                     [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,3,GroupInd3,GroupInd1,StraightLineToRightLoc(StraightLine_idx),GroupSize);
@@ -98,6 +102,9 @@ if size(GroupsSizes1,1)>2
                     [GroupsSizes2,~, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,WS.R2);
                     StraightLineToLeftLog = abs(GroupsSizes2) >= 5 | GroupsSizes2 == -4;
                     StraightLineToLeftLoc = find(StraightLineToLeftLog & ~[GroupsSizes2(:,2:end),zeros(size(GroupsSizes2,1),1)]);
+                    if isempty(StraightLineToLeftLoc)
+                        break
+                    end
                     GroupSize = GroupsSizes2(StraightLineToLeftLoc(StraightLine_idx));
                     [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,2,GroupInd2,GroupInd1,StraightLineToLeftLoc(StraightLine_idx),GroupSize);
                 end
