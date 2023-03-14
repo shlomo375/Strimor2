@@ -4,4 +4,4 @@
 *.mat
 *.avi
 ArticleMovie/*.avi
-!/LineFlatting
+!/LineFlatting/*
