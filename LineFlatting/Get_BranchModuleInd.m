@@ -22,13 +22,14 @@ ScannedAgent(cat(1,GroupsIndxes{Line-1}{:})) = true;
 if matches(FunctionMethod,["BRANCH_AND_MAX_STEP","BRANCH_MAX_STEP_REDUCE"])
   %% compute steps
         if Line >=3
-            ScannedAgent = ~WS.Space.Status;
-            ScannedAgent(cat(1,GroupsIndxes{Line-2}{:})) = true;
-            ScannedAgent(cat(1,GroupsIndxes{Line}{:})) = true;
-            ScannedAgent(BranchModulesInd) = false;
-        
-            [~, BaseModulesInd] = ScanningAgentsFast(WS, ScannedAgent, StartModule,true);
-            BaseModulesInd(ismember(BaseModulesInd,BranchModulesInd)) = [];
+%             ScannedAgent = ~WS.Space.Status;
+%             ScannedAgent(cat(1,GroupsIndxes{Line-2}{:})) = true;
+%             ScannedAgent(cat(1,GroupsIndxes{Line}{:})) = true;
+%             ScannedAgent(BranchModulesInd) = false;
+%         
+%             [~, BaseModulesInd] = ScanningAgentsFast(WS, ScannedAgent, StartModule,true);
+%             BaseModulesInd(ismember(BaseModulesInd,BranchModulesInd)) = [];
+            BaseModulesInd = vertcat(GroupsIndxes{Line-1}{:});
         else
             BaseModulesInd = GroupsIndxes{1}{1};
         end

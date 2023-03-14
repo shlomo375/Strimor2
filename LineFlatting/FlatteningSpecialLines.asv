@@ -25,27 +25,26 @@ if size(GroupsSizes1,1)>2
         
         OK = false;
         NewWS = WS;
-        NewParentInd = ParentInd;
-        Newtree = tree;
+        New
         while ~OK
-            [OK ,NewWS,Newtree,NewParentInd] = FlatteningBranch(NewWS,Newtree,NewParentInd,AllMovingModuleInd,ModuleLogForEachStep,3,"Simple");
+            [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllMovingModuleInd,ModuleLogForEachStep,3,"Simple");
 %             
 %             % An attempt to move the branch
             if ~OK
                 Axis = 1;
                 Step = 1;
                 
-                [Repair_OK, NewWS,Newtree,NewParentInd, OnlyBranchModulesInd] =...
-                    ManeuverStepProcess(NewWS,Newtree,NewParentInd,OnlyBranchModulesInd, Axis, Step);
+                [Repair_OK, WS, tree, ParentInd, OnlyBranchModulesInd] =...
+                    ManeuverStepProcess(WS,tree,ParentInd,OnlyBranchModulesInd, Axis, Step);
                 if ~Repair_OK
                     break
                 else
-                    ConfigMat3 = GetConfigProjection(NewWS.Space.Status,RotationMatrices,3);
-                    ConfigType3 = -1 * GetConfigProjection(NewWS.Space.Type,RotationMatrices,3);
+                    ConfigMat3 = GetConfigProjection(WS.Space.Status,RotationMatrices,3);
+                    ConfigType3 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,3);
                     
                     
-                    [GroupsSizes1,~, GroupInd1] = ConfigGroupSizes(NewWS.Space.Status,NewWS.Space.Type,NewWS.R1);
-                    [GroupsSizes3,~, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,NewWS.R3);
+                    [GroupsSizes1,~, GroupInd1] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+                    [GroupsSizes3,~, GroupInd3] = ConfigGroupSizes(ConfigMat3,ConfigType3,WS.R3);
 %                     AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
                     StraightLineToRightLoc = find(abs(GroupsSizes3(:,1)) >= 5 | GroupsSizes3(:,1) == 4);
                     
@@ -54,14 +53,11 @@ if size(GroupsSizes1,1)>2
                     end
                     GroupSize = GroupsSizes3(StraightLineToRightLoc(StraightLine_idx));
 
-                    [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(NewWS,3,GroupInd3,GroupInd1,StraightLineToRightLoc(StraightLine_idx),GroupSize);
+                    [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,3,GroupInd3,GroupInd1,StraightLineToRightLoc(StraightLine_idx),GroupSize);
         
                 
                 end
             else
-                WS = NewWS;
-                ParentInd = NewParentInd;
-                tree = Newtree;
                 return
             end
         end
@@ -84,43 +80,37 @@ if size(GroupsSizes1,1)>2
         catch ME1
             ME1
         end
-
+%         AttaceDir = Get_EdgeOfAttaceDir(OnlyEdgeOfAttaceModulesInd,OnlyBranchModulesInd);
         OK = false;
-        NewWS = WS;
-        NewParentInd = ParentInd;
-        Newtree = tree;
         while ~OK
-             [OK ,NewWS,Newtree,NewParentInd] = FlatteningBranch(NewWS,Newtree,NewParentInd,AllMovingModuleInd,ModuleLogForEachStep,2,"Simple");
+             [OK ,WS, tree, ParentInd] = FlatteningBranch(WS,tree,ParentInd,AllMovingModuleInd,ModuleLogForEachStep,2,"Simple");
             
             % An attempt to move the branch
             if ~OK
                 Axis = 1;
                 Step = -1;
                 
-                [Repair_OK, NewWS, tree, ParentInd, OnlyBranchModulesInd] =...
-                    ManeuverStepProcess(NewWS,tree,ParentInd,OnlyBranchModulesInd, Axis, Step);
+                [Repair_OK, WS, tree, ParentInd, OnlyBranchModulesInd] =...
+                    ManeuverStepProcess(WS,tree,ParentInd,OnlyBranchModulesInd, Axis, Step);
                 if ~Repair_OK
                     break
                 else
 %                     AllMovingModuleInd = UpdateLinearIndex(WS.SpaceSize,AllMovingModuleInd,Axis,Step);
-                    ConfigMat2 = GetConfigProjection(NewWS.Space.Status,RotationMatrices,2);
-                    ConfigType2 = -1 * GetConfigProjection(NewWS.Space.Type,RotationMatrices,2);
+                    ConfigMat2 = GetConfigProjection(WS.Space.Status,RotationMatrices,2);
+                    ConfigType2 = -1 * GetConfigProjection(WS.Space.Type,RotationMatrices,2);
                     
                     
-                    [~,~, GroupInd1] = ConfigGroupSizes(NewWS.Space.Status,NewWS.Space.Type,NewWS.R1);
-                    [GroupsSizes2,~, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,NewWS.R2);
+                    [~,~, GroupInd1] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+                    [GroupsSizes2,~, GroupInd2] = ConfigGroupSizes(ConfigMat2,ConfigType2,WS.R2);
                     StraightLineToLeftLog = abs(GroupsSizes2) >= 5 | GroupsSizes2 == -4;
                     StraightLineToLeftLoc = find(StraightLineToLeftLog & ~[GroupsSizes2(:,2:end),zeros(size(GroupsSizes2,1),1)]);
                     if isempty(StraightLineToLeftLoc)
                         break
                     end
                     GroupSize = GroupsSizes2(StraightLineToLeftLoc(StraightLine_idx));
-                    [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(NewWS,2,GroupInd2,GroupInd1,StraightLineToLeftLoc(StraightLine_idx),GroupSize);
+                    [AllMovingModuleInd, ModuleLogForEachStep,OnlyBranchModulesInd,OnlyEdgeOfAttaceModulesInd] = Get_ModuleLogForEachStep(WS,2,GroupInd2,GroupInd1,StraightLineToLeftLoc(StraightLine_idx),GroupSize);
                 end
             else
-                WS = NewWS;
-                ParentInd = NewParentInd;
-                tree = Newtree;
                 return
             end
         end
