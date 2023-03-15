@@ -83,7 +83,8 @@ while OnlySpread%isequal(logical(Output_WS.Space.Status),logical(WS.Space.Status
     OneModuleInd = GroupsIndexes{GroupSubLoc(1)}{GroupSubLoc(2)}(1);
     [MoveingModules, Max_Step, ReduceModuleInd, ReduceAxis] = Get_BranchModuleInd(WS,GroupsIndexes,OneModuleInd,GroupSubLoc(1),"BRANCH_MAX_STEP_REDUCE",Dir=SpreadingDir);
     catch me2
-        me2
+%         me2
+        return
     end
 
     if isempty(ReduceModuleInd) && ~Max_Step

@@ -29,7 +29,7 @@ for GroupNum = BranchesIn2thRow
     [OK, WS, Tree, ParentInd, BranchModulesInd] =...
                     ManeuverStepProcess(WS,Tree,ParentInd,BranchModulesInd, 1, StepApproved);
     New_StepApproved = StepApproved;
-    while ~OK
+    while ~OK && StepUnit
         New_StepApproved = New_StepApproved-StepUnit;
         [OK, WS, Tree, ParentInd, BranchModulesInd] =...
                     ManeuverStepProcess(WS,Tree,ParentInd,BranchModulesInd, 1, New_StepApproved);

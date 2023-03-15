@@ -52,6 +52,8 @@ end
 % PlotWorkSpace(WS,[]);
 
 [WS,Tree, ParentInd] =  GroupsUnification(WS, Tree, ParentInd);
+
+[WS,Tree, ParentInd] =  BaseUnification(WS, Tree, ParentInd);
 % figure(5)
 % PlotWorkSpace(WS,[]);
 

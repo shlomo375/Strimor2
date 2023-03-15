@@ -1,5 +1,5 @@
 %% Solve multiple Line flattning problem
-
+58,97,100 problem
 clear
 close all
 SoftwareLocation = pwd;
