@@ -1,26 +1,53 @@
 clear
 SoftwareLocation = pwd;
-% addpath(genpath(SoftwareLocation));
+addpath(genpath(SoftwareLocation));
 
-PairsNum = 80;
+PairsNum = 2;
 Stock = [];
 ConfigPairs = [];
-for AgentNum = 18
-    CP = GetConfigPairs(AgentNum,PairsNum);
-    load(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
-    ConfigPairs = [ConfigPairs,CP];
-    save(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+AgentNum = 100;
+MaxConfigNum = 50000;
+
+
+for N = AgentNum
+    WS = WorkSpace([N,N*2],"RRT*");
+    ConfigCellArray = cell(MaxConfigNum,1);
+    fprintf("ModuleNUm: %d\n",N);
+    for ConfigNum = 1:MaxConfigNum
+        [Config,NewWS] = CreatShape(WS,N);
+        %
+%          f = figure(666);
+%         f.Position = [1921,265,1536,739];
+%         cla
+%         PlotWorkSpace(NewWS,"Plot_CellInd",true);   
+        %
+        ConfigCellArray{ConfigNum} = Config;
+        if ~mod(ConfigNum,1000)
+            fprintf("ConfigNum: %d, ModuleNUm: %d\n",ConfigNum,N);
+        end
+    end
+    fprintf("save ModuleNUm: %d\n",N);
+    save(strcat("configuration\LargeConfigs\N",string(N),".mat"),"ConfigCellArray");
 end
 
-function ConfigPairs = GetConfigPairs(N,NumOfPairs)
+% for AgentN = AgentNum
+%     CP = GetConfigPairs(WS,AgentNum,PairsNum);
+%     try
+%         load(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+%     end
+%     ConfigPairs = [ConfigPairs,CP];
+%     save(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+% end
+
+function ConfigPairs = GetConfigPairs(WS,N,NumOfPairs)
     Stock = [];
     ConfigPairs = [];
     while size(ConfigPairs,2) < NumOfPairs
         try    
-        Config = CreatShape(N);
-        flag2 = false;
+            [Config,NewWS] = CreatShape(WS,N);
+            flag2 = false;
         catch e
-            e;
+            e
         end
             if isempty(Stock)
                 Stock{1} = Config;
@@ -65,72 +92,37 @@ function ConfigPairs = GetConfigPairs(N,NumOfPairs)
 end
 
 
-function Config = CreatShape(N)
-    space = zeros(N,N*2);
-    space(N/2,N) = 1;
-    male = 1;
-    female = 0;
-    
-    while (male<N/2) || (female<N/2)
-        type = randi(2,1);
-        switch type
-            case 1
-                if male<N/2
-                    space = AddAgent(space,-1);
+function [Config,NewWS] = CreatShape(WS,N)
+WS.Space.Status(floor(WS.SpaceSize(1)/2),floor(WS.SpaceSize(2)/2):floor(WS.SpaceSize(2)/2)+1) = 1;
+male = 1;
+
+female = 1;
+
+while (male<N/2) || (female<N/2)
+    type = randi(2,1);
+    switch type
+        case 1
+            if male<N/2
+                [WS,Sucsses] = AddAgent(WS,-1);
+                if Sucsses
+                    male = male+1;
+                end
+            end
+            
+        case 2
+            if female<N/2
+                [WS,Sucsses] = AddAgent(WS,1);
+                if Sucsses
+                    female = female+1;
                 end
                 
-            case 2
-                if female<N/2
-                    space = AddAgent(space,1);
-                end     
-        end
-        male = sum(space==1,"all");
-        female = sum(space==-1,"all");
-    
+            end     
     end
-    
-    type = ones(size(space,1),1);
-    type(2:2:end) = -1;
-    temp = ones(1,size(space,2));
-    temp(2:2:end) = -1;
-    type = type.*temp;
 
-    agent = find(space==1,1);
-    if type(agent) ~= space(agent)
-        type = -type;
-    end
- 
-    WS = WorkSpace([N,N*2],"RRT*");
-    Config.Status = double(logical(space));
-    Config.Type = type(find(Config.Status,1));
-    WS = SetConfigurationOnSpace(WS,Config);
-    Config = GetConfiguration(WS);
+end
+
+Config = GetConfiguration(WS);
+NewWS = WS;
 %     PlotWorkSpace(WS,[]);
 end
 
-function space = AddAgent(space,type)
-    [rows,cols] = find(space==type);
-    try
-    agent = randi(numel(rows),1);
-    catch e
-        return
-    end
-    row = rows(agent);
-    col = cols(agent);
-    
-    dir = randi(3,1)-2;
-    switch dir
-        case 1
-            space(row,col+1) = -type;
-        case -1
-            space(row,col-1) = -type;
-        case 0
-            if type==1
-                space(row-1,col) =-type;
-            else
-                space(row+1,col) = -type;
-            end
-    end
-
-
-end

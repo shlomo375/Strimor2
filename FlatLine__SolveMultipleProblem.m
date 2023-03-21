@@ -1,11 +1,11 @@
 %% Solve multiple Line flattning problem
-58,97,100 problem
+% 81
 clear
 close all
 SoftwareLocation = pwd;
 AddDirToPath;
 cd(SoftwareLocation);
-
+% Solutions{:}.Sucsses
 load("Problems18.mat","TotalProblem","Solutions","Flat");
 Solutions = cell(size(TotalProblem,1),1);
 
@@ -24,14 +24,14 @@ disp("start")
 
 
 Slices = SliceCellVector(TotalProblem,ceil(size(TotalProblem,1)/100));
-
+Slices=Slices([1,2])
 % Create a parallel pool
 delete(gcp('nocreate'));
 pool = parpool(5);
 for i = 1:numel(Slices)
-    future(i) = parfeval(pool, @SolveBatch, 4, Slices{i},Flat,i);
+    future(i) = parfeval(pool, @SolveBatch, 4, Slices{i},Flat,i+80);
 % [Sucsses,BatchIdx, ProblemIdx,Problem] = SolveBatch(Slices{i},Flat,i)
-end
+ end
 fprintf("Working... start at: %s\n",string(datetime))
 % Collect the results from the parallel pool
 for BatchFinish = 1:numel(Slices)

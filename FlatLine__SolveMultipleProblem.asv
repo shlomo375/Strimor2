@@ -1,11 +1,11 @@
 %% Solve multiple Line flattning problem
-
+% 81
 clear
 close all
 SoftwareLocation = pwd;
 AddDirToPath;
 cd(SoftwareLocation);
-
+% Solutions{:}.Sucsses
 load("Problems18.mat","TotalProblem","Solutions","Flat");
 Solutions = cell(size(TotalProblem,1),1);
 
@@ -23,21 +23,23 @@ disp("start")
 % StartFrom = find(cellfun(@isempty,Solutions),1);
 
 
-Slices = SliceCellVector(TotalProblem,5000);
-
+Slices = SliceCellVector(TotalProblem,ceil(size(TotalProblem,1)/100));
+Slices=Slices([17,20])
 % Create a parallel pool
-pool = gcp();
+delete(gcp('nocreate'));
+pool = parpool(5);
 for i = 1:numel(Slices)
-    future = parfeval(pool, @SolveBatch, 4, Slices{i},Flat,i);
-end
-
+    future(i) = parfeval(pool, @SolveBatch, 4, Slices{i},Flat,i+80);
+% [Sucsses,BatchIdx, ProblemIdx,Problem] = SolveBatch(Slices{i},Flat,i)
+ end
+fprintf("Working... start at: %s\n",string(datetime))
 % Collect the results from the parallel pool
-for BatchFinish = 1:numSlices
+for BatchFinish = 1:numel(Slices)
     [idx,Sucsses,BatchIdx, ProblemIdx,Problem] = fetchNext(future);
-    fprintf("Batch sucsses: %s, time: %s",string(BatchFinish),string(numel(Slices)),future(id));
+    fprintf("sucsses: %s, Batch : %d/%d, time: %s\n",string(Sucsses),idx,numel(Slices),future(idx).RunningDuration);
 end
 
-[Sucsses,BatchIdx, ProblemIdx,Problem] = SolveBatch(TotalProblem,Flat,BatchIdx)
+% [Sucsses,BatchIdx, ProblemIdx,Problem] = SolveBatch(TotalProblem,Flat,BatchIdx)
 % 
 % TotalTime = tic;
 % SaveTime = tic;
@@ -96,6 +98,9 @@ for idx = 1:N_Solution
     if ~Problem.Sucsses
         Sucsses = false;
         ProblemIdx = idx;
+        StartConfig = Problem.StartConfig;
+        save(fullfile("C:\Users\shlom\OneDrive\Documents\GitHub\Strimor2\LineFlatting\LineFlating_Solution","Problems18_Batch"+string(BatchIdx)+".mat"),"TotalProblem","Solutions","Flat","StartConfig");
+
         return
     end
 
