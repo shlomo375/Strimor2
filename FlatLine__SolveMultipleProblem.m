@@ -39,43 +39,6 @@ for BatchFinish = 1:numel(Slices)
     fprintf("sucsses: %s, Batch : %d/%d, time: %s\n",string(Sucsses),idx,numel(Slices),future(idx).RunningDuration);
 end
 
-% [Sucsses,BatchIdx, ProblemIdx,Problem] = SolveBatch(TotalProblem,Flat,BatchIdx)
-% 
-% TotalTime = tic;
-% SaveTime = tic;
-% MaxRunningTime = 5;
-% % parpool("Processes",10)
-% N_Solution = numel(Solutions);
-% 
-% for idx = 1:N_Solution
-% %     idx = 601+100
-%     t = tic;
-%     Problem = [];
-%     
-% 
-%     [Problem.Sucsses, Problem.Path] = OneGroupLineFlatteningAlgorithm(TotalProblem(idx,:),Flat,5);
-%     
-%     Problem.Runtime = toc(t);
-%     Problem.StartConfig = TotalProblem(idx,:);
-%     Solutions{idx} = Problem;
-%     
-%     if ~Problem.Sucsses
-%         fprintf("error in problem: %d",idx);
-%         pause
-%     else
-%         fprintf("Time: %d ProblemNum: %d, ToatlTime: %s, Problemleft: %d\n",Problem.Runtime,idx,string(duration(0,0,toc(TotalTime))),numel(Solutions)-idx);
-%     end
-% %     if ~mod(idx,50)
-%         
-% %     end
-%     if ~mod(idx,10000)
-% %         save(fullfile("C:\Users\shlom\OneDrive\Documents\GitHub\Strimor2\LineFlatting\LineFlating_Solution","Problems18.mat"),"TotalProblem","Solutions","Flat");
-% 
-%     end
-% end
-
-
-
 
 function [Sucsses,BatchIdx, ProblemIdx,Problem] = SolveBatch(TotalProblem,Flat,BatchIdx)
 ProblemIdx = 0;
