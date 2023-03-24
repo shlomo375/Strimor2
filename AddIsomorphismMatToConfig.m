@@ -1,8 +1,11 @@
-function NewConfig = AddIsomorphismMatToConfig(Config)
-
+function NewConfig = AddIsomorphismMatToConfig(Config,ZoneMatrix)
+arguments
+    Config
+    ZoneMatrix = true
+end
 ConfigFullType = GetFullType(Config{1,"ConfigMat"}{:},Config.Type);
 
-[StartConfigIsomorphism, StartConfigIsomorphismStr,IsomorpSizes] = CreatIsomorphismMetrices(Config{1,"ConfigMat"}{:},ConfigFullType);
+[StartConfigIsomorphism, StartConfigIsomorphismStr,IsomorpSizes] = CreatIsomorphismMetrices(Config{1,"ConfigMat"}{:},ConfigFullType,[],"ZoneMatrix",ZoneMatrix);
 NewConfig = [Config(1,1:end-1), table(StartConfigIsomorphism(1)...
                    ,StartConfigIsomorphism(2),StartConfigIsomorphism(3),...
                    StartConfigIsomorphismStr(1),StartConfigIsomorphismStr(2),StartConfigIsomorphismStr(3),IsomorpSizes(1,1),IsomorpSizes(1,2),IsomorpSizes(2,1),IsomorpSizes(2,2),IsomorpSizes(3,1),IsomorpSizes(3,2),...

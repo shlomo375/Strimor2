@@ -1,7 +1,14 @@
-function [IsomorphismMetrices,IsomorphismStr,IsomorpSizes] = CreatIsomorphismMetrices(ConfigMat,ConfigType,RotationMatrices)
+function [IsomorphismMetrices,IsomorphismStr,IsomorpSizes] = CreatIsomorphismMetrices(ConfigMat,ConfigType,RotationMatrices,P)
+arguments
+    ConfigMat
+    ConfigType
+    RotationMatrices = [];
+    P.ZoneMatrix {mustBeNumericOrLogical} = true;
+end
+
 IsomorpSizes = zeros(3,2);
 IsomorphismStr = ["","",""];
-if nargin < 3
+if isempty(RotationMatrices)
     if mod(find(ConfigMat,1),2) && ConfigType(find(ConfigMat,1)) == 1
         ConfigMat = [zeros(1,size(ConfigMat,2)); ConfigMat];
         ConfigType = [zeros(1,size(ConfigMat,2)); ConfigType];
@@ -15,8 +22,9 @@ IsomorphismMetrices = cell(1,3);
 [IsomorphismMetrices{1},GroupIndexes] = ConfigGroupSizes(ConfigMat,ConfigType);
 IsomorpSizes(1,1:2) = size(IsomorphismMetrices{1});
 
-IsomorphismMetrices{1}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{1},ConfigMat,ConfigType,GroupIndexes);
-
+if P.ZoneMatrix
+    IsomorphismMetrices{1}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{1},ConfigMat,ConfigType,GroupIndexes);
+end
 IsoMetrices = IsomorphismMetrices{1}(:,:,1);
 IsomorphismStr(1) = join(string(IsoMetrices(:))',"");
 for Axis = 2:3
@@ -25,8 +33,9 @@ for Axis = 2:3
     [IsomorphismMetrices{Axis},GroupIndexes] = ConfigGroupSizes(Temp,TempType);
     
     IsomorpSizes(Axis,1:2) = size(IsomorphismMetrices{Axis});
-    IsomorphismMetrices{Axis}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{Axis},Temp,TempType,GroupIndexes);
-    
+    if P.ZoneMatrix 
+        IsomorphismMetrices{Axis}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{Axis},Temp,TempType,GroupIndexes);
+    end
     IsoMetrices = IsomorphismMetrices{Axis}(:,:,1);
     IsomorphismStr(Axis) = join(string(IsoMetrices(:))',"");
     

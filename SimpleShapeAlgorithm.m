@@ -1,83 +1,29 @@
 %% Simple Shape Algorithm
+
 clear
-load("Problems18.mat","TotalProblem","Solutions","Flat");
-Config_A = TotalProblem(1555,:);
-Config_B = TotalProblem(13022,:);
+close all
 
-N = sum(logical(Config_A.ConfigMat{:}),"all");
+%% init
+load("SimpleShapeAlg\Shapes\Configs.mat","Config_A","Config_B");
 
-Config_B_Struct = Node2ConfigStruct(Config_B);
-% PlotWorkSpace(WS);
-WsSize = [N, 4*N];
-BasicWS = WorkSpace(WsSize,"RRT*");
-WS_B = SetConfigurationOnSpace(BasicWS,Config_B_Struct);
-figure(1234)
-PlotWorkSpace(WS_B,"Plot_CellInd",true);
+N = sum(logical(Config_A{1,"ConfigMat"}{:}),'all');
+Size = [N, 2*N];
+BasicWS = WorkSpace(Size,"RRT*");
 
-Config_A_Struct = Node2ConfigStruct(Config_A);
-% PlotWorkSpace(WS);
-WsSize = [N, 4*N];
-BasicWS = WorkSpace(WsSize,"RRT*");
-WS = SetConfigurationOnSpace(BasicWS,Config_A_Struct);
-figure(1235)
-PlotWorkSpace(WS,"Plot_CellInd",true);
-
-%%
-
-Tree = TreeClass("", N, 1e3, Config,Flat);
-
-% figure(1)
-% PlotWorkSpace(WS,[]);
-%%
-SpreadingDir = "Left_Right";
-ParentInd = 1;
-OldWS = WS;
-Break = 0;
-
-TimeOut_Clock = tic;
-while 1
-try
-if toc(TimeOut_Clock) > TimeOut && TimerON
-    Sucsses = false;
-    Path = Tree.Data(1:Tree.LastIndex,:);
-    return
-end
-% figure(3)
-% PlotWorkSpace(WS,[]);
-[WS,Tree, ParentInd] = SpreadAndReduce(WS,Tree, ParentInd,SpreadingDir);
+ConfigStruct_A = Node2ConfigStruct(Config_A);
+WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
+figure(1)
 % PlotWorkSpace(WS,"Plot_CellInd",true)
-[WS,Tree, ParentInd] = Expend(WS,Tree, ParentInd,SpreadingDir);
 
-[WS,Tree, ParentInd] = FlatteningSpecialLines(WS,Tree, ParentInd);
+ConfigStruct_B = Node2ConfigStruct(Config_B);
+WS_B = SetConfigurationOnSpace(BasicWS,ConfigStruct_B);
+figure(2)
+% PlotWorkSpace(WS_B,"Plot_CellInd",true)
 
-% figure(4)
-% PlotWorkSpace(WS,[]);
+[Config_A, Config_B] = GroupMatrixMatching(Config_A,Config_B);
 
-[WS,Tree, ParentInd] =  GroupsUnification(WS, Tree, ParentInd);
+Tree = TreeClass("", N, 1e3, Config_A,"EndConfig",Config_B,"ZoneMatrix",false);
 
-[WS,Tree, ParentInd] =  BaseUnification(WS, Tree, ParentInd);
-% figure(5)
-% PlotWorkSpace(WS,[]);
+%% start algorithm
 
-[WS,Tree, ParentInd] =  DualModuleOnly(WS, Tree, ParentInd);
 
-[WS,Tree, ParentInd, Finish] = FlatCompare(Flat, WS,Tree, ParentInd);
-if Finish
-    break
-end
-if isequal(WS.Space.Status,OldWS.Space.Status)
-    Break = Break+1;
-    if Break > 5
-        Sucsses = false;
-        break
-    end
-end
-% figure(6)
-% PlotWorkSpace(WS,[]);
-SpreadingDir = setdiff(["Left_Right","Right_Left"],SpreadingDir);
-catch eee
-    eee
-end
-end
-
-Path = Tree.Data(1:Tree.LastIndex,:);

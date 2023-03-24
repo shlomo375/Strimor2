@@ -1,1 +1,0 @@
-knnsearch(points, points, 'k', k)

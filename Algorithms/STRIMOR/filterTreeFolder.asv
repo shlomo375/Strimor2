@@ -1,9 +1,0 @@
-function TreeFolder = filterTreeFolder(TreeFolder,AllResultFolder)
-ds = fileDatastore(AllResultFolder,"IncludeSubfolders",true,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
-Solution = ds.Files;
-Solution = replace(ds.Files,"-","\");
-Solution = extractBetween(Solution,"Results\",".mat");
-
-TreeFolder = extractAfter(TreeFolder,"")
-
-end

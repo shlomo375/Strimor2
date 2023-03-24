@@ -1,5 +1,0 @@
-function Cost = Cost2TargetLines(WS,Config,Target)
-logical;
-
-
-end
