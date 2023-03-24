@@ -1,0 +1,14 @@
+function ActionFuncHandle = LineDifferenceAnalysis(StartLine,TargetLine)
+
+if abs(StartLine) > abs(TargetLine)
+    ActionFuncHandle = @RemoveModules;
+elseif abs(StartLine) == abs(TargetLine)
+    if sign(StartLine) ~= sign(TargetLine)
+        ActionFuncHandle = @SwitchEdges;
+    else
+        ActionFuncHandle = [];
+    end
+else % StartLine < TargetLine
+    ActionFuncHandle = @AddingModules;
+end
+end

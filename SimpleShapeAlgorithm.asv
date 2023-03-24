@@ -4,26 +4,31 @@ clear
 close all
 
 %% init
-load("SimpleShapeAlg\Shapes\Configs.mat","Config_A","Config_B");
+load("SimpleShapeAlg\Shapes\Configs.mat","StartConfig","TargetConfig");
 
-N = sum(logical(Config_A{1,"ConfigMat"}{:}),'all');
+N = sum(logical(StartConfig{1,"ConfigMat"}{:}),'all');
 Size = [N, 2*N];
 BasicWS = WorkSpace(Size,"RRT*");
 
-ConfigStruct_A = Node2ConfigStruct(Config_A);
+ConfigStruct_A = Node2ConfigStruct(StartConfig);
 WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
 figure(1)
-% PlotWorkSpace(WS,"Plot_CellInd",true)
+PlotWorkSpace(WS,"Plot_CellInd",true)
 
-ConfigStruct_B = Node2ConfigStruct(Config_B);
+ConfigStruct_B = Node2ConfigStruct(TargetConfig);
 WS_B = SetConfigurationOnSpace(BasicWS,ConfigStruct_B);
 figure(2)
-% PlotWorkSpace(WS_B,"Plot_CellInd",true)
+PlotWorkSpace(WS_B,"Plot_CellInd",true)
 
-[Config_A, Config_B] = GroupMatrixMatching(Config_A,Config_B);
+[StartConfig, TargetConfig] = GroupMatrixMatching(StartConfig,TargetConfig);
 
-Tree = TreeClass("", N, 1e3, Config_A,"EndConfig",Config_B,"ZoneMatrix",false);
+Tree = TreeClass("", N, 1e3, StartConfig,"EndConfig",TargetConfig,"ZoneMatrix",false);
 
 %% start algorithm
 
+for Line = 1:size(StartConfig,1)
 
+    if StartConfig.IsomorphismMatrices1{1}(Line,:) == TargetConfig.IsomorphismMatrices1{1}(Line,:) 
+    
+    end
+end
