@@ -6,7 +6,6 @@ arguments
     P.ZoneMatrix {mustBeNumericOrLogical} = true;
 end
 
-DeleteFirstLine = false;
 IsomorpSizes = zeros(3,2);
 IsomorphismStr = ["","",""];
 if isempty(RotationMatrices)
@@ -14,7 +13,8 @@ if isempty(RotationMatrices)
         ConfigMat = [zeros(1,size(ConfigMat,2)); ConfigMat];
         ConfigType = [zeros(1,size(ConfigMat,2)); ConfigType];
         DeleteFirstLine = true;
-
+    else
+        DeleteFirstLine = false;
     end
     WSConfig = WorkSpace(size(ConfigMat),"RRT*");
 
@@ -28,10 +28,7 @@ IsomorpSizes(1,1:2) = size(IsomorphismMetrices{1});
 if P.ZoneMatrix
     IsomorphismMetrices{1}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{1},ConfigMat,ConfigType,GroupIndexes);
 end
-if DeleteFirstLine
-    ConfigMat(1,:) = [];
-    IsomorphismMetrices{1}(1,:,:) = [];
-end
+if DeleteFirstLin
 
 IsoMetrices = IsomorphismMetrices{1}(:,:,1);
 IsomorphismStr(1) = join(string(IsoMetrices(:))',"");

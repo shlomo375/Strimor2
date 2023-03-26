@@ -381,12 +381,19 @@ classdef TreeClass
            
            if isfield(P,"EndConfig")
                tree.EndConfig = P.EndConfig;
-               WSEndConfig = WorkSpace(size(P.EndConfig.ConfigMat{:}),"RRT*");
-
-               tree.EndConfig_RotationMatrices = {WSEndConfig.R1, WSEndConfig.R2, WSEndConfig.R3};
-                
-               FullType = GetFullType(P.EndConfig.ConfigMat{:},P.EndConfig.Type);
-               [tree.EndConfig_IsomorphismMetrices,tree.EndConfig_IsomorphismStr,tree.EndConfig_IsomorphismSizes] = CreatIsomorphismMetrices(P.EndConfig.ConfigMat{:},FullType,tree.EndConfig_RotationMatrices,"ZoneMatrix",P.ZoneMatrix);
+               
+                   WSEndConfig = WorkSpace(size(P.EndConfig.ConfigMat{:}),"RRT*");
+    
+                   tree.EndConfig_RotationMatrices = {WSEndConfig.R1, WSEndConfig.R2, WSEndConfig.R3};
+                    
+                   FullType = GetFullType(P.EndConfig.ConfigMat{:},P.EndConfig.Type);
+               if isempty(P.EndConfig{1,"IsomorphismMatrices1"})
+                    [tree.EndConfig_IsomorphismMetrices,tree.EndConfig_IsomorphismStr,tree.EndConfig_IsomorphismSizes] = CreatIsomorphismMetrices(P.EndConfig.ConfigMat{:},FullType,tree.EndConfig_RotationMatrices,"ZoneMatrix",P.ZoneMatrix);
+               else
+                    tree.EndConfig_IsomorphismMetrices = tree.EndConfig{1,["IsomorphismMatrices1","IsomorphismMatrices2","IsomorphismMatrices3"]};
+                    tree.EndConfig_IsomorphismStr = tree.EndConfig{1,["IsomorphismStr1","IsomorphismStr2","IsomorphismStr3"]};
+                    tree.EndConfig_IsomorphismSizes = reshape(tree.EndConfig{1,["IsoSiz1r","IsoSiz1c";"IsoSiz2r","IsoSiz2c";"IsoSiz3r","IsoSiz3c"]},3,2);
+               end
            end
 
            
