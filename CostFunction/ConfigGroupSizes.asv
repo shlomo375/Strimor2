@@ -1,23 +1,48 @@
-function [GroupsSizes,GroupIndexes,GroupInd] = ConfigGroupSizes(Config,ConfigType,R,P)
-arguments
-    Config
-    ConfigType
-    R
-    P.RemoveEmptyLine = "false";
+function [GroupsSizes,GroupIndexes,GroupInd] = ConfigGroupSizes(Config,ConfigType,R)
+    
+ReduceConfig = Config
+ReduceConfig(:,all(~Config,1)) = [];
+ReduceConfig(all(~Config,2),:) = [];
+
+IndConfig = reshpe(1:numel(Config),size(Config));
+IndConfig(:,all(~Config,1)) = [];
+IndConfig(all(~Config,2),:) = [];
+StartGroup = true;
+for Line = 1:size(ReduceConfig,1)
+    GroupNum = 1;
+    
+    for Col = 1:size(ReduceConfig,2)
+        
+        if ReduceConfig(Line,Col)
+            GroupsSizes(Line,GroupNum) = GroupsSizes(Line,GroupNum)+1;
+            if StartGroup
+                StartGroup = false;
+                StartCol = Col;
+            end
+        else
+            StartGroup = true;
+            GroupInd{Line}{GroupNum} = IndConfig(Line,StartCol:Col-1);
+            GroupIndexes{Line}{GroupNum} = StartCol:Col-1];
+
+            GroupType = ConfigType()
+            GroupNum = GroupNum + 1;
+        end
+        
+    end
+
 end
-    Groups = num2cell(zeros(size(Config,1),1))';
+
+Groups = num2cell(zeros(size(Config,1),1))';
     [row,col] = find(Config);
     try
         GroupIndexes = accumarray(row,col,[],@(x) {x});
-        if ~P.RemoveEmptyLine
-            for Line_idx = 1:numel(GroupIndexes)
-                if ~isempty(GroupIndexes{Line_idx})
-                    StartLine = Line_idx;
-                    GroupIndexes(1:StartLine-1) = [];
-                    break
-                end
-    
+        for Line_idx = 1:numel(GroupIndexes)
+            if ~isempty(GroupIndexes{Line_idx})
+                StartLine = Line_idx;
+                GroupIndexes(1:StartLine-1) = [];
+                break
             end
+
         end
     catch e
         e

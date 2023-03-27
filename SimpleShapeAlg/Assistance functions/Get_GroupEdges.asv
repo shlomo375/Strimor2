@@ -1,0 +1,17 @@
+function [EdgeType, EdgeInd, EdgeCol] = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds)
+
+
+
+Edges = cell(numel(GroupsInds),1);
+% EdgeCol = cell(numel(GroupsInds),1);
+for Line = 1:size(GroupsSizes,1)
+    for GroupNum = 1:numel(GroupsInds{Line})
+        Edges{Line,GroupNum} = [GroupsInds{Line}{GroupNum}(1),GroupsInds{Line}{GroupNum}(end);...
+                                  GroupIndexes{Line}{GroupNum}(1),GroupIndexes{Line}{GroupNum}(end);...
+                                  sign(GroupsSizes(Line,GroupNum)), double(EndIsAlpha(GroupsSizes(Line,GroupNum)))-double(~EndIsAlpha(GroupsSizes(Line,GroupNum)))];
+%         EdgeCol{Line,GroupNum} = [GroupIndexes{Line}{GroupNum}(1),GroupIndexes{Line}{GroupNum}(end)];
+%         EdgeType{Line,GroupNum}()
+    end
+end
+
+end

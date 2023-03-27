@@ -1,5 +1,6 @@
 function [GroupsSizes,GroupIndexes,GroupInd] = ConfigGroupSizes(Config,ConfigType,R)
-    Groups = num2cell(zeros(size(Config,1),1))';
+
+Groups = num2cell(zeros(size(Config,1),1))';
     [row,col] = find(Config);
     try
         GroupIndexes = accumarray(row,col,[],@(x) {x});
