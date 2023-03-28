@@ -1,8 +1,8 @@
 %% Simple Shape Algorithm
 
 % clear
-% close all
-AddDirToPath()
+close all
+% AddDirToPath()
 %% init
 load("SimpleShapeAlg\Shapes\Configs.mat","StartConfig","TargetConfig");
 

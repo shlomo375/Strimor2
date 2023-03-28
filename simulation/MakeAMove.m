@@ -1,7 +1,6 @@
 function [OK, Configuration, Movment, WS1, CollidingAgent] = MakeAMove(WS,dir,step, Agent)
     Configuration = [];
     
-    WS1 = WS;
     Movment = WorkSpace.MovmentStructure(dir,step,Agent);
 
     [OK, MoveAgent2Ind, CollidingAgent, Alert] = ApproveMovment(WS,Movment,"Slide");
@@ -22,5 +21,7 @@ function [OK, Configuration, Movment, WS1, CollidingAgent] = MakeAMove(WS,dir,st
             Configuration = GetConfiguration(WS1);
 
         end
+    else
+        WS1=WS;
     end
 end

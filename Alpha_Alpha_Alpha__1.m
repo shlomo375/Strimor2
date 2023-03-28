@@ -1,0 +1,1 @@
+function [Axis, Step, Moving_Log] = Alpha_Alpha_Alpha__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges)arguments/n

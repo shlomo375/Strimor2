@@ -1,4 +1,4 @@
-function [NewWS, Newtree, NewParentInd] = Sequence_of_Maneuvers(WS,tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step)
+function [NewWS, Newtree, NewParentInd] = Sequence_of_Maneuvers(WS,tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,P)
 
 arguments
     WS
@@ -8,6 +8,7 @@ arguments
     Moving_Log (:,:) {mustBeNumericOrLogical}
     Axis {mustBeInteger,mustBePositive,mustBeVector}
     Step {mustBeInteger,mustBeVector}
+    P.Plot (1,1) {mustBeNumericOrLogical} = false;
 end
 
 NewWS = WS;
@@ -15,7 +16,7 @@ Newtree = tree;
 NewParentInd = ParentInd;
 
 for Maneuver_ind = 1:length(Axis)
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(Moving_Log(1,:))] =...
+    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(Moving_Log(Maneuver_ind,:))] =...
                 ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
                     AllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
             
@@ -23,6 +24,11 @@ for Maneuver_ind = 1:length(Axis)
         fprintf("Maneuver num %d faild, enter to puse mode",Maneuver_ind);
         pause
         break
+    end
+    if P.Plot
+        figure
+        PlotWorkSpace(NewWS,"Plot_CellInd",false);
+        NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end
 end
 

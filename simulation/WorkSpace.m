@@ -6,6 +6,7 @@ classdef WorkSpace
         R2
         R3
         Algoritem
+        MovmentColorIdx = 4
         
     end
     
@@ -29,10 +30,13 @@ classdef WorkSpace
                         colors(i,:) = [1 .55 .55];%red
                     case 2 %selected
                         colors(i,:) = [0.4 1 0.4];%green
-                    case 10 %error
-                        colors(i,:) = [232, 7, 37]/255;%blue%[214,12,50]/255;%
                     case 3 %center of mass
                         colors(i,:) = [1 .75 .81];%pink
+                    case 4 %Movment
+                        colors(i,:) = [1 .55 .55];%red    
+                    case 10 %error
+                        colors(i,:) = [232, 7, 37]/255;%blue%[214,12,50]/255;%
+    
                     case 11
                         colors(i,:) = [0.5 0.5 0.5];
                 end
@@ -55,7 +59,7 @@ classdef WorkSpace
     
     methods
         
-        function WS = WorkSpace(Size,algoritem,Lite,FullType)
+        function WS = WorkSpace(Size,algoritem,~,FullType)
             WS.Space = WorkSpace.SpaceStructure(Size);
 %             [WS.Space.index] = index{:};
             WS.SpaceSize = Size;
@@ -656,60 +660,7 @@ classdef WorkSpace
             end
         end 
 
-%         function approve = ScanningAgentsFast(WS, ScannedAgent)
-%             approve = true;
-% %             Agent = find(~ScannedAgent);
-% %             Agent = Agent(randperm(length(Agent),1));
-%             
-% %             ScannedAgent(Agent) = 1;
-%             group = {[]};
-% %             r = {WS.R1, WS.R2, WS.R3};
-%             while any(~ScannedAgent)
-%                 Agent = find(~ScannedAgent);
-%                 Agent = Agent(randperm(length(Agent),1));
-% 
-% 
-%                 Neighbors = [];
-%                 for r = {WS.R1, WS.R2, WS.R3}
-%                     R = cell2mat(r);
-%                     [row,~] = find(ismember(R,Agent),1);
-%                     NextLoc = R(sub2ind(size(R),row*ones(1,size(R,2)),1:size(R,2)));
-%                     NextLoc(NextLoc==0) = []; 
-%                     Populated = ~[WS.Space(NextLoc).Status];
-%                     
-%                     first = Populated(1:find(NextLoc==Agent));
-%                     last = Populated(size(first,2)+1:end);
-%                     Neighbors = [Neighbors, NextLoc(find(first,1,"last")+1:size(first,2))];
-%                     Neighbors = [Neighbors, NextLoc(size(first,2)+(1:find(last,1,"first")-1))];
-%                     
-%                 end
-%                 ScannedAgent(Neighbors) = 1;
-%                 AddToGroup = false;
-%                 for i=1:size(group,2)
-%                     
-%                     g = cell2mat(group(i));
-%                     if isempty(g)
-%                         group = {Neighbors};
-%                         AddToGroup = true; 
-%                         break
-%                     end
-%                     
-%                     if ~isempty(ismember(g,Neighbors))
-%                         group(i) = {unique([g,Neighbors])};
-%                         AddToGroup = true; 
-%                         break
-%                     end
-%                 end
-%                 if ~AddToGroup
-%                     group(end+1) = {Neighbors};
-%                 end
-%             end
-%                 if size(group,2)>1
-%                     approve = false;
-%                 end
-%                 
-%         end
-%         
+
         function [Approve, Alert] = SplittingCheckSlow(WS)
             Approve = true;            
             space = logical(reshape([WS.Space.Status],size(WS.R1)));
@@ -828,7 +779,7 @@ classdef WorkSpace
                 end
                 WS.Space.Status(OldInd) = deal(0);
                 if WS.Algoritem == "RRT*"
-                    status = 2;
+                    status = WS.MovmentColorIdx;
                 end
                 
             end

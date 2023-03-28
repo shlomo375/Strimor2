@@ -11,9 +11,31 @@ if Three_Line_GroupsSizes(3,GroupNum) > 2 || Three_Line_GroupsSizes(3,GroupNum) 
     varargout{1} = Num_Removed_Module;
 else % Total line remove
 
-    [Decision, varargout{1}] = CheapManeuver(Three_Line_Edges,GroupNum,Three_Line_GroupsSizes(3,GroupNum));
+    [ManeuverRequired, Direction] = CheapManeuver(Three_Line_Edges,GroupNum,Three_Line_GroupsSizes(3,GroupNum));
 
-    
+    switch ManeuverRequired
+        case "Alpha_Alpha_Alpha__1"
+
+        case "Alpha_Alpha_Alpha__2"
+        case "Alpha_Alpha_Beta__1"
+        case "Alpha_Alpha_Beta__2"
+        case "Alpha_Beta_Alpha__1"
+        case "Alpha_Beta_Alpha__2"
+
+        case "Alpha_Beta_Beta__1"
+        case "Alpha_Beta_Beta__2"
+                       
+        case "Beta_Alpha_Alpha__2"
+        case "Beta_Alpha_Alpha__3"
+
+        case "Beta_Alpha_Beta__2"
+        case "Beta_Alpha_Beta__3"
+        case "Beta_Beta_Alpha__2"                      
+        case "Beta_Beta_Alpha__3"
+                   
+        case "Beta_Beta_Beta__2"
+        case "Beta_Beta_Beta__3"
+    end
 end
 
 
