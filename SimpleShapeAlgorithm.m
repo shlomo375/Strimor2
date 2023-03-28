@@ -2,7 +2,7 @@
 
 % clear
 % close all
-% AddDirToPath()
+AddDirToPath()
 %% init
 load("SimpleShapeAlg\Shapes\Configs.mat","StartConfig","TargetConfig");
 
@@ -12,8 +12,8 @@ BasicWS = WorkSpace(Size,"RRT*");
 
 ConfigStruct_A = Node2ConfigStruct(StartConfig);
 WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
-% figure(1)
-% PlotWorkSpace(WS,"Plot_CellInd",true)
+figure(1)
+PlotWorkSpace(WS,"Plot_CellInd",true)
 % 
 ConfigStruct_B = Node2ConfigStruct(TargetConfig);
 WS_B = SetConfigurationOnSpace(BasicWS,ConfigStruct_B);
