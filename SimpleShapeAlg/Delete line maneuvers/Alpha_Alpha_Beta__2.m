@@ -1,15 +1,23 @@
-function [Axis, Step, Moving_Log] = Alpha_Alpha_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges)
-arguments
-    Top_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
-    Mid_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
-    Buttom_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
-    MovmentDirection (1,1) {matches(MovmentDirection,["Right","Left"])}
-    Edges = [];
-end
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom] = Alpha_Alpha_Beta__2(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges)
+
+
 
 if ~isempty(Edges)
     Position_relative_buttom_group = [0;-2;-1];
-    Step = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
+    [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
+ 
+    Moving_Log_Mid(1,:) = true;
+    Moving_Log_Top(1:2,:) = true;
 end
+
+
+Step = [Step, 1, -1];
+Axis = [Axis, 2, 3];
+Moving_Log_Mid(3,1) = true;
+
+Moving_Log_Mid(4,2) = true;
+Moving_Log_Top(4,:) = true;
+
+
 
 end

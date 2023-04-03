@@ -8,4 +8,11 @@ arguments
     Edges = [];
 end
 
+Top_Group_num = numel(Top_GroupInd);
+Mid_Group_num = numel(Mid_GroupInd);
+Buttom_Group_num = numel(Buttom_GroupInd);
+
+All_Module_Ind = [Top_Group_num,Mid_Group_num,Buttom_Group_num];
+Moving_Log = false(4,numel(All_Module_Ind));
+
 end

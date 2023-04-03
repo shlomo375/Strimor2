@@ -7,9 +7,45 @@ arguments
     Edges = [];
 end
 
+Top_Group_num = numel(Top_GroupInd);
+Mid_Group_num = numel(Mid_GroupInd);
+Buttom_Group_num = numel(Buttom_GroupInd);
+
+All_Module_Ind = [Top_Group_num,Mid_Group_num,Buttom_Group_num];
+Moving_Log = false(3,numel(All_Module_Ind));
+
 if ~isempty(Edges)
     Position_relative_buttom_group = [0;0;0];
-    Step = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
+    [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
+ 
+    Moving_Log_Mid(1,:) = true;
+    Moving_Log_Top(1:2,:) = true;
 end
+
+
+switch MovmentDirection
+    case "Left"
+        Step = [Step, -1];
+        Axis = [Axis,  2];
+        Moving_Log(3,Top_Group_num+Mid_Group_num+1) = true;
+
+        Mid_GroupInd = [Buttom_GroupInd(1) ,Mid_GroupInd];
+        Buttom_GroupInd(1) = [];
+
+    case "Right"
+        Step = [Step, 1];
+        Axis = [Axis, 3];
+        
+        Moving_Log(3,end) = true;  
+
+        Mid_GroupInd = [Mid_GroupInd, Buttom_GroupInd(end)];
+        Buttom_GroupInd(end) = [];
+end
+
+[Axis1, Step1, Moving_Log1] = Beta_Alpha_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection);
+
+Axis = [Axis, Axis1];
+Step = [Step, Step1];
+Moving_Log = [Moving_Log; Moving_Log1];
 
 end

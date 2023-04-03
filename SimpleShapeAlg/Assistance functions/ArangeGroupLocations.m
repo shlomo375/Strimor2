@@ -1,4 +1,4 @@
-function Step = ArangeGroupLocations(Direction,Edges,Position_relative_buttom_group,GroupsNum)
+function [Step, Axis] = ArangeGroupLocations(Direction,Edges,Position_relative_buttom_group,GroupsNum)
 
 arguments
     Direction (1,1) {matches(Direction,["Right","Left"])}    
@@ -21,4 +21,5 @@ switch Direction
 end
 
 Step = Step + Position_relative_buttom_group;
+Axis = ones(size(Step));
 end

@@ -1,4 +1,4 @@
-function [Axis, Step, Moving_Log] = Alpha_Alpha_Alpha__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges)
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom] = Alpha_Alpha_Alpha__1(ManuverHandle, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Right_Left,Up_Down)
 %% spacual ettentions
 arguments
     Top_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
