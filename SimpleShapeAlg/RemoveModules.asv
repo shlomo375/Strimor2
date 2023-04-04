@@ -1,4 +1,4 @@
-function [WS,Tree, ParentInd] = RemoveModules(WS,Tree, ParentInd,ConfigShift,Line)
+function [WS,Tree, ParentInd] = RemoveModules(WS,Tree, ParentInd,ConfigShift,Line,Up_Down)
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1));
 TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
 % GroupMatrix = GetGroupMatrixFromTree(Tree,ParentInd);
@@ -14,58 +14,32 @@ for GroupNum = 1:length(GroupsInLine)
     
     [Decision, Parameter] = RemoveModule_ActionSelection(GroupsSizes(Line-2:Line), TargetGroupSize(Line-2:Line), Edges,GroupNum);
     
-    switch Decision
-        case "Remove Module"
-            Num_Removed_Module = Parameter(1); %needed function
-            [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,"Both");
-    
-            %% all moving modules
-            % Top_GroupInd
-            Mid_GroupInd = GroupsInds{Line-1}{BaseGroupNum_1st};
-            Buttom_GroupInd = GroupsInds{Line-2}{BaseGroupNum_2nd};
-            AllModuleInd = [Top_GroupInd, Mid_GroupInd]';
-            
-            
-            [Axis, Step, Moving_Log] = StepSeqence(LineSteps,MovmentDirection,Edges(2:3),Num_Removed_Module,numel(Top_GroupInd),numel(Mid_GroupInd));
+    %% all moving modules
+    % Top_GroupInd
+    Mid_GroupInd = GroupsInds{Line-1}{BaseGroupNum_1st};
+    Buttom_GroupInd = GroupsInds{Line-2}{BaseGroupNum_2nd};
+
+    if ~isa(Decision,"function_handle")
+        switch Decision
+            case "Remove Module"
+                Num_Removed_Module = Parameter(1); %needed function
+                [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,"Both");
         
-            %% movment process
+                
+                AllModuleInd = [Top_GroupInd, Mid_GroupInd]';
+                
+                
+                [Axis, Step, Moving_Log] = StepSeqence(LineSteps,MovmentDirection,Edges(2:3),Num_Removed_Module,numel(Top_GroupInd),numel(Mid_GroupInd));
+            
+                %% movment process
+            
+                [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,"Plot",true);
         
-            [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,"Plot",true);
-    
-        case "Alpha_Alpha_Alpha__1"
-            [Axis, Step, Moving_Log] = Alpha_Alpha_Alpha__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Alpha_Alpha__2"
-            [Axis, Step, Moving_Log] = Alpha_Alpha_Alpha__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Alpha_Beta__1"
-            [Axis, Step, Moving_Log] = Alpha_Alpha_Beta__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Alpha_Beta__2"
-            [Axis, Step, Moving_Log] = Alpha_Alpha_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Beta_Alpha__1"
-            [Axis, Step, Moving_Log] = Alpha_Beta_Alpha__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Beta_Alpha__2"
-            [Axis, Step, Moving_Log] = Alpha_Beta_Alpha__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Beta_Beta__1"
-            [Axis, Step, Moving_Log] = Alpha_Beta_Beta__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Beta_Beta__2"
-            [Axis, Step, Moving_Log] = Alpha_Beta_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);                 
-        case "Beta_Alpha_Alpha__2"
-            [Axis, Step, Moving_Log] = Beta_Alpha_Alpha__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Beta_Alpha_Alpha__3"
-            [Axis, Step, Moving_Log] = Beta_Alpha_Alpha__3(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Beta_Alpha_Beta__2"
-            [Axis, Step, Moving_Log] = Beta_Alpha_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Beta_Alpha_Beta__3"
-            [Axis, Step, Moving_Log] = Beta_Alpha_Beta__3(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Beta_Beta_Alpha__2"                      
-            [Axis, Step, Moving_Log] = Beta_Beta_Alpha__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Beta_Beta_Alpha__3"
-            [Axis, Step, Moving_Log] = Beta_Beta_Alpha__3(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);      
-        case "Beta_Beta_Beta__2"
-            [Axis, Step, Moving_Log] = Beta_Beta_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Beta_Beta_Beta__3"
-            [Axis, Step, Moving_Log] = Beta_Beta_Beta__3(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-    
-    
+        end
+    else
+        [Step, Axis, All_Module_Ind, Moving_Log] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Parameter,Up_Down);
+
+        [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,"Plot",true);
     end
 
     

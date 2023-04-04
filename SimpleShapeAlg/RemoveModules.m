@@ -1,4 +1,4 @@
-function [WS,Tree, ParentInd] = RemoveModules(WS,Tree, ParentInd,ConfigShift,Line)
+function [WS,Tree, ParentInd, ConfigShift] = RemoveModules(WS,Tree, ParentInd,ConfigShift,Line,Up_Down)
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1));
 TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
 % GroupMatrix = GetGroupMatrixFromTree(Tree,ParentInd);
@@ -14,47 +14,43 @@ for GroupNum = 1:length(GroupsInLine)
     
     [Decision, Parameter] = RemoveModule_ActionSelection(GroupsSizes(Line-2:Line), TargetGroupSize(Line-2:Line), Edges,GroupNum);
     
-    switch Decision
-        case "Remove Module"
-            Num_Removed_Module = Parameter(1); %needed function
-            [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,"Both");
-    
-            %% all moving modules
-            % Top_GroupInd
-            Mid_GroupInd = GroupsInds{Line-1}{BaseGroupNum_1st};
-            Buttom_GroupInd = GroupsInds{Line-2}{BaseGroupNum_2nd};
-            AllModuleInd = [Top_GroupInd, Mid_GroupInd]';
-            
-            
-            [Axis, Step, Moving_Log] = StepSeqence(LineSteps,MovmentDirection,Edges(2:3),Num_Removed_Module,numel(Top_GroupInd),numel(Mid_GroupInd));
-        
-            %% movment process
-        
-            [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,"Plot",true);
-    
-        case "Alpha_Alpha_Alpha__1"
-            [Axis, Step, Moving_Log] = Alpha_Alpha_Alpha__1(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges);
-        case "Alpha_Alpha_Alpha__2"
-        case "Alpha_Alpha_Beta__1"
-        case "Alpha_Alpha_Beta__2"
-        case "Alpha_Beta_Alpha__1"
-        case "Alpha_Beta_Alpha__2"
+    %% all moving modules
+    % Top_GroupInd
+    Mid_GroupInd = GroupsInds{Line-1}{BaseGroupNum_1st};
+    Buttom_GroupInd = GroupsInds{Line-2}{BaseGroupNum_2nd};
 
-        case "Alpha_Beta_Beta__1"
-        case "Alpha_Beta_Beta__2"
-                       
-        case "Beta_Alpha_Alpha__2"
-        case "Beta_Alpha_Alpha__3"
+    if ~isa(Decision,"function_handle")
+        switch Decision
+            case "Remove Module"
+                Num_Removed_Module = Parameter(1); %needed function
+                [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,"Both");
+        
+                
+                AllModuleInd = [Top_GroupInd, Mid_GroupInd]';
+                
+                
+                [Axis, Step, Moving_Log] = StepSeqence(LineSteps,MovmentDirection,Edges(2:3),Num_Removed_Module,numel(Top_GroupInd),numel(Mid_GroupInd));
+            
+                %% movment process
+            
+                [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",true);
+        
+        end
+    else
+        [Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Parameter,Up_Down);
+        
+        [WS, Tree, ParentInd , OK] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",true);
+            
+        if OK
+            if matches(Up_Down,"Down")
+                ConfigShift(1,1) = ConfigShift(1,1) + 1;
 
-        case "Beta_Alpha_Beta__2"
-        case "Beta_Alpha_Beta__3"
-        case "Beta_Beta_Alpha__2"                      
-        case "Beta_Beta_Alpha__3"
-                   
-        case "Beta_Beta_Beta__2"
-        case "Beta_Beta_Beta__3"
-    
-    
+            else
+                ConfigShift(2,1) = ConfigShift(2,1) + 1;
+                
+            end
+            Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},ConfigShift(:,1));
+        end
     end
 
     
@@ -98,7 +94,7 @@ switch MovmentDirection
                 
                 All_Moving_Module_Logical(3,[Num_Top_Group-1,Num_Top_Group]) = true;
 
-                fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                     pause
             case 9 % Top-Alpha, Mid-Beta
                 if Num_Removed_Module == 1
@@ -109,7 +105,7 @@ switch MovmentDirection
 
                     All_Moving_Module_Logical(2,:) = [];
 
-                    fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                    fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                     pause
                 else
                     Axis = [Axis(1),3,2];
@@ -120,7 +116,7 @@ switch MovmentDirection
                     All_Moving_Module_Logical(4,Num_Top_Group-1) = true;
                     All_Moving_Module_Logical(2,:) = [];  
 
-                    fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                    fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                     pause
                     
                 end
@@ -131,7 +127,7 @@ switch MovmentDirection
                 All_Moving_Module_Logical(3,Num_Top_Group) = true;
                 All_Moving_Module_Logical(2,:) = [];
 
-                fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                     pause
         end
     case "Left"
@@ -143,16 +139,14 @@ switch MovmentDirection
 
                 All_Moving_Module_Logical(3,1:2) = true;
 
-                fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                     pause
             case 11 % Top-Alpha, Mid-Alpha
                 Axis = [Axis,3];
                 Step = [Step,-1];
 
                 All_Moving_Module_Logical(3,1:2) = true;
-
-                fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
-                    pause
+               
             case -9 % Top-Beta, Mid-Alpha
                 Axis = [Axis(1),3];
                 Step = [Step(1),-1];
@@ -161,7 +155,7 @@ switch MovmentDirection
 
                 All_Moving_Module_Logical(2,:) = [];
 
-                fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                 pause
             case 9 % Top-Alpha, Mid-Beta
                 
@@ -171,7 +165,7 @@ switch MovmentDirection
 
                     All_Moving_Module_Logical(3,1) = true;
 
-                    fprintf("not tested yet: RemoveModule\StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
+                    fprintf("not tested yet: RemoveModule_StepSeqence function, case %d, Dir: %s",EdgeCase,MovmentDirection);
                     pause
                 else
                     Axis = [Axis,2,3];

@@ -1,18 +1,4 @@
-function [Axis, Step, Moving_Log] = Beta_Beta_Alpha__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges)
-arguments
-    Top_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
-    Mid_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
-    Buttom_GroupInd {mustBeVector,mustBeInteger,mustBePositive}
-    MovmentDirection (1,1) {matches(MovmentDirection,["Right","Left"])}
-    Edges = [];
-end
-
-Top_Group_num = numel(Top_GroupInd);
-Mid_Group_num = numel(Mid_GroupInd);
-Buttom_Group_num = numel(Buttom_GroupInd);
-
-All_Module_Ind = [Top_Group_num,Mid_Group_num,Buttom_Group_num];
-Moving_Log = false(3,numel(All_Module_Ind));
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom] = Beta_Beta_Alpha__2(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges)
 
 if ~isempty(Edges)
     Position_relative_buttom_group = [0;0;0];
@@ -23,29 +9,18 @@ if ~isempty(Edges)
 end
 
 
-switch MovmentDirection
-    case "Left"
-        Step = [Step, -1];
-        Axis = [Axis,  2];
-        Moving_Log(3,Top_Group_num+Mid_Group_num+1) = true;
 
-        Mid_GroupInd = [Buttom_GroupInd(1) ,Mid_GroupInd];
-        Buttom_GroupInd(1) = [];
+Step = [Step, -1, -1, -1, 1];
+Axis = [Axis,  2,  3,  1, 2];
 
-    case "Right"
-        Step = [Step, 1];
-        Axis = [Axis, 3];
-        
-        Moving_Log(3,end) = true;  
+Moving_Log_Buttom(3,1) = true;
 
-        Mid_GroupInd = [Mid_GroupInd, Buttom_GroupInd(end)];
-        Buttom_GroupInd(end) = [];
-end
+Moving_Log_Top(4,1) = true;
 
-[Axis1, Step1, Moving_Log1] = Beta_Alpha_Beta__2(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection);
+Moving_Log_Top(5,2) = true;
 
-Axis = [Axis, Axis1];
-Step = [Step, Step1];
-Moving_Log = [Moving_Log; Moving_Log1];
+Moving_Log_Top(6,1:2) = true;
+Moving_Log_Mid(6,1) = true;
+
 
 end

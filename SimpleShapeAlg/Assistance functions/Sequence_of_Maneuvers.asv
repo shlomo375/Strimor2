@@ -26,7 +26,7 @@ for Maneuver_ind = 1:length(Axis)
                     AllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
     
     if any(ConfigShifts)
-        Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1}, ConfigShifts);
+        Newtree.Data{NewParentInd} = AddConfigShifts(Newtree.Data{NewParentInd}, Shifts)
     end
 
 
