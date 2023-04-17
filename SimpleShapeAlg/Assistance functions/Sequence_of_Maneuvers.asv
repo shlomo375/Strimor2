@@ -26,7 +26,7 @@ for Maneuver_ind = 1:length(Axis)
                     AllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
     
     if any(ConfigShifts)
-        Newtree.Data{NewParentInd} = AddConfigShifts(Newtree.Data{NewParentInd}, Shifts)
+        Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1}, ConfigShifts);
     end
 
 
@@ -36,7 +36,20 @@ for Maneuver_ind = 1:length(Axis)
         break
     end
     if P.Plot
-        figure
+
+        % get the root object
+        rootObj = groot;
+        
+        % get the positions of all monitors
+        monitorPositions = rootObj.MonitorPositions;
+        
+        % check if there is more than one monitor
+        if size(monitorPositions, 1) > 1
+            figure()
+        else
+            disp('Only one monitor detected.');
+        end
+        
         PlotWorkSpace(NewWS,"Plot_CellInd",false);
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end

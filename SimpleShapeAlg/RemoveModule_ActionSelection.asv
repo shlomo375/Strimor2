@@ -11,33 +11,18 @@ if Three_Line_GroupsSizes(3,GroupNum) > 2 || Three_Line_GroupsSizes(3,GroupNum) 
     varargout{1} = Num_Removed_Module;
 else % Total line remove
 
-    [ManeuverRequired, Direction] = CheapManeuver(Three_Line_Edges,GroupNum,Three_Line_GroupsSizes(3,GroupNum));
+    [Decision, varargout{1}] = CheapManeuver(Three_Line_Edges,GroupNum,Three_Line_GroupsSizes(3,GroupNum));
 
-    switch ManeuverRequired
-        case "Alpha_Alpha_Alpha__1"
-
-        case "Alpha_Alpha_Alpha__2"
-        case "Alpha_Alpha_Beta__1"
-        case "Alpha_Alpha_Beta__2"
-        case "Alpha_Beta_Alpha__1"
-        case "Alpha_Beta_Alpha__2"
-
-        case "Alpha_Beta_Beta__1"
-        case "Alpha_Beta_Beta__2"
-                       
-        case "Beta_Alpha_Alpha__2"
-        case "Beta_Alpha_Alpha__3"
-
-        case "Beta_Alpha_Beta__2"
-        case "Beta_Alpha_Beta__3"
-        case "Beta_Beta_Alpha__2"                      
-        case "Beta_Beta_Alpha__3"
-                   
-        case "Beta_Beta_Beta__2"
-        case "Beta_Beta_Beta__3"
-    end
+    
 end
 
+if AlphaDiff(2) + BetaDiff(2) > Num_Removed_Module
+
+    varargout(2) = "Last Module Movment";
+
+else
+    varargout(2) = "Another line";
+end
 
 end
 
@@ -55,7 +40,7 @@ Maneuver_Cost = struct("Alpha_Alpha_Alpha__1",100,...
                        "Alpha_Beta_Alpha__2",1,...
                         ...
                        "Alpha_Beta_Beta__1",1,...
-                       "Alpha_Beta_Beta__2",7,...
+                       "Alpha_Beta_Beta__2",3,...
                         ...
                         ...
                         ...
@@ -81,10 +66,10 @@ Right = join([join([LineEdgesRight,"_"],"").replace("-1","Beta_").replace("1","A
 Left = join([join([LineEdgesLeft,"_"],"").replace("-1","Beta_").replace("1","Alpha_"),string(NumModule_TopLine)],"");
 
 if Maneuver_Cost.(Right) < Maneuver_Cost.(Left)
-    ManeuverRequired = Right;
+    ManeuverRequired = str2func(Right);
     Direction = "Right";
 else
-    ManeuverRequired = Left;
+    ManeuverRequired = str2func(Left);
     Direction = "Left";
 end
 

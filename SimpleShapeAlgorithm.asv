@@ -12,7 +12,7 @@ BasicWS = WorkSpace(Size,"RRT*");
 
 ConfigStruct_A = Node2ConfigStruct(StartConfig);
 WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
-figure(1)
+figure("Name","StartConfig","Position",[-1919 265 1536 739])
 PlotWorkSpace(WS,"Plot_CellInd",true)
 % 
 ConfigStruct_B = Node2ConfigStruct(TargetConfig);
@@ -24,20 +24,63 @@ WS_B = SetConfigurationOnSpace(BasicWS,ConfigStruct_B);
 
 Tree = TreeClass("", N, 1000, StartConfig,"EndConfig",TargetConfig,"ZoneMatrix",false);
 
-Up_Down = "Up";
+Downwards = true;
 %% start algorithm
 ParentInd = 1;
+% Module_Task_Allocation(WS, Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}, TargetConfig.IsomorphismMatrices1{1}, ConfigShift,13)
 for Line = size(StartConfig.IsomorphismMatrices1{1},1):-1:1
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetConfig.IsomorphismMatrices1{1}(Line,:)) 
         StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
         TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
         
-        [Action, ActionName] = LineDifferenceAnalysis(StartLine,TargetLine);
+        [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards);
         
-        [WS,Tree, ParentInd,ConfigShift] = Action(WS,Tree, ParentInd,ConfigShift, Line, Up_Down);
     end
 end
 
+function [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,ModuleTransitionData)
+
+arguments
+    WS
+    Tree
+    ParentInd
+    TargetConfig
+    ConfigShift
+    Line
+    Downwards
+    ModuleTransitionData = [];
+end
+
+StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
+TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
+
+
+if abs(StartLine) > abs(TargetLine)
+        
+    %% Remove modules
+    [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = RemoveModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
+
+elseif abs(StartLine) == abs(TargetLine)
+    if sign(StartLine) ~= sign(TargetLine) && ModuleTransitionData.
+        ActionFuncHandle = @SwitchEdges;
+        ActionName = "Switch edges";
+    else
+        ActionFuncHandle = [];
+        ActionName = "Line are the same";
+    end
+else % StartLine < TargetLine
+    ActionFuncHandle = @AddingModules;
+    ActionName = "Adding modules";
+end
+
+ModuleTransitionData.Current_Line
+if ModuleTransitionData.Finish
+    return
+else
+   [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,ModuleTransitionData.Current_Line,Downwards,ModuleTransitionData);
+end
+
+end
 
 
 

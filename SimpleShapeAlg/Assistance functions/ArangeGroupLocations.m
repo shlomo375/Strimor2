@@ -8,15 +8,17 @@ arguments
 end
 
 Step = zeros(1,numel(Edges));
-
+% +(Edges{1,GroupsNum(1)}(3,1) ~= Edges{3,GroupsNum(1)}(3,1))
 switch Direction
     case "Left"
-        for Line = 2:numel(Edges)
-            Step(Line) = floor((Edges{1,GroupsNum(1)}(2,1)+(Edges{1,GroupsNum(1)}(3,1)==1) - (Edges{Line,GroupsNum(Line)}(2,1)+(Edges{Line,GroupsNum(Line)}(3,1)==-1)))/2);
+        for Line = 3:-1:2
+            Step(Line) = floor((Edges{1,GroupsNum(1)}(2,1) - (Edges{Line,GroupsNum(Line)}(2,1)))/2);
         end
     case "Right"
         for Line = 2:numel(Edges)
-            Step(Line) = (Edges{1,GroupsNum(1)}(2,1)-(Edges{1,GroupsNum(1)}(3,1)==1) - Edges{Line,GroupsNum(Line)}(2,1)-(Edges{Line,GroupsNum(Line)}(3,1)==-1))/2;
+            Step(Line) = floor((Edges{1,GroupsNum(1)}(2,2) - Edges{Line,GroupsNum(Line)}(2,2))/2);
+            fprintf("not tested, pause")
+            pause
         end
 end
 Step(3) = Step(3) - Step(2);

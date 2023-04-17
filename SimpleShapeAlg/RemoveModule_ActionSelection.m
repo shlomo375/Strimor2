@@ -9,13 +9,19 @@ if Three_Line_GroupsSizes(3,GroupNum) > 2 || Three_Line_GroupsSizes(3,GroupNum) 
        Num_Removed_Module = 2;
     end
     varargout{1} = Num_Removed_Module;
+
 else % Total line remove
 
     [Decision, varargout{1}] = CheapManeuver(Three_Line_Edges,GroupNum,Three_Line_GroupsSizes(3,GroupNum));
-
+    Num_Removed_Module = Three_Line_GroupsSizes(1);
     
 end
 
+if abs(Three_Line_TargetGroupSizes(2)) - abs(Three_Line_GroupsSizes) >= Num_Removed_Module
+    varargout{2} = true;
+else
+    varargout{2} = false;
+end
 
 end
 

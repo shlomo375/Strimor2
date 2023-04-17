@@ -1,0 +1,22 @@
+function Module_Task_Allocation(WS,StartConfig, TargetConfig, ConfigShift,Up_Down, Line)
+
+[AlphaDiff, BetaDiff] = GetGroupConfigDiff(StartConfig,TargetConfig);
+
+[GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1));
+Edges = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
+
+Tbl = CreatTaskAllocationTable;
+
+
+
+end
+
+
+
+function Tbl = CreatTaskAllocationTable()
+
+
+Tbl = table(0,0,false,false,"","Down",false,'VariableNames',["Current_Line","Destination_Line","Alpha","Beta","Side","Up_Down","Exclusive"]);
+
+end
+
