@@ -5,23 +5,53 @@ TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
 GroupsInLine = GroupsSizes(Line,GroupsSizes(Line,:)~=0);
 for GroupNum = 1:length(GroupsInLine)
     
-    Top_GroupInd = GroupsInds{Line}{GroupNum};
-    [BaseGroupNum_1st, BaseGroupInd_1st] = GetBasedGroup(WS,GroupsInds{Line-1},Top_GroupInd);
-    [BaseGroupNum_2nd, BaseGroupInd_2nd] = GetBasedGroup(WS,GroupsInds{Line-2},GroupsInds{Line-1}{BaseGroupNum_1st});
+    
+%     [BaseGroupNum_1st, BaseGroupInd_1st] = GetBasedGroup(WS,GroupsInds{Line-1},Top_GroupInd);
+%     [BaseGroupNum_2nd, BaseGroupInd_2nd] = GetBasedGroup(WS,GroupsInds{Line-2},GroupsInds{Line-1}{BaseGroupNum_1st});
+    if Downwards
+        if Line < numel(GroupsInds)
+            Edges = Get_GroupEdges(GroupsSizes(Line-2:Line+1),GroupIndexes(Line-2:Line+1),GroupsInds(Line-2:Line+1));
+        else
+            Edges = Get_GroupEdges(GroupsSizes(Line-2:Line),GroupIndexes(Line-2:Line),GroupsInds(Line-2:Line));
+            Edges{4} = [];
+        end
+    else
+        % It is necessary to change the creation of the edges when the move is from bottom to top.
+        % The type of modules changes from an alpha module to a beta,
+        % so the type of operation required will also change. It should also be checked by deleting a line
+        Edges = flip(Get_GroupEdges(GroupsSizes(Line-1:Line+2),GroupIndexes(Line-1:Line+2),GroupsInds(Line-1:Line+2)));
+    end
+%     [Decision, Parameter, Get_to_Destination_Line] = RemoveModule_ActionSelection(GroupsSizes(Line-2:Line), TargetGroupSize(Line-2:Line), Edges,GroupNum);
+    [Decision, Direction] = RemoveModule_ActionSelection(GroupsSizes(Line), Edges,GroupNum);
 
-    Edges = Get_GroupEdges(GroupsSizes(Line-2:Line),GroupIndexes(Line-2:Line),GroupsInds(Line-2:Line));
-    
-    [Decision, Parameter, Get_to_Destination_Line] = RemoveModule_ActionSelection(GroupsSizes(Line-2:Line), TargetGroupSize(Line-2:Line), Edges,GroupNum);
-    
     %% all moving modules
     % Top_GroupInd
-    Mid_GroupInd = GroupsInds{Line-1}{BaseGroupNum_1st};
-    Buttom_GroupInd = GroupsInds{Line-2}{BaseGroupNum_2nd};
+    if numel(Decision) == 2 % Reduce module
+        if Line == numel(GroupsInds)
+            Top_GroupInd = [];
+        else
+            Top_GroupInd = GroupsInds{Line+1}{1};
+        end
+        Mid_GroupInd = GroupsInds{Line}{1};
+        Buttom_GroupInd = GroupsInds{Line-1}{1};
 
-    if ~isa(Decision,"function_handle")
-        switch Decision
-            case "Remove Module"
-                Num_Removed_Module = Parameter(1); %needed function
+
+
+        [Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Downwards);
+
+
+
+
+    else % Remove line
+        Top_GroupInd = GroupsInds{Line}{1};
+        Mid_GroupInd = GroupsInds{Line-1}{1};
+        Buttom_GroupInd = GroupsInds{Line-2}{1};
+    end
+
+%     if ~isa(Decision,"function_handle")
+%         switch Decision
+%             case "Remove Module"
+                Num_Removed_Module = Direction(1); %needed function
                 
                 if ~isempty(ModuleTransitionData)
                     MovmentDirection = ModuleTransitionData.Side;
@@ -30,7 +60,7 @@ for GroupNum = 1:length(GroupsInLine)
                 end
 
 %                 [Step, Axis] = ArangeGroupLocations(Direction,Edges,Position_relative_buttom_group,GroupsNum)
-                [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,MovmentDirection);
+%                 [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,MovmentDirection);
                 [Step, Axis, MovmentDirection] = ArangeLinePostion_For_ReduceModule(MovmentDirection, Edges);
 
                 
@@ -45,9 +75,9 @@ for GroupNum = 1:length(GroupsInLine)
                 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",true);
                 
                 ModuleTransitionData = CreatTaskAllocationTable("Current_Line",Line-Downwards+(~Downwards),"Module_Num",Num_Removed_Module,"Side",MovmentDirection,"Downwards",Downwards,"Finish",Get_to_Destination_Line);
-        end
-    else
-        [Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Parameter,Downwards);
+        % end
+%     else
+        [Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction,Downwards);
         
         [WS, Tree, ParentInd , OK] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",true);
             
@@ -62,12 +92,12 @@ for GroupNum = 1:length(GroupsInLine)
             Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},ConfigShift(:,1));
         end
 
-        ModuleTransitionData = CreatTaskAllocationTable("Current_Line",Line-Downwards+(~Downwards),"Module_Num",numel(Top_GroupInd),"Side",Parameter,"Downwards",Downwards,"Finish",Get_to_Destination_Line);
-    end
+        ModuleTransitionData = CreatTaskAllocationTable("Current_Line",Line-Downwards+(~Downwards),"Module_Num",numel(Top_GroupInd),"Side",Direction,"Downwards",Downwards,"Finish",Get_to_Destination_Line);
+end
 
     
 
-end
+% end
 
 end
 

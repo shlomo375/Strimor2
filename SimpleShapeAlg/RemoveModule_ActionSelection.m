@@ -1,50 +1,48 @@
-function [Decision, varargout] = RemoveModule_ActionSelection(Three_Line_GroupsSizes, Three_Line_TargetGroupSizes, Three_Line_Edges,GroupNum)
+function [Decision, Direction] = RemoveModule_ActionSelection(Line_GroupsSizes, Three_Line_Edges,GroupNum)
 
-if Three_Line_GroupsSizes(3,GroupNum) > 2 || Three_Line_GroupsSizes(3,GroupNum) < -3
+if Line_GroupsSizes > 2 || Line_GroupsSizes < -3
     
-    [ManeuverRequired, Direction] = SelectReduceManeuver(Three_Line_Edges)
+    [Decision, Direction] = SelectReduceManeuver(Three_Line_Edges);
     
-    [AlphaDiff, BetaDiff] = GetGroupConfigDiff(Three_Line_GroupsSizes,Three_Line_TargetGroupSizes);
-    Decision = "Remove Module";
-    if xor(abs(AlphaDiff(1)) == 1,abs(BetaDiff(1)) == 1) 
-       Num_Removed_Module = 1;
-    else
-       Num_Removed_Module = 2;
-    end
-    varargout{1} = Num_Removed_Module;
+%     [AlphaDiff, BetaDiff] = GetGroupConfigDiff(Three_Line_GroupsSizes,Three_Line_TargetGroupSizes);
+%     Decision = "Remove Module";
+%     if xor(abs(AlphaDiff(1)) == 1,abs(BetaDiff(1)) == 1) 
+%        Num_Removed_Module = 1;
+%     else
+%        Num_Removed_Module = 2;
+%     end
+%     varargout{1} = Num_Removed_Module;
 
 else % Total line remove
 
-    [Decision, varargout{1}] = CheapRemoveManeuver(Three_Line_Edges,GroupNum,Three_Line_GroupsSizes(3,GroupNum));
-    Num_Removed_Module = Three_Line_GroupsSizes(1);
+    [Decision, Direction] = CheapRemoveManeuver(Three_Line_Edges,GroupNum,Line_GroupsSizes);
+%     Num_Removed_Module = Three_Line_GroupsSizes(1);
     
 end
 
-if abs(Three_Line_TargetGroupSizes(2)) - abs(Three_Line_GroupsSizes) >= Num_Removed_Module
-    varargout{2} = true;
-else
-    varargout{2} = false;
-end
+% if abs(Three_Line_TargetGroupSizes(2)) - abs(Three_Line_GroupsSizes) >= Num_Removed_Module
+%     varargout{2} = true;
+% else
+%     varargout{2} = false;
+% end
 
 end
 
-function [ManeuverRequired, Direction] = SelectReduceManeuver(Three_Line_Edges)
+function [ManeuversRequired, Direction] = SelectReduceManeuver(Three_Line_Edges)
 
 LineEdgesLeft = join(string([Three_Line_Edges{3,1}(3,1), ...
                              Three_Line_Edges{2,1}(3,1)]),"_");
 LineEdgesRight = join(string([Three_Line_Edges{3,1}(3,2), ...
-                         Three_Line_Edges{2,1}(3,2)]),"_");
+                              Three_Line_Edges{2,1}(3,2)]),"_");
 
 Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha")],"");
 Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha")],"");
 
-if Maneuver_Cost.(Right) < Maneuver_Cost.(Left)
-    ManeuverRequired = str2func(Right);
-    Direction = "Right";
-else
-    ManeuverRequired = str2func(Left);
-    Direction = "Left";
-end
+ManeuversRequired{2} = str2func(Right);
+Direction(2) = "Right";
+
+ManeuversRequired{1} = str2func(Left);
+Direction(1) = "Left";
 
 end
 

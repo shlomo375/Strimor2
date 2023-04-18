@@ -1,21 +1,21 @@
 function [Step, Axis, Direction] = ArangeLinePostion_For_ReduceModule(Direction, Edges,GroupsNum)
 arguments
-    Direction (1,1) {matches(Direction,"Right","Left","Both")}
+    Direction (1,1) {matches(Direction,["Right","Left","Both"])}
     Edges
     GroupsNum (:,1) {mustBePositive,mustBeInteger} = ones(numel(Edges),1);
 end
 
 if Edges{2,GroupsNum(2)}(3,1) == 1 && Edges{3,GroupsNum(3)}(3,1) == 1
-    Reletive_Position = [0;1;-1;2];
+    Reletive_Position = [1;-1;2];
 
 elseif Edges{2,GroupsNum(2)}(3,1) == -1 && Edges{3,GroupsNum(3)}(3,1) == 1
-    Reletive_Position = [0;-1;-2;2];
+    Reletive_Position = [-1;-2;2];
 
 elseif Edges{2,GroupsNum(2)}(3,1) == 1 && Edges{3,GroupsNum(3)}(3,1) == -1
-    Reletive_Position = [0;-inf;0;1];
+    Reletive_Position = [-inf;0;1];
 
 elseif Edges{2,GroupsNum(2)}(3,1) == -1 && Edges{3,GroupsNum(3)}(3,1) == -1
-    Reletive_Position = [0;0;-3;1];
+    Reletive_Position = [0;-3;1];
 end
 
 

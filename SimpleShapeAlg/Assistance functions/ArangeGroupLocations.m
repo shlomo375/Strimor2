@@ -5,7 +5,7 @@ arguments
     Edges (:,1) {mustBeA(Edges,"cell")}
     Reletive_Position (:,1) {mustBeInteger} = false;
     GroupsNum (:,1) {mustBePositive,mustBeInteger} = ones(numel(Edges),1);
-    ManeuverType (1,1) {matches(ManeuverType,"Reduce","Remove")} = "Remove";
+    ManeuverType (1,1) {matches(ManeuverType,["Reduce","Remove"])} = "Remove";
 end
 
 
@@ -20,7 +20,7 @@ switch Direction
         for Line = 2:numel(Edges)
             Step(Line) = floor((Edges{Line-1,GroupsNum(Line-1)}(2,2) - Edges{Line,GroupsNum(Line)}(2,2))/2);
             fprintf("ArangeGroupLocations, not tested, pause")
-            pause
+%             pause
         end
 end
 % Step(3) = Step(3) - Step(2);
