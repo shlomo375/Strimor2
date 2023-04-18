@@ -29,6 +29,8 @@ for GroupNum = 1:length(GroupsInLine)
                 else
                     MovmentDirection = "Both";
                 end
+
+                [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group)
                 [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,MovmentDirection);
         
                 
@@ -37,7 +39,7 @@ for GroupNum = 1:length(GroupsInLine)
                 
                 [Axis, Step, Moving_Log] = StepSeqence(LineSteps,MovmentDirection,Edges(2:3),Num_Removed_Module,numel(Top_GroupInd),numel(Mid_GroupInd));
                 
-                Moving_Log = AddAboveModule(LineSteps, Moving_Log,Downwards)
+                [Moving_Log,AllModuleInd] = AddAboveModule(Line,AllModuleInd,GroupsInds,LineSteps, Moving_Log, Downwards);
                 %% movment process
             
                 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",true);
@@ -51,10 +53,10 @@ for GroupNum = 1:length(GroupsInLine)
             
         if OK
             if Downwards
-                ConfigShift(1,1) = ConfigShift(1,1) + 1;
+                ConfigShift(2,1) = ConfigShift(2,1) + 1;
 
             else
-                ConfigShift(2,1) = ConfigShift(2,1) + 1;
+                ConfigShift(1,1) = ConfigShift(1,1) + 1;
                 
             end
             Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},ConfigShift(:,1));

@@ -2,39 +2,30 @@ function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom] = Alpha_B
 
 
 if ~isempty(Edges)
-    Position_relative_buttom_group = [0;0;2];
+    Position_relative_buttom_group = [-3,0,2];
     [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
  
-    Moving_Log_Mid(1,:) = true;
-    Moving_Log_Top(1:2,:) = true;
+    Moving_Log_Buttom(1,:) = true;
+    Moving_Log_Mid(1:2,:) = true;
+    Moving_Log_Top(1:3,:) = true;
 end
-
-% Position_relative_buttom_group = [0;0;2];
-% if Downwards
-%     Position_relative_buttom_group = flip(Position_relative_buttom_group);
-% end
-% [Step, Axis] = ArangeGroupLocations(Right_Left,Edges,Position_relative_buttom_group);
-% 
-% Moving_Log_Mid(1,:) = true;
-% Moving_Log_Top(1:2,:) = true;
-
 
 Step = [Step, 1, 1, -1, -1, -1, 1];
 Axis = [Axis, 3, 1,  2,  3,  1, 2];
 
-Moving_Log_Mid(3,1) = true;
+Moving_Log_Mid(4,1) = true;
 
-Moving_Log_Buttom(4,:) = true;
+Moving_Log_Buttom(5,:) = true;
 
-Moving_Log_Mid(5,2) = true;
-Moving_Log_Buttom(5,1) = true;
+Moving_Log_Mid(6,2) = true;
+Moving_Log_Buttom(6,1) = true;
 
-Moving_Log_Mid(6,1:2) = true;
-
-Moving_Log_Top(7,1) = true;
+Moving_Log_Mid(7,1:2) = true;
 
 Moving_Log_Top(8,1) = true;
-Moving_Log_Mid(8,1:2) = true;
-Moving_Log_Buttom(8,1) = true;
+
+Moving_Log_Top(9,1) = true;
+Moving_Log_Mid(9,1:2) = true;
+Moving_Log_Buttom(9,1) = true;
 
 end

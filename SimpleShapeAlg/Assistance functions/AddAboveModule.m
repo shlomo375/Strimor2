@@ -5,11 +5,15 @@ if Line < numel(GroupsInds) && any(LineSteps)
     
     if Downwards
         for l = numel(GroupsInds):-1:Line+1
-            ExtraModule = [ExtraModule, GroupsInds{l}{1}];
+            if ~isempty(GroupsInds{l})
+                ExtraModule = [ExtraModule, GroupsInds{l}{1}];
+            end
         end
     else
         for l = 1:Line-1
-            ExtraModule = [ExtraModule, GroupsInds{l}{1}];
+            if ~isempty(GroupsInds{l})
+                ExtraModule = [ExtraModule, GroupsInds{l}{1}];
+            end
         end
     end
     AllModuleInd = [AllModuleInd;ExtraModule'];

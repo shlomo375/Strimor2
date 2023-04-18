@@ -9,7 +9,6 @@ for GroupNum = 1:length(GroupsInLine)
     [BaseGroupNum_1st, BaseGroupInd_1st] = GetBasedGroup(WS,GroupsInds{Line-1},Top_GroupInd);
     [BaseGroupNum_2nd, BaseGroupInd_2nd] = GetBasedGroup(WS,GroupsInds{Line-2},GroupsInds{Line-1}{BaseGroupNum_1st});
 
-    
     Edges = Get_GroupEdges(GroupsSizes(Line-2:Line),GroupIndexes(Line-2:Line),GroupsInds(Line-2:Line));
     
     [Decision, Parameter, Get_to_Destination_Line] = RemoveModule_ActionSelection(GroupsSizes(Line-2:Line), TargetGroupSize(Line-2:Line), Edges,GroupNum);
@@ -29,8 +28,11 @@ for GroupNum = 1:length(GroupsInLine)
                 else
                     MovmentDirection = "Both";
                 end
+
+%                 [Step, Axis] = ArangeGroupLocations(Direction,Edges,Position_relative_buttom_group,GroupsNum)
                 [LineSteps, MovmentDirection] = Get_Step_To_Remove_Module(Edges,GroupNum,BaseGroupNum_1st,BaseGroupNum_2nd,MovmentDirection);
-        
+                [Step, Axis, MovmentDirection] = ArangeLinePostion_For_ReduceModule(MovmentDirection, Edges);
+
                 
                 AllModuleInd = [Top_GroupInd, Mid_GroupInd]';
                 
@@ -51,10 +53,10 @@ for GroupNum = 1:length(GroupsInLine)
             
         if OK
             if Downwards
-                ConfigShift(1,1) = ConfigShift(1,1) + 1;
+                ConfigShift(2,1) = ConfigShift(2,1) + 1;
 
             else
-                ConfigShift(2,1) = ConfigShift(2,1) + 1;
+                ConfigShift(1,1) = ConfigShift(1,1) + 1;
                 
             end
             Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},ConfigShift(:,1));
