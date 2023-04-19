@@ -37,7 +37,7 @@ for GroupNum = 1:length(GroupsInLine)
 
 
 
-        [Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Downwards);
+        [Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges{2:end},Direction(1),Downwards);
 
 
 

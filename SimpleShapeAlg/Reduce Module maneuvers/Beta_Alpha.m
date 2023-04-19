@@ -1,5 +1,13 @@
-function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Direction] = Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction)
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Direction] = Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,GroupsNum)
 
+arguments
+    Moving_Log_Top
+    Moving_Log_Mid
+    Moving_Log_Buttom
+    Edges
+    Direction
+    GroupsNum = ones(numel(Edges),1);
+end
 
 if ~isempty(Edges)
     Reletive_Position = [inf;0;1];

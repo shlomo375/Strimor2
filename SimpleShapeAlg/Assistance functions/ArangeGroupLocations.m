@@ -14,13 +14,18 @@ Step = zeros(1,numel(Edges));
 switch Direction
     case "Left"
         for Line = numel(Edges):-1:2
-            Step(Line) = floor((Edges{Line-1,GroupsNum(Line-1)}(2,1) - (Edges{Line,GroupsNum(Line)}(2,1)))/2);
+            if ~isempty(Edges{Line})
+                Step(Line) = floor((Edges{Line-1,GroupsNum(Line-1)}(2,1) - (Edges{Line,GroupsNum(Line)}(2,1)))/2);
+        
+            end
         end
     case "Right"
         for Line = 2:numel(Edges)
-            Step(Line) = floor((Edges{Line-1,GroupsNum(Line-1)}(2,2) - Edges{Line,GroupsNum(Line)}(2,2))/2);
-            fprintf("ArangeGroupLocations, not tested, pause")
+            if ~isempty(Edges{Line})
+                Step(Line) = floor((Edges{Line-1,GroupsNum(Line-1)}(2,2) - Edges{Line,GroupsNum(Line)}(2,2))/2);
+                fprintf("ArangeGroupLocations, not tested, pause")
 %             pause
+            end
         end
 end
 % Step(3) = Step(3) - Step(2);
