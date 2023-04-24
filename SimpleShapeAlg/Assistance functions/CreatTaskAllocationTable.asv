@@ -1,0 +1,20 @@
+function Tbl = CreatTaskAllocationTable(ModuleTransitionData,Name,Value)
+arguments
+    ModuleTransitionData
+end
+arguments (Repeating)
+    Name (1,1) {mustBeTextScalar,matches(Name,["Current_Line","Module_Num","Side","Downwards"])}
+    Value (1,1)
+end
+
+if ModuleTransitionData.Module_Num == 1
+    
+
+Tbl = table(0,0,"",false,false,"Both",'VariableNames',["Current_Line","Module_Num","Side","Downwards","Finish","NextDirection"]);
+for ii = 1:numel(Name)
+
+    Tbl{1,Name{ii}} = Value{ii};
+
+end
+
+end

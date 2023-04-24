@@ -81,8 +81,8 @@ LineEdgesLeft = join(string([Three_Line_Edges{3,GroupNum}(3,1), ...
 LineEdgesRight = join(string([Three_Line_Edges{3,GroupNum}(3,2), ...
                              Three_Line_Edges{2,GroupNum}(3,2), ...
                              Three_Line_Edges{1,GroupNum}(3,2)]),"_");
-Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
-Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
+Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(NumModule_TopLine)],"__");%join([join([LineEdgesRight,"_"],"").replace("-1","Beta_").replace("1","Alpha_"),string(NumModule_TopLine)],"");
+Left = LineEdgesLeft.replace("-1","Beta").replace("1","Alpha");%join([join([LineEdgesLeft,"_"],"").replace("-1","Beta_").replace("1","Alpha_"),string(NumModule_TopLine)],"");
 
 if Maneuver_Cost.(Right) < Maneuver_Cost.(Left)
     ManeuverRequired = str2func(Right);

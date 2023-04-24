@@ -27,7 +27,7 @@ for GroupNum = 1:length(GroupsInLine)
     %% all moving modules
     % Top_GroupInd
     if numel(Decision) == 2 % Reduce module
-        if Line == numel(GroupsInds) || ~GroupsSizes(Line+1)
+        if Line == numel(GroupsInds) 
             Top_GroupInd = [];
         else
             Top_GroupInd = GroupsInds{Line+1}{1};

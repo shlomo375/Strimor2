@@ -10,7 +10,7 @@ arguments
 end
 
 if ~isempty(Edges)
-    Reletive_Position = [-1;-2;2];
+    Reletive_Position = [0;-2;-inf];
     [Step, Axis, Direction] = Select_Direction_Compute_Step(Direction,Edges,Reletive_Position,GroupsNum);
     
 
@@ -22,6 +22,6 @@ end
 Step = [Step,1];
 Axis = [Axis, 2];
 
-Moving_Log_Mid(3,1) = true;
+Moving_Log_Mid(4,1) = true;
 
 end

@@ -22,6 +22,6 @@ end
 Step = [Step,1];
 Axis = [Axis, 2];
 
-Moving_Log_Mid(3,1:2) = true;
+Moving_Log_Mid(4,1:2) = true;
 
 end

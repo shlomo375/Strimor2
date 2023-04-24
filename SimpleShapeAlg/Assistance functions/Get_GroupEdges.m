@@ -1,6 +1,7 @@
 function Edges = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds)
 
 EndIsAlphaMat = EndIsAlpha(GroupsSizes);
+% EndIsAlphaMat(isnan(EndIsAlphaMat)) = 
 EndIsBetaMat = ~EndIsAlphaMat;
 SignMat = sign(GroupsSizes);
 Edges = cell(numel(GroupsInds),1);

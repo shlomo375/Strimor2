@@ -17,7 +17,7 @@ if Line < numel(GroupsInds) && any(LineSteps) && any(Axis==1)
         end
     end
     AllModuleInd = [AllModuleInd,ExtraModule]';
-    Moving_Log(Axis==1,(end+1):(end+numel(ExtraModule))) = true;
+    Moving_Log(1:nnz(LineSteps),(end+1):(end+numel(ExtraModule))) = true;
 end
 
 end
