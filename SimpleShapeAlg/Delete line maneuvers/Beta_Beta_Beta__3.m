@@ -1,4 +1,7 @@
-function [Axis, Step, Moving_Log] = Beta_Beta_Beta__3(Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,MovmentDirection,Edges)
-%% spatial ettention
+function ModuleTransitionData = Beta_Beta_Beta__3(GroupsSizes,GroupIndexes,GroupsInds,DestenationLine,Downwards)
+
+ModuleType = 1; % 
+DestenationLine = DestenationLine - 2;
+ModuleTransitionData = TransferModuleToLine(GroupsSizes,GroupIndexes,GroupsInds,ModuleType,DestenationLine,~Downwards);
 
 end

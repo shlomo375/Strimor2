@@ -1,8 +1,8 @@
-function [Decision, Direction] = RemoveModule_ActionSelection(Line_GroupsSizes, Three_Line_Edges,GroupNum)
+function [Decision, Direction] = RemoveModule_ActionSelection(Line_GroupsSizes, Four_Line_Edges,GroupNum)
 
 if Line_GroupsSizes > 2 || Line_GroupsSizes < -3
     
-    [Decision, Direction] = SelectReduceManeuver(Three_Line_Edges);
+    [Decision, Direction] = SelectReduceManeuver(Four_Line_Edges);
     
 %     [AlphaDiff, BetaDiff] = GetGroupConfigDiff(Three_Line_GroupsSizes,Three_Line_TargetGroupSizes);
 %     Decision = "Remove Module";
@@ -15,7 +15,7 @@ if Line_GroupsSizes > 2 || Line_GroupsSizes < -3
 
 else % Total line remove
 
-    [Decision, Direction] = CheapRemoveManeuver(Three_Line_Edges,GroupNum,Line_GroupsSizes);
+    [Decision, Direction] = CheapRemoveManeuver(Four_Line_Edges,GroupNum,Line_GroupsSizes);
 %     Num_Removed_Module = Three_Line_GroupsSizes(1);
     
 end

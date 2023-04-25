@@ -1,11 +1,11 @@
-function [Step, Axis, All_Module_Ind, Moving_Log] = ComputeManuver(ManuverHandle, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Right_Left,Downwards)
+function [Step, Axis, All_Module_Ind, Moving_Log,ReducedModuleNum] = ComputeManuver(ManuverHandle, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Right_Left,Downwards)
 
-if ~Downwards
-    Temp = Top_GroupInd;
-    Top_GroupInd = Buttom_GroupInd;
-    Buttom_GroupInd = Top_GroupInd;
-    Edges = flip(Edges,1);
-end
+% if ~Downwards
+%     Temp = Top_GroupInd;
+%     Top_GroupInd = Buttom_GroupInd;
+%     Buttom_GroupInd = Top_GroupInd;
+%     Edges = flip(Edges,1);
+% end
 
 Moving_Log_Top = false(4,numel(Top_GroupInd));
 Moving_Log_Mid = false(4,numel(Mid_GroupInd));
@@ -54,4 +54,5 @@ RemoveStep = ~Step;
 Step(RemoveStep) = [];
 Axis(RemoveStep) = [];
 Moving_Log(RemoveStep,:) = [];
+ReducedModuleNum = sum(Moving_Log(end,:));
 end

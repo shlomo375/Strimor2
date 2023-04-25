@@ -34,7 +34,7 @@ for Line = size(StartConfig.IsomorphismMatrices1{1},1):-1:1
         TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
         
         [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards);
-        close all
+%         close all
     end
 end
 
@@ -48,19 +48,22 @@ arguments
     ConfigShift
     Line
     Downwards
-    ModuleTransitionData = [];
+    ModuleTransitionData = CreatTaskAllocationTable("Sequence",false,"Current_Line",0);
 end
 
 StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
 TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
 
 
-if abs(StartLine) > abs(TargetLine)
+if abs(StartLine) > abs(TargetLine) || ModuleTransitionData.DestenationLine % Translate module to spacifice line
     try
     %% Remove modules
+%     if ModuleTransitionData.Current_Line == 11
+%         d=5;
+%     end
     [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = RemoveModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
     
-    
+
     
     catch ee
         ee
