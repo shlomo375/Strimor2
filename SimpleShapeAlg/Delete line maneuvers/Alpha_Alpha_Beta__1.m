@@ -1,7 +1,7 @@
 function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom] = Alpha_Alpha_Beta__1(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,MovmentDirection)
 
 if ~isempty(Edges)
-    Position_relative_buttom_group = [-4;2;-1];
+    Position_relative_buttom_group = [-4;2;1];
     [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
  
     Moving_Log_Buttom(1,:) = true;

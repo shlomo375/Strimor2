@@ -20,6 +20,6 @@ for Line = LineSequence
     end
 end
 
-ModuleTransitionData = CreatTaskAllocationTable("Current_Line",Line,"Side",Direction,"DestenationLine",DestenationLine,"Module_Num",1,"Type",ModuleType,"Downwards",Downwards);
+ModuleTransitionData = CreatTaskAllocationTable([],"Current_Line",Line,"Side",Direction,"DestenationLine",DestenationLine,"Module_Num",1,"Type",ModuleType,"Downwards",Downwards);
 
 end

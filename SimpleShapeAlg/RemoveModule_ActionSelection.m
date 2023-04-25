@@ -1,4 +1,4 @@
-function [Decision, Direction] = RemoveModule_ActionSelection(Line_GroupsSizes, Four_Line_Edges,GroupNum)
+function [Decision, Direction] = RemoveModule_ActionSelection(Line_GroupsSizes, Four_Line_Edges)
 
 if Line_GroupsSizes > 2 || Line_GroupsSizes < -3
     
@@ -15,7 +15,7 @@ if Line_GroupsSizes > 2 || Line_GroupsSizes < -3
 
 else % Total line remove
 
-    [Decision, Direction] = CheapRemoveManeuver(Four_Line_Edges,GroupNum,Line_GroupsSizes);
+    [Decision, Direction] = CheapRemoveManeuver(Four_Line_Edges,Line_GroupsSizes);
 %     Num_Removed_Module = Three_Line_GroupsSizes(1);
     
 end
@@ -47,7 +47,7 @@ Direction(1) = "Left";
 end
 
 
-function [ManeuverRequired, Direction] = CheapRemoveManeuver(Three_Line_Edges,GroupNum,NumModule_TopLine)
+function [ManeuverRequired, Direction] = CheapRemoveManeuver(Three_Line_Edges,NumModule_TopLine)
 
 Maneuver_Cost = struct("Alpha_Alpha_Alpha__1",100,...
                        "Alpha_Alpha_Alpha__2",2,...
@@ -75,12 +75,12 @@ Maneuver_Cost = struct("Alpha_Alpha_Alpha__1",100,...
                        "Beta_Beta_Beta__2",1,...
                        "Beta_Beta_Beta__3",100);
 
-LineEdgesLeft = join(string([Three_Line_Edges{3,GroupNum}(3,1), ...
-                                 Three_Line_Edges{2,GroupNum}(3,1), ...
-                                 Three_Line_Edges{1,GroupNum}(3,1)]),"_");
-LineEdgesRight = join(string([Three_Line_Edges{3,GroupNum}(3,2), ...
-                             Three_Line_Edges{2,GroupNum}(3,2), ...
-                             Three_Line_Edges{1,GroupNum}(3,2)]),"_");
+LineEdgesLeft = join(string([Three_Line_Edges{3,1}(3,1), ...
+                                 Three_Line_Edges{2,1}(3,1), ...
+                                 Three_Line_Edges{1,1}(3,1)]),"_");
+LineEdgesRight = join(string([Three_Line_Edges{3,1}(3,2), ...
+                             Three_Line_Edges{2,1}(3,2), ...
+                             Three_Line_Edges{1,1}(3,2)]),"_");
 Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
 Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
 

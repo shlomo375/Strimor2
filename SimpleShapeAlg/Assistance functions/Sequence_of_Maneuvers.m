@@ -47,7 +47,12 @@ for Maneuver_ind = 1:length(Axis)
         if size(monitorPositions, 1) > 1
             figure("Position",[-1914 572 560 420]);
         else
-            figure("Position",[1 50 560 420]);
+%             figure("Position",[1 50 560 420]);
+            f = figure(666);
+            % f.Position = [1921,265,1536,739];
+            f.WindowStyle = 'docked'
+            cla
+            PlotWorkSpace(WS,"Plot_CellInd",true);
         end
         
         PlotWorkSpace(NewWS,"Plot_CellInd",false);

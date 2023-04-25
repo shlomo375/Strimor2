@@ -30,9 +30,6 @@ ParentInd = 1;
 % Module_Task_Allocation(WS, Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}, TargetConfig.IsomorphismMatrices1{1}, ConfigShift,13)
 for Line = size(StartConfig.IsomorphismMatrices1{1},1):-1:1
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetConfig.IsomorphismMatrices1{1}(Line,:)) 
-        StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
-        TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
-        
         [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards);
 %         close all
     end
@@ -50,6 +47,9 @@ arguments
     Downwards
     ModuleTransitionData = CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
 end
+if ~ModuleTransitionData.Downwards
+    d=5
+end
 
 StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
 TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
@@ -63,8 +63,13 @@ if abs(StartLine) > abs(TargetLine) || ModuleTransitionData.DestenationLine % Tr
     end
     [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = RemoveModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
     
-
-    
+%%
+%     f = figure(666);
+% % f.Position = [1921,265,1536,739];
+% f.WindowStyle = 'docked'
+% cla
+% PlotWorkSpace(WS,"Plot_CellInd",true);
+%%
     catch ee
         ee
     end
