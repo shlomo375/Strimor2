@@ -1,0 +1,16 @@
+function Finish = FinishTask(ModuleTransitionData)
+
+if ModuleTransitionData.Current_Line_Alpha
+    
+   
+
+
+elseif ModuleTransitionData.DestenationLine 
+    Finish = ModuleTransitionData.Current_Line_Alpha == ModuleTransitionData.DestenationLine && ...
+            ModuleTransitionData.Current_Line_Beta == ModuleTransitionData.DestenationLine;
+
+elseif ModuleTransitionData.Current_Line
+    Finish = ModuleTransitionData.DestenationLine_Alpha == ModuleTransitionData.Current_Line && ...
+            ModuleTransitionData.DestenationLine_Beta == ModuleTransitionData.Current_Line;
+
+end

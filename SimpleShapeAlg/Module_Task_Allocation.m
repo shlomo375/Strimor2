@@ -1,4 +1,4 @@
-function ModuleTransitionData = Module_Task_Allocation(WS,StartConfig, TargetConfig, ConfigShift,Downwards, Line)
+function ModuleTransitionData = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line)
 
 [AbsDiff, AlphaDiff, BetaDiff] = GetGroupConfigDiff(StartConfig,TargetConfig);
 TopLine = find(StartConfig,1,"last");
@@ -18,30 +18,30 @@ StartLine = [StartingLine_Alpha,StartingLine_Beta];
         if Line == TopLine && ...
                 abs(AbsDiff(Line)) == abs(StartConfig(Line)) && ...
                 AlphaDiff(Line) == -1
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine",Dest);
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",Dest(1),"DestenationLine_Beta",Dest(2));
         
     % One module
         elseif AlphaDiff(Line) == -1 && BetaDiff(Line) >= 0
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","ReduceLine","Current_Line",Line,"Downwards",Downwards,"Type",1,"DestenationLine",Dest(1));
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","ReduceLine","Current_Line_Alpha",Line,"Downwards",Downwards,"Type",1,"DestenationLine_Alpha",Dest(1));
         elseif BetaDiff(Line) == -1  && AlphDiff(Line) >= 0
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","ReduceLine","Current_Line",Line,"Downwards",Downwards,"Type",-1,"DestenationLine",Dest(2));
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","ReduceLine","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Dest(2));
     % Two module
         elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) <= -1
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","ReduceLine","Current_Line",Line,"Downwards",Downwards,"Type",0,"DestenationLine",Dest);
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","ReduceLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine_Alpha",Dest(1),"DestenationLine_Beta",Dest(2));
 
 % Adding modules
     % whole line
         elseif Line == (TopLine + 1) && ...
                 abs(StartConfig(Line)) == 0
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",Line);
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",StartLine(1),"Current_Line_Beta",StartLine(2),"Downwards",Downwards,"Type",0,"DestenationLine",Line);
     % One module
         elseif AlphaDiff(Line) == 1 && BetaDiff(Line) <= 0
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","AddModule","Current_Line",StartLine(1),"Downwards",Downwards,"Type",1,"DestenationLine",Line);
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","AddModule","Current_Line_Alpha",StartLine(1),"Downwards",Downwards,"Type",1,"DestenationLine",Line);
         elseif AlphaDiff(Line) <= 0 && BetaDiff(Line) == 1
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","AddModule","Current_Line",StartLine(2),"Downwards",Downwards,"Type",-1,"DestenationLine",Line);
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","AddModule","Current_Line_Beta",StartLine(2),"Downwards",Downwards,"Type",-1,"DestenationLine",Line);
     % Two module
         elseif AlphaDiff(Line) >= 1 && BetaDiff(Line) >= 1
-            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","AddModule","Current_Line",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",Line);
+            ModuleTransitionData = CreatTaskAllocationTable([],"ActionType","AddModule","Current_Line_Alpha",StartLine(1),"Current_Line_Beta",StartLine(2),"Downwards",Downwards,"Type",0,"DestenationLine",Line);
 
 
 % Switch edges

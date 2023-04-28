@@ -45,16 +45,29 @@ arguments
     ConfigShift
     Line
     Downwards
-    ModuleTransitionData = CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
+    ModuleTransitionData =[];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
 end
-if ~ModuleTransitionData.Downwards
-    d=5
-end
+
 
 StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
 TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
 
+StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
+TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
+ModuleTransitionData = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line);
 
+switch ModuleTransitionData.ActionType
+
+    case "ReduceLine"
+        [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = ReduceModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
+    case "DeleteLine"
+
+    case "CreateLine"
+
+    case "AddModule"
+
+    case "Switch"
+end
 if abs(StartLine) > abs(TargetLine) || ModuleTransitionData.DestenationLine % Translate module to spacifice line
     try
     %% Remove modules
