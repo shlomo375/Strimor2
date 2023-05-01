@@ -30,12 +30,12 @@ ParentInd = 1;
 % Module_Task_Allocation(WS, Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}, TargetConfig.IsomorphismMatrices1{1}, ConfigShift,13)
 for Line = size(StartConfig.IsomorphismMatrices1{1},1):-1:1
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetConfig.IsomorphismMatrices1{1}(Line,:)) 
-        [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards);
+        [WS,Tree, ParentInd,ConfigShift] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards);
 %         close all
     end
 end
 
-function [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,ModuleTransitionData)
+function [WS,Tree, ParentInd,ConfigShift] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards)
 
 arguments
     WS
@@ -43,82 +43,47 @@ arguments
     ParentInd
     TargetConfig
     ConfigShift
-    Line
-    Downwards
-    ModuleTransitionData =[];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
+    Line = [];
+    Downwards = [];
+
+%     T.Task_Queue = [];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
 end
+% Ploting = false;
+Ploting = true;
 
-
-StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
-TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
-
-StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
-TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
-ModuleTransitionData = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line);
-
-switch ModuleTransitionData.ActionType
-
-    case "ReduceLine"
-        [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = ReduceModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
-    case "DeleteLine"
-
-    case "CreateLine"
-
-    case "AddModule"
-
-    case "Switch"
-end
-if abs(StartLine) > abs(TargetLine) || ModuleTransitionData.DestenationLine % Translate module to spacifice line
+% StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
+% TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
+% if size(Task_Queue,1) == 0
+    StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
+    TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    %% Remove modules
-    if ModuleTransitionData.DestenationLine
-        d=5;
+    Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line);
+    catch me
+        me
     end
-    [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = RemoveModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
+    % end
+while size(Task_Queue,1) > 0
+    switch Task_Queue(end,:).ActionType
     
-%%
-%     f = figure(666);
-% % f.Position = [1921,265,1536,739];
-% f.WindowStyle = 'docked'
-% cla
-% PlotWorkSpace(WS,"Plot_CellInd",true);
-%%
-    catch ee
-        ee
+        case "TransitionModules"
+            [WS,Tree, ParentInd,ConfigShift,Task_Queue] = TransitionModules(WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
+        case "DeleteLine"
+            [WS,Tree, ParentInd,ConfigShift,Task_Queue] = DeleteLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
+        case "CreateLine"
+    
+        case "Switch"
     end
-elseif abs(StartLine) == abs(TargetLine)
-    if sign(StartLine) ~= sign(TargetLine)
-        if  isempty(ModuleTransitionData)
-            ActionFuncHandle = @SwitchEdges;
-            ActionName = "Switch edges";
-
-            % temp
-            ModuleTransitionData.Finish = true;
-        else
-            return
-        end
-    else
-        ActionFuncHandle = [];
-        ActionName = "Line are the same";
-
-        % temp
-        ModuleTransitionData.Finish = true;
+    
+    try
+    Task_Queue(end,:).Current_Line     
     end
-else % StartLine < TargetLine
-    ActionFuncHandle = @AddingModules;
-    ActionName = "Adding modules";
-
-    % temp
-    ModuleTransitionData.Finish = true;
+    % if Task_Queue(end,:).Finish
+    %     return
+    % else
+    %    [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Task_Queue=T.Task_Queue);
+    % end
 end
-
-ModuleTransitionData.Current_Line
-if ModuleTransitionData.Finish
-    return
-else
-   [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,ModuleTransitionData.Current_Line,Downwards,ModuleTransitionData);
-end
-
+d=5;
 end
 
 

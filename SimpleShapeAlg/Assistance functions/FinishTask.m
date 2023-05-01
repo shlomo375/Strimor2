@@ -1,5 +1,5 @@
-function ModuleTransitionData = FinishTask(ModuleTransitionData)
-
+function Finished = FinishTask(ModuleTransitionData)
+Finished = false;
 if ModuleTransitionData.Current_Line_Alpha
     if ModuleTransitionData.Current_Line_Alpha ~= ModuleTransitionData.DestenationLine_Alpha &&...
             ModuleTransitionData.Current_Line_Alpha ~= ModuleTransitionData.DestenationLine
@@ -16,5 +16,5 @@ if ModuleTransitionData.Current_Line_Beta
 
 end
    
-ModuleTransitionData.Finish = true;
+Finished = true;
 end

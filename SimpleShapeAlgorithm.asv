@@ -35,7 +35,7 @@ for Line = size(StartConfig.IsomorphismMatrices1{1},1):-1:1
     end
 end
 
-function [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,ModuleTransitionData)
+function [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Task_Queue)
 
 arguments
     WS
@@ -45,7 +45,7 @@ arguments
     ConfigShift
     Line
     Downwards
-    ModuleTransitionData =[];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
+    Task_Queue =[];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
 end
 
 
@@ -54,65 +54,69 @@ TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
 
 StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
 TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
-ModuleTransitionData = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line);
+Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line);
 
-switch ModuleTransitionData.ActionType
+switch Task_Queue.ActionType
 
     case "ReduceLine"
+        [WS,Tree, ParentInd,ConfigShift,Task_Queue] = ReduceModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,Task_Queue);
+    case "DeleteLine"
 
-    case
+    case "CreateLine"
 
-        
+    case "AddModule"
+
+    case "Switch"
 end
-if abs(StartLine) > abs(TargetLine) || ModuleTransitionData.DestenationLine % Translate module to spacifice line
-    try
-    %% Remove modules
-    if ModuleTransitionData.DestenationLine
-        d=5;
-    end
-    [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = RemoveModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
-    
-%%
-%     f = figure(666);
-% % f.Position = [1921,265,1536,739];
-% f.WindowStyle = 'docked'
-% cla
-% PlotWorkSpace(WS,"Plot_CellInd",true);
-%%
-    catch ee
-        ee
-    end
-elseif abs(StartLine) == abs(TargetLine)
-    if sign(StartLine) ~= sign(TargetLine)
-        if  isempty(ModuleTransitionData)
-            ActionFuncHandle = @SwitchEdges;
-            ActionName = "Switch edges";
+% if abs(StartLine) > abs(TargetLine) || ModuleTransitionData.DestenationLine % Translate module to spacifice line
+%     try
+%     %% Remove modules
+%     if ModuleTransitionData.DestenationLine
+%         d=5;
+%     end
+%     [WS,Tree, ParentInd,ConfigShift,ModuleTransitionData] = RemoveModules(WS,Tree, ParentInd,ConfigShift, Line, Downwards,ModuleTransitionData);
+%     
+% %%
+% %     f = figure(666);
+% % % f.Position = [1921,265,1536,739];
+% % f.WindowStyle = 'docked'
+% % cla
+% % PlotWorkSpace(WS,"Plot_CellInd",true);
+% %%
+%     catch ee
+%         ee
+%     end
+% elseif abs(StartLine) == abs(TargetLine)
+%     if sign(StartLine) ~= sign(TargetLine)
+%         if  isempty(ModuleTransitionData)
+%             ActionFuncHandle = @SwitchEdges;
+%             ActionName = "Switch edges";
+% 
+%             % temp
+%             ModuleTransitionData.Finish = true;
+%         else
+%             return
+%         end
+%     else
+%         ActionFuncHandle = [];
+%         ActionName = "Line are the same";
+% 
+%         % temp
+%         ModuleTransitionData.Finish = true;
+%     end
+% else % StartLine < TargetLine
+%     ActionFuncHandle = @AddingModules;
+%     ActionName = "Adding modules";
+% 
+%     % temp
+%     ModuleTransitionData.Finish = true;
+% end
 
-            % temp
-            ModuleTransitionData.Finish = true;
-        else
-            return
-        end
-    else
-        ActionFuncHandle = [];
-        ActionName = "Line are the same";
-
-        % temp
-        ModuleTransitionData.Finish = true;
-    end
-else % StartLine < TargetLine
-    ActionFuncHandle = @AddingModules;
-    ActionName = "Adding modules";
-
-    % temp
-    ModuleTransitionData.Finish = true;
-end
-
-ModuleTransitionData.Current_Line
-if ModuleTransitionData.Finish
+Task_Queue.Current_Line
+if Task_Queue.Finish
     return
 else
-   [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,ModuleTransitionData.Current_Line,Downwards,ModuleTransitionData);
+   [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Task_Queue.Current_Line,Downwards,Task_Queue);
 end
 
 end
