@@ -48,8 +48,8 @@ arguments
 
 %     T.Task_Queue = [];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
 end
-% Ploting = false;
-Ploting = true;
+Ploting = false;
+% Ploting = true;
 
 % StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
 % TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
@@ -57,21 +57,32 @@ Ploting = true;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line);
+        if ParentInd == 325
+            d=5
+        end
+    Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
     catch me
         me
     end
     % end
 while size(Task_Queue,1) > 0
+
+    if ~Task_Queue{end,"Downwards"}
+        d=5
+    end
+
     switch Task_Queue(end,:).ActionType
     
         case "TransitionModules"
+            try
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = TransitionModules(WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
+            catch me1
+                me1
+            end
         case "DeleteLine"
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = DeleteLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
-        case "CreateLine"
-    
         case "Switch"
+            d=5
     end
     
     try

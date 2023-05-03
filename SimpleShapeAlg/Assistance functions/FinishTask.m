@@ -1,20 +1,17 @@
-function Finished = FinishTask(ModuleTransitionData)
-Finished = false;
-if ModuleTransitionData.Current_Line_Alpha
-    if ModuleTransitionData.Current_Line_Alpha ~= ModuleTransitionData.DestenationLine_Alpha &&...
-            ModuleTransitionData.Current_Line_Alpha ~= ModuleTransitionData.DestenationLine
-        return
-    end
+function Task = FinishTask(Task)
 
+if Task.Current_Line_Alpha == Task.DestenationLine_Alpha ||...
+        Task.Current_Line_Alpha == Task.DestenationLine
+    Task.Finish_Alpha = true;
 end
 
-if ModuleTransitionData.Current_Line_Beta
-    if ModuleTransitionData.Current_Line_Beta ~= ModuleTransitionData.DestenationLine_Beta &&...
-            ModuleTransitionData.Current_Line_Beta ~= ModuleTransitionData.DestenationLine
-        return
-    end
-
+if Task.Current_Line_Beta == Task.DestenationLine_Beta ||...
+        Task.Current_Line_Beta == Task.DestenationLine
+    Task.Finish_Beta = true;
 end
-   
-Finished = true;
+
+
+if Task.Finish_Alpha && Task.Finish_Beta
+    Task.Finish = true;
+end
 end

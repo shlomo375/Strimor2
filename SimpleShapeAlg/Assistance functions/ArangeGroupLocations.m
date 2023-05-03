@@ -1,10 +1,9 @@
-function [Step, Axis] = ArangeGroupLocations(Direction,Edges,Displacement_Reqierd,GroupsNum,ManeuverType)
+function [Step, Axis] = ArangeGroupLocations(Direction,Edges,Displacement_Reqierd,ManeuverType)
 
 arguments
     Direction (1,1) {matches(Direction,["Right","Left"])}    
-    Edges (3,2,:) {mustBeInteger}
+    Edges (4,2,:) {mustBeInteger}
     Displacement_Reqierd (:,1) = false;
-    GroupsNum = [];
     ManeuverType (1,1) {matches(ManeuverType,["Reduce","Remove"])} = "Remove";
 end
 
@@ -14,18 +13,20 @@ Displacment = zeros(1,size(Edges,3));
 switch Direction
     case "Left"
         for Line = size(Edges,3):-1:2
-            if Edges(1,1,Line)
-                Displacment(Line) = floor((Edges(2,1,Line))) - (Edges(2,1,Line-1));
-        
-            else
-                Displacment(Line) = inf;
+            if Edges(1,1,Line-1)
+                if Edges(1,1,Line)
+                    Displacment(Line) = floor((Edges(2,1,Line))) - (Edges(2,1,Line-1));
+            
+                else
+                    Displacment(Line) = inf;
+                end
             end
         end
-        if matches(ManeuverType,"Reduce")
+%         if matches(ManeuverType,"Reduce")
             Displacment(1) = [];
-        else
-            Displacment(4) = [];
-        end
+%         else
+%             Displacment(1) = [];
+%         end
         NotCare_Buttom = Displacment(1) < Displacement_Reqierd(1);
         NotCare_Top = Displacment(3) > Displacement_Reqierd(3);
         Step = (Displacement_Reqierd' - Displacment)/2; 
@@ -35,17 +36,20 @@ switch Direction
     case "Right"
         
         for Line = 2:size(Edges,3)
-            if Edges(1,1,Line)
-                Displacment(Line) = floor(Edges(2,2,Line) - (Edges(2,2,Line-1)));
-            else
-                Displacment(Line) = -inf;
+            if Edges(1,1,Line-1)
+                if Edges(1,1,Line)
+                    Displacment(Line) = floor(Edges(2,2,Line) - (Edges(2,2,Line-1)));
+                else
+                    Displacment(Line) = -inf;
+                end
             end
+             
         end
-        if matches(ManeuverType,"Reduce")
+%         if matches(ManeuverType,"Reduce")
             Displacment(1) = [];
-        else
-            Displacment(4) = [];
-        end
+%         else
+%             Displacment(4) = [];
+%         end
         Displacement_Reqierd = -Displacement_Reqierd;
         NotCare_Buttom = Displacment(1) > Displacement_Reqierd(1);
         NotCare_Top = Displacment(3) < Displacement_Reqierd(3);

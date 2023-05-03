@@ -7,7 +7,9 @@ arguments
     Task_Queue
     Plot = false;
 end
-
+if ParentInd >=310
+    d=5
+end
 Task = Task_Queue(end,:);
 
 Line = max(Task{1,["Current_Line_Alpha","Current_Line_Beta"]});
@@ -16,16 +18,27 @@ Line = max(Task{1,["Current_Line_Alpha","Current_Line_Beta"]});
 %%
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
 % TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
-
-if Line < numel(GroupsInds) && GroupsSizes(Line+1)
-    Edges = Get_GroupEdges(GroupsSizes(Line-2:Line+1),GroupIndexes(Line-2:Line+1),GroupsInds(Line-2:Line+1));
+if Line > 2
+    if Line < numel(GroupsInds) && GroupsSizes(Line+1)
+        Edges = Get_GroupEdges(GroupsSizes(Line-2:Line+1),GroupIndexes(Line-2:Line+1),GroupsInds(Line-2:Line+1));
+    else
+        Edges = Get_GroupEdges(GroupsSizes(Line-2:Line),GroupIndexes(Line-2:Line),GroupsInds(Line-2:Line));
+    end
 else
-    Edges = Get_GroupEdges(GroupsSizes(Line-2:Line),GroupIndexes(Line-2:Line),GroupsInds(Line-2:Line));
+    Edges = Get_GroupEdges(GroupsSizes(Line-1:Line+1),GroupIndexes(Line-1:Line+1),GroupsInds(Line-1:Line+1),1);
 end
+
 
 [Decision, Direction] = SelectReduceManeuver(Edges);
 % [Decision, Direction] = RemoveModule_ActionSelection(GroupsSizes(Line), Edges);
-
+% [NeedHelp, Decision,Direction] = Read_Module_For_Help(WS, Tree, ParentInd, ConfigShift, Decision, Direction,Task);
+% if NeedHelp
+%     Task_Queue(end+1,:) = Decision;
+%     return
+% elseif numel(Direction) == 1
+%     Decision = {Decision,Decision};
+%     Direction = [Direction,Direction];
+% end
 %%
 if Line == numel(GroupsInds) || ~GroupsSizes(Line+1)
     Top_GroupInd = [];
@@ -38,18 +51,16 @@ Buttom_GroupInd = GroupsInds{Line-1}{1};
 %%
 switch Task.Side
     case "Left" % Moving one specific module from a certain side
-        [Step, Axis, AllModuleInd, Moving_Log,ReducedModuleNum] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Task.Downwards);
-        Task.Side = Task.Side;
+        [Step, Axis, AllModuleInd, Moving_Log,NewTask] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Task,Tree);
         Decision = func2str(Decision{1});
     case "Right"
-        [Step, Axis, AllModuleInd, Moving_Log,ReducedModuleNum] = ComputeManuver(Decision{2}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(2),Task.Downwards);
-        Task.Side = Task.Side;
+        [Step, Axis, AllModuleInd, Moving_Log,NewTask] = ComputeManuver(Decision{2}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(2),Task,Tree);
         Decision = func2str(Decision{2});
     otherwise
-        [Step{2}, Axis{2}, AllModuleInd{2}, Moving_Log{2}] = ComputeManuver(Decision{2}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(2),Task.Downwards);
-        [Step{1}, Axis{1}, AllModuleInd{1}, Moving_Log{1}] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Task.Downwards);
+        [Step{2}, Axis{2}, AllModuleInd{2}, Moving_Log{2},NewTask{2}] = ComputeManuver(Decision{2}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(2),Task,Tree);
+        [Step{1}, Axis{1}, AllModuleInd{1}, Moving_Log{1},NewTask{1}] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Task, Tree);
         
-        [Step, Axis,AllModuleInd, Moving_Log,Task.Side,Decision, ReducedModuleNum] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log,Direction,Decision);
+        [Step, Axis,AllModuleInd, Moving_Log,Task.Side,Decision] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log,Direction,Decision,NewTask);
 end
 
 
@@ -57,15 +68,21 @@ end
 PlotStep = false;
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 
- 
+try
 Task = Update_CurrentLine_Of_ModuleReduced(Task,Decision);
-
+if Task.Current_Line_Alpha <0 || Task.Current_Line_Beta<0
+    d=5
+end
+Task = FinishTask(Task);
 % Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},ConfigShift(:,1));
 
-if FinishTask(Task)
+if Task.Finish
     Task_Queue(end,:) = [];
 else
     Task_Queue(end,:) = Task;
+end
+catch me2
+    me2
 end
 % ModuleTransitionData_Table(end,:) = ModuleTransitionData;
 % if ReducedModuleNum == 1 && ~ModuleTransitionData.Sequence && ~ModuleTransitionData.DestenationLine
@@ -75,30 +92,50 @@ end
 % end
 end
 
-function ModuleTransitionData = Update_CurrentLine_Of_ModuleReduced(ModuleTransitionData,Decision)
+function Task = Update_CurrentLine_Of_ModuleReduced(Task,Decision)
 
 switch Decision
     case "Alpha_Alpha"
-        ModuleTransitionData.Current_Line = ModuleTransitionData.Current_Line - 1;
-        ModuleTransitionData.Current_Line_Alpha = ModuleTransitionData.Current_Line_Alpha - 1;
-        ModuleTransitionData.Current_Line_Beta = ModuleTransitionData.Current_Line_Beta - 1;
+        Task.Current_Line = Task.Current_Line - 1;
+        Task.Current_Line_Alpha = Task.Current_Line_Alpha - 1;
+        Task.Current_Line_Beta = Task.Current_Line_Beta - 1;
     case "Alpha_Beta"
-        if ModuleTransitionData.Downwards
-            ModuleTransitionData.Current_Line_Alpha = ModuleTransitionData.Current_Line_Alpha - 1;
+        if Task.Downwards
+            Task.Current_Line_Alpha = Task.Current_Line_Alpha - 1;
         else
-            ModuleTransitionData.Current_Line_Beta = ModuleTransitionData.Current_Line_Beta - 1;
+            Task.Current_Line_Beta = Task.Current_Line_Beta - 1;
         end
     case "Beta_Alpha"
-        if ModuleTransitionData.Downwards
-            ModuleTransitionData.Current_Line_Beta = ModuleTransitionData.Current_Line_Beta - 1;
+        if Task.Downwards
+            Task.Current_Line_Beta = Task.Current_Line_Beta - 1;
         else
-            ModuleTransitionData.Current_Line_Alpha = ModuleTransitionData.Current_Line_Alpha - 1;
+            Task.Current_Line_Alpha = Task.Current_Line_Alpha - 1;
         end
     case "Beta_Beta"
-        ModuleTransitionData.Current_Line = ModuleTransitionData.Current_Line - 1;
-        ModuleTransitionData.Current_Line_Alpha = ModuleTransitionData.Current_Line_Alpha - 1;
-        ModuleTransitionData.Current_Line_Beta = ModuleTransitionData.Current_Line_Beta - 1;
+        Task.Current_Line = Task.Current_Line - 1;
+        Task.Current_Line_Alpha = Task.Current_Line_Alpha - 1;
+        Task.Current_Line_Beta = Task.Current_Line_Beta - 1;
 
 end
-
+if Task.Current_Line_Alpha < 0
+    Task.Current_Line_Alpha = 0;
+end
+if Task.Current_Line_Beta < 0
+    Task.Current_Line_Beta = 0;
+end
+if Task.Current_Line < 0
+    Task.Current_Line = 0;
+end
+% if Task.Current_Line == Task.DestenationLine
+%     Task.Current_Line = 0;
+%     Task.DestenationLine = 0;
+% end
+% if Task.Current_Line_Alpha == Task.DestenationLine_Alpha
+%     Task.Current_Line_Alpha = 0;
+%     Task.DestenationLine_Alpha = 0;
+% end
+% if Task.Current_Line_Beta == Task.DestenationLine_Beta
+%     Task.Current_Line_Beta = 0;
+%     Task.DestenationLine_Beta = 0;
+% end
 end

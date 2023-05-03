@@ -8,13 +8,16 @@ arguments
     Plot = false;
 end
 Task = Task_Queue(end,:);
-
+try
+    if ParentInd>286
+        d=5
+    end
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
 % TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
 
 Line = Task.Current_Line;
 
-Edges = Get_GroupEdges(GroupsSizes(Line-2:Line),GroupIndexes(Line-2:Line),GroupsInds(Line-2:Line));
+Edges = Get_GroupEdges(GroupsSizes(Line-3:Line),GroupIndexes(Line-3:Line),GroupsInds(Line-3:Line));
 
     
 [Decision, Direction] = CheapRemoveManeuver(Edges,abs(GroupsSizes(Line)));
@@ -30,10 +33,15 @@ Top_GroupInd = GroupsInds{Line}{1};
 Mid_GroupInd = GroupsInds{Line-1}{1};
 Buttom_GroupInd = GroupsInds{Line-2}{1};
 
-[Step, Axis, AllModuleInd, Moving_Log] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction,Task.Downwards);
+[Step, Axis, AllModuleInd, Moving_Log, NewTask] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction,Task,Tree);
+
+if size(NewTask,1)
+    Task_Queue(end+1,:) = NewTask;
+    return
+end
 
 [WS, Tree, ParentInd , OK] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
-    
+
 if OK
     if Task.Downwards
         ConfigShift(2,1) = ConfigShift(2,1) + 1;
@@ -50,6 +58,9 @@ if OK
     Task_Queue(end,:) = [];
 else
     error("bad manuvers");
+end
+catch eer
+    eer
 end
 
 % ModuleTransitionData_Table = FinishTask(ModuleTransitionData_Table);
@@ -91,12 +102,12 @@ Maneuver_Cost = struct("Alpha_Alpha_Alpha__1",100,...
                        "Beta_Beta_Beta__2",1,...
                        "Beta_Beta_Beta__3",100);
 
-LineEdgesLeft = join(string([Three_Line_Edges(3,1,3), ...
-                                 Three_Line_Edges(3,1,2), ...
-                                 Three_Line_Edges(3,1,1)]),"_");
-LineEdgesRight = join(string([Three_Line_Edges(3,2,3), ...
-                             Three_Line_Edges(3,2,2), ...
-                             Three_Line_Edges(3,2,1)]),"_");
+LineEdgesLeft = join(string([Three_Line_Edges(3,1,4), ...
+                                 Three_Line_Edges(3,1,3), ...
+                                 Three_Line_Edges(3,1,2)]),"_");
+LineEdgesRight = join(string([Three_Line_Edges(3,2,4), ...
+                             Three_Line_Edges(3,2,3), ...
+                             Three_Line_Edges(3,2,2)]),"_");
 Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
 Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
 

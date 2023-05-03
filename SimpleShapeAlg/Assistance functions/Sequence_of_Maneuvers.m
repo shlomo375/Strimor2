@@ -45,16 +45,18 @@ for Maneuver_ind = 1:length(Axis)
         
         % check if there is more than one monitor
         if size(monitorPositions, 1) > 1
-            figure("Position",[-1914 572 560 420]);
+            f = figure(666);
+            f.Position = [-1919 265 1536 740.8000];
+            
         else
 %             figure("Position",[1 50 560 420]);
             f = figure(666);
             % f.Position = [1921,265,1536,739];
-            f.WindowStyle = 'docked'
-            cla
-            PlotWorkSpace(WS,"Plot_CellInd",true);
+            f.WindowStyle = 'docked';
+%             cla
+%             PlotWorkSpace(WS,"Plot_CellInd",true);
         end
-        
+        pause(0.03)
         PlotWorkSpace(NewWS,"Plot_CellInd",false);
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end

@@ -1,15 +1,19 @@
-for i=1:1000
-% [GroupsSizes,GroupIndexes,GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
-% 
-% GroupsSizes =   [zeros(ConfigShift(1),size(GroupsSizes,2));     GroupsSizes;   zeros(ConfigShift(2),size(GroupsSizes,2))];
-% GroupIndexes =  [cell(ConfigShift(1),size(GroupIndexes',2));     GroupIndexes';  cell(ConfigShift(2),size(GroupIndexes',2))];
-% GroupInd =      [cell(ConfigShift(1),size(GroupInd,2));         GroupInd;      cell(ConfigShift(2),size(GroupInd,2))];
+% Define a function that returns three outputs
 
 
-[GroupsSizes2,GroupIndexes2,GroupInd2] = ConfigGroupSizes2(WS.Space.Status,WS.Space.Type,WS.R1);
+% Call the function and set the fourth output to a value of your choice
+[output1, output2, output3, myValue] = myFunction(3);
 
-GroupsSizes =   [zeros(ConfigShift(1),size(GroupsSizes,2));     GroupsSizes;   zeros(ConfigShift(2),size(GroupsSizes,2))];
-GroupIndexes =  [cell(ConfigShift(1),size(GroupIndexes',2));     GroupIndexes';  cell(ConfigShift(2),size(GroupIndexes',2))];
-GroupInd =      [cell(ConfigShift(1),size(GroupInd,2));         GroupInd;      cell(ConfigShift(2),size(GroupInd,2))];
+% Check the number of output arguments requested by the caller
+if nargout > 3
+    myValue = 0;
+end
 
+% The fourth output argument will have the value of 0
+disp(myValue); % Output: 0
+
+function [output1, output2, output3] = myFunction(input)
+    output1 = input + 1;
+    output2 = input - 1;
+    output3 = input * 2;
 end

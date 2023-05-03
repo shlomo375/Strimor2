@@ -1,10 +1,15 @@
-function [NewStep, NewAxis,NewAllModuleInd, NewMoving_Log, NewDirection,NewDecision,ReducedModuleNum] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log, Direction,Decision)
-
-for ii = 1:numel(Step)
-    Cost(ii) = abs(Step{ii}(:)')*sum(Moving_Log{ii},2);
+function [NewStep, NewAxis,NewAllModuleInd, NewMoving_Log, NewDirection,NewDecision,ReducedModuleNum] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log, Direction,Decision,Tasks)
+if size(Tasks{1},1) && ~size(Tasks{2},1)
+    LowestCost_Loc = 2;
+elseif ~size(Tasks{1},1) && size(Tasks{2},1)
+    LowestCost_Loc = 1;
+else
+    for ii = 1:numel(Step)
+        Cost(ii) = abs(Step{ii}(:)')*sum(Moving_Log{ii},2);
+    end
+    
+    [~,LowestCost_Loc] = min(Cost);
 end
-
-[~,LowestCost_Loc] = min(Cost);
 
 NewStep = Step{LowestCost_Loc};
 NewAxis = Axis{LowestCost_Loc};
