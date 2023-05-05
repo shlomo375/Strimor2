@@ -5,6 +5,7 @@ function [AbsDiff, AlphaDiff, BetaDiff, Switch] = GetGroupConfigDiff(StartGroupC
 AlphaDiff = TargetGroupAlpha - StartGroupAlpha; %minus mean to substract the module
 BetaDiff  = TargetGroupBeta  - StartGroupBeta;
 AbsDiff = AlphaDiff + BetaDiff;
+Switch = StartGroupConfig == - TargetGroupConfig;
 end
 
 function [Alpha, Beta] = Num_Alpha_Beta_In_Group(Groups)

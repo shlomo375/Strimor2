@@ -82,7 +82,8 @@ if AlphaDiff(Line) >= 0 && BetaDiff(Line) >= 0
         % whole line
             if Line == (TopLine + 1) && ...
                     abs(StartConfig(Line)) == 0
-                Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",StartingLine_Alpha,"Current_Line_Beta",StartingLine_Beta,"Downwards",Downwards,"Type",0,"DestenationLine",Line);
+                
+                Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine",0);
                 return
         % One module
             elseif xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1)

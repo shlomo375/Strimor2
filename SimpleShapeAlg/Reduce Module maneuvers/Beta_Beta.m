@@ -1,6 +1,6 @@
 function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Beta_Beta(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx)
 Task = [];
-
+NotTested
 if ~isempty(Edges)
     
     GroupSizeRequired = [-1,-4];

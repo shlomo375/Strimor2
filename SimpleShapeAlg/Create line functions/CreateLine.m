@@ -1,4 +1,4 @@
-function [WS,Tree, ParentInd, ConfigShift,Task_Queue] = DeleteLine(WS,Tree, ParentInd,ConfigShift,Task_Queue,Plot)
+function [WS,Tree, ParentInd, ConfigShift,Task_Queue] = CreateLine(WS,Tree, ParentInd,ConfigShift,Task_Queue,Plot)
 arguments
     WS
     Tree
@@ -11,25 +11,28 @@ Task = Task_Queue(end,:);
 try
 
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
-% TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
+
 
 Line = Task.Current_Line;
+TargetGroup = Tree.EndConfig_IsomorphismMetrices{1}(Line,:,1);
 
-Edges = Get_GroupEdges(GroupsSizes(Line-3:Line),GroupIndexes(Line-3:Line),GroupsInds(Line-3:Line));
+Edges = Get_GroupEdges(GroupsSizes(Line+(1:2)),GroupIndexes(Line+(1:2)),GroupsInds(Line+(1:2)));
 
     
-[Decision, Direction] = CheapRemoveManeuver(Edges,abs(GroupsSizes(Line)));
+[Decision, Direction] = CheapCreateManeuver(Edges,TargetGroup);
 
 
 try
-if matches(func2str(Decision),["Alpha_Alpha_Alpha__1","Beta_Beta_Beta__3"])
-    Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line);
-    return
-end
-
-Top_GroupInd = GroupsInds{Line}{1};
-Mid_GroupInd = GroupsInds{Line-1}{1};
-Buttom_GroupInd = GroupsInds{Line-2}{1};
+% if matches(func2str(Decision),["Alpha_Alpha_Alpha__1","Beta_Beta_Beta__3"])
+%     Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line);
+%     return
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%until here
+fprintf("until here");
+pause
+Top_GroupInd = GroupsInds{Line+2}{1};
+Mid_GroupInd = [];
+Buttom_GroupInd = GroupsInds{Line+1}{1};
 
 [Step, Axis, AllModuleInd, Moving_Log, NewTask] = ComputeManuver(Decision, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction,Task,Tree);
 
@@ -42,17 +45,17 @@ end
 
 if OK
     if Task.Downwards
-        ConfigShift(2,1) = ConfigShift(2,1) + 1;
+        ConfigShift(2,1) = ConfigShift(1,1) - 1;
 
     else
-        ConfigShift(1,1) = ConfigShift(1,1) + 1;
+        ConfigShift(1,1) = ConfigShift(2,1) - 1;
         
     end
-    if Task.Downwards
-        Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},[0;1]);
-    else
-        Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},[1;0]);
-    end
+%     if Task.Downwards
+%         Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},[0;1]);
+%     else
+%         Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},[1;0]);
+%     end
     Task_Queue(end,:) = [];
 else
     error("bad manuvers");
@@ -72,43 +75,46 @@ end
 end
 
 
-function [ManeuverRequired, Direction] = CheapRemoveManeuver(Three_Line_Edges,NumModule_TopLine)
+function [ManeuverRequired, Direction] = CheapCreateManeuver(Three_Line_Edges,TargetGroup)
+if TargetGroup > 0
+    LeftEdge = "Alpha";
+else
+    LeftEdge = "Beta";
+end
+if abs(TargetGroup) == 1
+    RightEdge = [];
+else
+    if EndIsAlpha(TargetGroup)
+        RightEdge = "Alpha";
+    else
+        RightEdge = "Beta";
+    end
+end
 
-Maneuver_Cost = struct("Alpha_Alpha_Alpha__1",100,...
-                       "Alpha_Alpha_Alpha__2",2,...
-                       ...
-                       "Alpha_Alpha_Beta__1",7,...
-                       "Alpha_Alpha_Beta__2",2,...
-                       ...
-                       "Alpha_Beta_Alpha__1",6,...
-                       "Alpha_Beta_Alpha__2",1,...
-                        ...
-                       "Alpha_Beta_Beta__1",1,...
-                       "Alpha_Beta_Beta__2",3,...
-                        ...
-                        ...
-                        ...
-                       "Beta_Alpha_Alpha__2",4,...
-                       "Beta_Alpha_Alpha__3",1,...
-                       ...
-                       "Beta_Alpha_Beta__2",3,...
-                       "Beta_Alpha_Beta__3",2,...
-                       ...
-                       "Beta_Beta_Alpha__2",4,...
-                       "Beta_Beta_Alpha__3",1,...
-                       ...
-                       "Beta_Beta_Beta__2",1,...
-                       "Beta_Beta_Beta__3",100);
 
-LineEdgesLeft = join(string([Three_Line_Edges(3,1,4), ...
-                                 Three_Line_Edges(3,1,3), ...
-                                 Three_Line_Edges(3,1,2)]),"_");
-LineEdgesRight = join(string([Three_Line_Edges(3,2,4), ...
-                             Three_Line_Edges(3,2,3), ...
-                             Three_Line_Edges(3,2,2)]),"_");
-Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
-Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
+Maneuver_Cost = struct("Alpha_Alpha_to_Alpha_Beta",2,...
+                       "Alpha_Alpha_to_Alpha",4,...
+                       ...
+                       "Alpha_Beta_to_Alpha_Beta",2,... 
+                       "Alpha_Beta_to_Alpha",1,...
+                       ...
+                       "Beta_Alpha_to_Beta_Beta",1,...
+                        ...
+                       "Beta_Beta_to_Beta_Alpha",1);
 
+LineEdgesLeft = join(string([Three_Line_Edges(3,1,2), ...
+                                 Three_Line_Edges(3,1,1)]),"_");
+LineEdgesRight = join(string([Three_Line_Edges(3,2,2), ...
+                             Three_Line_Edges(3,2,1)]),"_");
+Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),join([RightEdge,LeftEdge],"_")],"_to_");
+Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),join([LeftEdge,RightEdge],"_")],"_to_");
+if ~isfield(Maneuver_Cost,Right) && ~ isfield(Maneuver_Cost,Left)
+    Field = fieldnames(Maneuver_Cost);
+    RightField = Field(contains(extractBefore(Field,"_to_"),extractBefore(Right,"_to_")));
+    Right = RightField{1};
+    LeftField = Field(contains(extractBefore(Field,"_to_"),extractBefore(Left,"_to_")));
+    Left = LeftField{1};
+end
 if Maneuver_Cost.(Right) < Maneuver_Cost.(Left)
     ManeuverRequired = str2func(Right);
     Direction = "Right";

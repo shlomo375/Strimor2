@@ -3,7 +3,6 @@
 % clear
 close all
 AddDirToPath()
-dbstop in NotTested at 12
 %% init
 load("SimpleShapeAlg\Shapes\Configs.mat","StartConfig","TargetConfig");
 
@@ -84,8 +83,6 @@ while size(Task_Queue,1) > 0
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = DeleteLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
         case "Switch"
             d=5
-        case "CreateLine"
-            [WS,Tree, ParentInd,ConfigShift,Task_Queue] = CreateLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
     end
     
     try

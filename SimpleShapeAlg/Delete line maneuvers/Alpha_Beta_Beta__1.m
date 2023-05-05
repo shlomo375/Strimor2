@@ -2,7 +2,7 @@ function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Al
 Step = [];
 Axis = [];
 Task = [];
-
+NotTested
 if ~isempty(Edges)
 
     GroupSizeRequired = [-1,-4,1];

@@ -2,6 +2,7 @@ function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Be
 Step = [];
 Axis = [];
 Task = [];
+NotTested
 if ~isempty(Edges)
 
     GroupSizeRequired = [2,3,2];

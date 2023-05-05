@@ -1,4 +1,5 @@
 function ModuleTransitionData = Beta_Beta_Beta__3(GroupsSizes,GroupIndexes,GroupsInds,DestenationLine,Downwards)
+NotTested
 
 Destenation_Line = Line - 2;
 Alpha_Override = zeros(size(StartConfig));
