@@ -1,4 +1,4 @@
-function [Step, Axis, All_Module_Ind, Moving_Log, NewTask] = ComputeManuver(ManuverHandle, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Right_Left,Task,Tree)
+function [Step, Axis, All_Module_Ind, Moving_Log, NewTask] = ComputeManuver(ManuverHandle, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Side,Task,Tree)
 
 % if ~Downwards
 %     Temp = Top_GroupInd;
@@ -15,7 +15,7 @@ Moving_Log_Buttom = false(4,numel(Buttom_GroupInd));
 
 
 
-[Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom, NewTask] = ManuverHandle(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Right_Left,Task.Downwards,Tree,Task.Current_Line);
+[Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom, NewTask] = ManuverHandle(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Side,Task.Downwards,Tree,Task.Current_Line,Task.Module_Num);
 
 if size(NewTask,1)
     return
@@ -30,7 +30,7 @@ Moving_Log = [Moving_Log_Top, Moving_Log_Mid, Moving_Log_Buttom];
 
 
 
-if matches(Right_Left,"Right")
+if matches(Side,"Right")
     Step = -Step;
     if Task.Downwards 
         NewAxis = Axis;
@@ -49,7 +49,7 @@ end
 
 
 %%
-if matches(Right_Left,"Right")
+if matches(Side,"Right")
     Top_GroupInd = flip(Top_GroupInd);
     Mid_GroupInd = flip(Mid_GroupInd);
     Buttom_GroupInd = flip(Buttom_GroupInd);

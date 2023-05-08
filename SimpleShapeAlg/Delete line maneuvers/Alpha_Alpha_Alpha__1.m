@@ -1,5 +1,5 @@
 function NewTask = Alpha_Alpha_Alpha__1(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line)
-NotTested
+
 % StartConfig, TargetConfig, Downwards, Line
 % ModuleType = -1;
 Destenation_Line = Line - 2;

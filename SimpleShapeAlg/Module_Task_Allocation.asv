@@ -108,13 +108,10 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 return
         % One module
             elseif xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1)
-%                 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(Addition.WS, Addition.ConfigShift,Downwards);
-%                 Edges1 = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
-                if ~Downwards
-                    StartConfig = -flip(StartConfig);
-                end
+                [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(Addition.WS, Addition.ConfigShift,Downwards);
+                Edges1 = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
                 Edges = Get_GroupEdges(StartConfig);
-                DestenationLine = size(Edges,1)-(Line-1);
+                DestenationLine = size(Edges,3)-(Line-1);
                 
 %                 Addition.Side = ["Left","Right"];
                 if AlphaDiff(Line) == 1 && BetaDiff(Line) <= 0
@@ -125,14 +122,14 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 Direction = ["Left","Right"];
                 switch Addition.Side
                     case "Left"
-                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);
+                        First_Left = DestenationLine + find(Edges(3,1,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
                         First_Right = inf;
                     case "Right"
-                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);
+                        First_Right = DestenationLine + find(Edges(3,2,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
                         First_Left = inf;
                     otherwise
-                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);
-                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);
+                        First_Left = DestenationLine + find(Edges(3,1,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
+                        First_Right = DestenationLine + find(Edges(3,2,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
                 end
 
                 [First_Line, DirLoc] = min([First_Left,First_Right]);

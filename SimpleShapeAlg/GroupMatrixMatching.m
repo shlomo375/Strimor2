@@ -4,7 +4,7 @@ GroupSizes_A = ConfigGroupSizes(WS_A.Space.Status,WS_A.Space.Type,WS_A.R1);
 GroupSizes_B = ConfigGroupSizes(WS_B.Space.Status,WS_B.Space.Type,WS_B.R1);
 % GroupSizes_A = Config_A.IsomorphismMatrices1{1}(:,:,1);
 % GroupSizes_B = Config_B.IsomorphismMatrices1{1}(:,:,1);
-NotTested()
+
 Config_A_Shift = [1;1];
 Config_B_Shift = [1;1];
 if size(GroupSizes_A,1) > size(GroupSizes_B,1)

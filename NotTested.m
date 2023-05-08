@@ -6,7 +6,7 @@ fprintf(Massege)
 beep on
 for ii = 1:3
     beep
-    pause(1)
+    pause(0.5)
 end
 
 end

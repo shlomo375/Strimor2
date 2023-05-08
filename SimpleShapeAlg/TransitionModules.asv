@@ -117,9 +117,16 @@ if Task.Current_Line < 0
     Task.Current_Line = 0;
 end
 Task.Module_Num = sum([Task.Current_Line_Alpha~=Task.DestenationLine_Alpha,Task.Current_Line_Beta~=Task.DestenationLine_Beta]);
-
-Task.Current_Line = ActiveLine(Task);
+Task.
+Task.Current_Line = ActiveLine(Task)
 end
 
 
+function Line = ActiveLine(Task)
 
+OptionalLine = Task{1,["Current_Line_Alpha","Current_Line_Beta"]};
+Finish = Task{1,["Finish_Alpha","Finish_Beta"]};
+Line = max(OptionalLine(~Finish));
+
+
+end

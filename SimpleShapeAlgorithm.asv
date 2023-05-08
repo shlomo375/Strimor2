@@ -3,6 +3,8 @@
 % clear
 close all
 AddDirToPath()
+dbstop in NotTested at 12
+dbstop if error
 %% init
 load("SimpleShapeAlg\Shapes\Configs.mat","StartConfig","TargetConfig");
 
@@ -48,8 +50,8 @@ arguments
 
 %     T.Task_Queue = [];%= CreatTaskAllocationTable([],"Sequence",false,"Current_Line",0,"Downwards",Downwards);
 end
-Ploting = false;
-% Ploting = true;
+% Ploting = false;
+Ploting = true;
 
 % StartLine = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1);
 % TargetLine = TargetConfig.IsomorphismMatrices1{1}(Line,:,1);
@@ -82,7 +84,9 @@ while size(Task_Queue,1) > 0
         case "DeleteLine"
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = DeleteLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
         case "Switch"
-            d=5
+            [WS,Tree, ParentInd,ConfigShift,Task_Queue] = SwitchLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
+        case "CreateLine"
+            [WS,Tree, ParentInd,ConfigShift,Task_Queue] = CreateLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
     end
     
     try
