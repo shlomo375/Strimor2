@@ -2,7 +2,7 @@ function [WS,tree, ParentInd] =  GroupsUnification(WS, tree, ParentInd)
 GroupConnected = true;
 while GroupConnected
     GroupConnected = false;
-    try
+%     try
     if size(tree.Data{ParentInd,"IsomorphismMatrices1"}{1},2) < 2
         return
     end
@@ -83,8 +83,8 @@ while GroupConnected
         end
     end
     
-    catch me1
-        me1
-    end
+%     catch me1
+%         me1
+%     end
 end
 end

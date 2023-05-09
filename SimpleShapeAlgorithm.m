@@ -70,17 +70,17 @@ while size(Task_Queue,1) > 0
     if ~Task_Queue{end,"Downwards"}
         d=5
     end
-    if ParentInd == 32
+    if ParentInd == 350
             d=5
-        end
+    end
     switch Task_Queue(end,:).ActionType
     
         case "TransitionModules"
-            try
+%             try
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = TransitionModules(WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
-            catch me1
-                me1
-            end
+%             catch me1
+%                 me1
+%             end
         case "DeleteLine"
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = DeleteLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
         case "Switch"

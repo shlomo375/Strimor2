@@ -8,7 +8,7 @@ arguments
     Plot = false;
 end
 Task = Task_Queue(end,:);
-try
+% try
 
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
 
@@ -22,7 +22,7 @@ Edges = Get_GroupEdges(GroupsSizes(Line+(1:2)),GroupIndexes(Line+(1:2)),GroupsIn
 [Decision, Direction] = CheapCreateManeuver(Edges,TargetGroup);
 
 
-try
+% try
 % if matches(func2str(Decision),["Alpha_Alpha_Alpha__1","Beta_Beta_Beta__3"])
 %     Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line);
 %     return
@@ -60,16 +60,16 @@ if OK
 else
     error("bad manuvers");
 end
-catch eer
-    eer
-end
+% catch eer
+%     eer
+% end
 
 % ModuleTransitionData_Table = FinishTask(ModuleTransitionData_Table);
 % Finish = CheckFinished(ModuleTransitionData_Table,Line-Downwards+(~Downwards), numel(Top_GroupInd), GroupsSizes, TargetGroupSize);
 % ModuleTransitionData_Table = CreatTaskAllocationTable([],"Current_Line",Line-Downwards+(~Downwards),"Module_Num",numel(Top_GroupInd),"Side",Direction,"Downwards",Downwards,"Finish",Finish);
-catch Remove_e
-    Remove_e
-end
+% catch Remove_e
+%     Remove_e
+% end
     
 
 end

@@ -48,15 +48,17 @@ for Maneuver_ind = 1:length(Axis)
             f = figure(666);
             f.Position = [-1919 265 1536 740.8000];
             
+            
         else
 %             figure("Position",[1 50 560 420]);
             f = figure(666);
             % f.Position = [1921,265,1536,739];
             f.WindowStyle = 'docked';
-%             cla
+            
 %             PlotWorkSpace(WS,"Plot_CellInd",true);
         end
-        pause(0.03)
+%         pause(0.03)
+        cla
         PlotWorkSpace(NewWS,"Plot_CellInd",false);
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end

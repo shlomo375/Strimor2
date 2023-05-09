@@ -4,15 +4,15 @@ arguments
     TargetConfig
     Downwards
     Line
-    Addition.AlphaDiff_Override (:,1) {mustBeInteger} = [];
-    Addition.BetaDiff_Override (:,1) {mustBeInteger} = [];
+    Addition.AlphaDiff_Override (:,1) {mustBeInteger} = false(size(StartConfig));
+    Addition.BetaDiff_Override (:,1) {mustBeInteger} = false(size(StartConfig));
     Addition.WS = [];
     Addition.ConfigShift = [];
     Addition.Side = "";
     Addition.DisableSwitch = false;
 end
 [AbsDiff, AlphaDiff, BetaDiff, Switch] = GetGroupConfigDiff(StartConfig,TargetConfig);
-try
+% try
 if numel(Addition.BetaDiff_Override) == 1 || numel(Addition.AlphaDiff_Override) == 1
     Temp = zeros(size(StartConfig));
     Temp(Line) = Addition.BetaDiff_Override;
@@ -22,10 +22,10 @@ if numel(Addition.BetaDiff_Override) == 1 || numel(Addition.AlphaDiff_Override) 
     Temp(Line) = Addition.AlphaDiff_Override;
     Addition.AlphaDiff_Override = Temp;
 end
-catch mee3
-    mee3
-end
-if ~isempty(Addition.AlphaDiff_Override) && ~isempty(Addition.BetaDiff_Override)
+% catch mee3
+%     mee3
+% end
+if any(Addition.AlphaDiff_Override) && any(Addition.BetaDiff_Override)
     AlphaDiff_Override_Log = logical(Addition.AlphaDiff_Override);
     AlphaDiff(AlphaDiff_Override_Log) = Addition.AlphaDiff_Override(AlphaDiff_Override_Log);
 
@@ -39,13 +39,13 @@ if ~isempty(Addition.AlphaDiff_Override) && ~isempty(Addition.BetaDiff_Override)
         AbsDiff(AlphaDiff_Override_Log) = AbsDiff(AlphaDiff_Override_Log) + Addition.BetaDiff_Override(BetaDiff_Override_Log);
     end
 else
-    if ~isempty(Addition.AlphaDiff_Override)
+    if any(Addition.AlphaDiff_Override)
         AlphaDiff_Override_Log = logical(Addition.AlphaDiff_Override);
         AlphaDiff(AlphaDiff_Override_Log) = Addition.AlphaDiff_Override(AlphaDiff_Override_Log);
         BetaDiff(AlphaDiff_Override_Log) = 0;
         AbsDiff(AlphaDiff_Override_Log) = Addition.AlphaDiff_Override(AlphaDiff_Override_Log);
     end
-    if ~isempty(Addition.BetaDiff_Override)
+    if any(Addition.BetaDiff_Override)
         BetaDiff_Override_Log = logical(Addition.BetaDiff_Override);
         BetaDiff(BetaDiff_Override_Log) = Addition.BetaDiff_Override(BetaDiff_Override_Log);
         AlphaDiff(BetaDiff_Override_Log) = 0;
@@ -108,10 +108,14 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 return
         % One module
             elseif xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1)
-                [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(Addition.WS, Addition.ConfigShift,Downwards);
-                Edges1 = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
+%                 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(Addition.WS, Addition.ConfigShift,Downwards);
+%                 Edges1 = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
+                if ~Downwards
+                    StartConfig = -flip(StartConfig);
+                    AbsDiff = flip(AbsDiff);
+                end
                 Edges = Get_GroupEdges(StartConfig);
-                DestenationLine = size(Edges,3)-(Line-1);
+                DestenationLine = size(Edges,1)-(Line-1);
                 
 %                 Addition.Side = ["Left","Right"];
                 if AlphaDiff(Line) == 1 && BetaDiff(Line) <= 0
@@ -122,16 +126,18 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 Direction = ["Left","Right"];
                 switch Addition.Side
                     case "Left"
-                        First_Left = DestenationLine + find(Edges(3,1,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
+                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);
                         First_Right = inf;
                     case "Right"
-                        First_Right = DestenationLine + find(Edges(3,2,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
+                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);
                         First_Left = inf;
                     otherwise
-                        First_Left = DestenationLine + find(Edges(3,1,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
-                        First_Right = DestenationLine + find(Edges(3,2,(DestenationLine+1):size(Edges,3)) == ReqiuerdType,1);
+                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);
+                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);
                 end
-
+                if (isempty(First_Right) && isinf(First_Left)) || (isempty(First_Left) && isinf(First_Right))
+                    Task = Get_Module_From_The_Other_Side(First_Left,First_Right,DestenationLine,Addition.Side,ReqiuerdType,Downwards,Edges,AbsDiff)
+                end
                 [First_Line, DirLoc] = min([First_Left,First_Right]);
                 if ReqiuerdType == -1
                     Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",First_Line,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Direction(DirLoc));
@@ -156,6 +162,49 @@ end
 
 
 
+
+
+end
+
+
+function Task_Queue = Get_Module_From_The_Other_Side(First_Left,First_Right,DestenationLine,Side,ReqiuerdType,Downwards,Edges,AbsDiff)
+NotCompleteLine = logical(AbsDiff);
+
+if matches(Side,"Left")
+    FirstStage_Side = "Right";
+else
+    FirstStage_Side = "Left";
+end
+
+if isempty(First_Right)
+    %% Stage 1
+    FirstStage_Init_Location = find(Edges(:,1) == ReqiuerdType & NotCompleteLine,1,"last");
+    FirstStage_Final_Location = find(Edges(:,1),1,"last");
+    
+else
+
+    e
+    FirstStage_Current_Line = size(Edges,1)-(FirstStage_Init_Location-1);
+    FirstStage_Destenation_Line = size(Edges,1)-(FirstStage_Final_Location-1);
+    if ReqiuerdType == -1
+        Task_Queue(3,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",FirstStage_Side);
+    else
+        Task_Queue(3,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",FirstStage_Side);
+    end
+
+    %% Stage 2
+    Task_Queue(2,:) = CreatTaskAllocationTable([],"ActionType","SwitchLine","Downwards",~Downwards);
+
+    %% Stage 3
+    if ReqiuerdType == -1
+        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Destenation_Line,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
+    else
+        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Destenation_Line,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
+    end
+else
+
+
+end
 
 
 end
