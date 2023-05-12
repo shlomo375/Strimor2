@@ -26,176 +26,128 @@ if Line ~= FirstConfigLine
     return
 else
     %% Bottom line switch
-    GroupSizeRequired = [3,4];
-    [OK, Task] = GroupSizeAsNeeded(GroupsSizes,TargetGroupSize,GroupSizeRequired,Line,Task.Downwards);
+    GroupSizeRequired = [4,3];
+    [OK, NewTask] = GroupSizeAsNeeded(GroupsSizes,TargetGroupSize,GroupSizeRequired,Line,Task.Downwards);
     if ~OK
-        Task_Queue(end+1,:) = Task;
+        Task_Queue(end+1,:) = NewTask;
         return
     end
     
     %% algorithm
     
-    Top_GroupInd = GroupsInds{Line}{1};
-    Buttom_GroupInd = GroupsInds{Line-1}{1};
-    All_MovingModule = [Top_GroupInd,Buttom_GroupInd];
-
+    Bottom_GroupInd = GroupsInds{Line}{1};
+    Top_GroupInd = GroupsInds{Line+1}{1};
+    AllModuleInd = [Bottom_GroupInd,Top_GroupInd];
+    
+    Moving_Log_Bottom = false(1,size(Bottom_GroupInd,2));
+    Moving_Log_Top = false(1,size(Top_GroupInd,2));
     if GroupsSizes(Line) < 0
-        BaseSide = "Right";
+        BaseSide = "Left";
+        Side_Sign = -1;
         
         MAX_StepLeft = Edges(2,2,Line-1) - Edges(2,1,Line-2)
         Step = [Step, 1];
         Axis = [Axis, 2];
         
-        Moving_Log_Top(4,1) = true;
-        Moving_Log_Mid(4,1:2) = true;
+        Moving_Log_Bottom(4,1) = true;
+        Moving_Log_Top(4,1:2) = true;
 
     else
-        BaseSide = "Left";
+        BaseSide = "Right";
+        Side_Sign = 1;
+
+        Top_Step = floor(Side_Sign*((Edges(2,2,Line+1)-(Edges(3,2,Line+1)==-1)) - (Edges(2,2,Line)-(Edges(3,2,Line)==1)))/2);
+        TopBottom_Step = floor(Side_Sign*((Edges(2,1,Line+2)+(Edges(3,1,Line+2)==-1)) - (Edges(2,2,Line+1)-(Edges(3,2,Line+1)==1)))/2);
+        Step = [Top_Step,TopBottom_Step];
+        Axis = [1,1];
+        
+        Moving_Log_Bottom(1:2,:) = true;
+        Moving_Log_Top(2,:) = true;
+
+        %%
+        Step(3) = 1;
+        Axis(3) = 2;
+        Moving_Log_Bottom(3,1:end-1) = true;
+        if EndIsAlpha(GroupsSizes(Line+1))
+            Moving_Log_Top(3,1:end-4) = true;
+        else
+            Moving_Log_Top(3,1:end-3) = true;
+        end
+        %%
+        Step(4) = 1;
+        Axis(4) = 3;
+        Moving_Log_Bottom(4,end-1) = true;
+        
+        %%
+        Step(5) = -1;
+        Axis(5) = 2;
+        Moving_Log_Bottom(5,1:end-2) = true;
+        if EndIsAlpha(GroupsSizes(Line+1))
+            Moving_Log_Top(5,1:end-4) = true;
+        else
+            Moving_Log_Top(5,1:end-3) = true;
+        end
+
+        %% 
+        Step(6) = Base_Num(GroupsSizes(Line+1),-1) + Base_Num(GroupsSizes(Line+2),1)-2;
+        Axis(6) = 1;
+        Moving_Log_Bottom(6,:) = true;
+        Moving_Log_Top(6,:) = true;
+
+        %%
+        Step(7) = -1;
+        Axis(7) = 3;
+        Moving_Log_Bottom(7,end-1:end) = true;
+        if EndIsAlpha(GroupsSizes(Line+1))
+            Moving_Log_Top(7,end-2:end) = true;
+        else
+            Moving_Log_Top(7,end-1:end) = true;
+        end
+
+        %%
+        Step(8) = -(Base_Num(GroupsSizes(Line),1)-2);
+        Axis(8) = 1;
+        Moving_Log_Bottom(8,end-1:end) = true;
+        % Moving_Log_Top(8,1:end-3) = true;
+
+        %%
+        Step(9) = 1;
+        Axis(9) = 2;
+        Moving_Log_Bottom(9,1) = true;
+        
+        %%
+        Step(10) = (Base_Num(GroupsSizes(Line),1)-2);
+        Axis(10) = 1;
+        Moving_Log_Bottom(10,[1,end-1:end]) = true;
+        % Moving_Log_Top(8,1:end-3) = true;
+
+        %%
+        Step(11) = 1;
+        Axis(11) = 3;
+        Moving_Log_Bottom(11,[1,end-1:end]) = true;
+        if EndIsAlpha(GroupsSizes(Line+1))
+            Moving_Log_Top(11,end-2:end) = true;
+        else
+            Moving_Log_Top(11,end-1:end) = true;
+        end
+
     end
     
-   
-
-    ScannedAgent = ~WS.Space.Status;
-    ScannedAgent(GroupInd1{1}{1}) = true;
-    [~, StraightLineModulesInd] = ScanningAgentsFast(WS, ScannedAgent, ModulesGroupInd(3),true);
-    
-    
-    % load("Switch.mat")
-[GroupsSizes,GroupIndexes, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
-
-% Temp = 1:numel(BottomModuleInd);
-if FirstIsAlpha(GroupsSizes(1,:))
-    % Swapping occurs on the right side of a configuration
-    TopModuleInd = GroupInd{2}{1};
-    BottomModuleInd = flip(GroupInd{1}{1}(end-5:end));
-    AllModuleInd = [BottomModuleInd; TopModuleInd];
-    
-    FirstStep = (GroupIndexes{1}{1}(end)-GroupIndexes{2}{1}(end)-4)/2;
-    Steps = [FirstStep,-1,-1,-1,-1,1,-1,-1,1];
-    Axis = [1,2,1,2,3,2,3,2,3];
-
-else
-    TopModuleInd = GroupInd{2}{1};
-    BottomModuleInd = GroupInd{1}{1}(1:6);
-    AllModuleInd = [BottomModuleInd; TopModuleInd];
-
-    FirstStep = -(GroupIndexes{2}{1}(1)-GroupIndexes{1}{1}(1)-4)/2;
-    Steps = [FirstStep,1,1,1,1,-1,1,1,-1];
-    Axis = [1,3,1,3,2,3,2,3,2];
+if ~Task.Downwards
+    NewAxis = Axis;
+    NewAxis(Axis==2) = 3;
+    NewAxis(Axis==3) = 2;
+    Axis = NewAxis;
 end
-% figure(1)
-% PlotWorkSpace(WS,[],[]);
-%% swap group adges algorithm
+Moving_Log = [Moving_Log_Bottom, Moving_Log_Top];
 
-% The six modules at the end of the bottom row are numbered from the end
-% inward, 1,2,3,4,5,6.
-%%
-% 1) Moving the top row to the end with the beta module, 2 steps before the
-% end of the row.
 
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(7)] =...
-    ManeuverStepProcess(WS,tree,ParentInd,AllModuleInd(7), Axis(1), Steps(1));
+RemoveStep = ~Step;
+Step(RemoveStep) = [];
+Axis(RemoveStep) = [];
+Moving_Log(RemoveStep,:) = [];
 
-    if ~ OK
-        return
-    end
-% figure(2)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 2) uploading modules 1,2,3 from the bottom row.
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3]), Axis(2), Steps(2));
-
-    if ~ OK
-        return
-    end
-% figure(3)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 3) moving the top row one step in the other direction (top row + modules
-% 1,2,3).
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3,7])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3,7]), Axis(3), Steps(3));
-
-    if ~ OK
-        return
-    end
-% figure(4)
-% PlotWorkSpace(NewWS,[],[]);    
-%%
-% 4) Upload modules 1-5 one line up.
-    
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3,4,5])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3,4,5]), Axis(4), Steps(4));
-
-    if ~ OK
-        return
-    end
-% figure(5)
-% PlotWorkSpace(NewWS,[],[]);    
-%%
-% 5) Download module 3 one step.
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(3)] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd(3), Axis(5), Steps(5));
-
-    if ~ OK
-        return
-    end
-% figure(6)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 6) Downloading modules 1,2,4,5 one row in the other axis back to the
-% previous place.
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,4,5])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,4,5]), Axis(6), Steps(6));
-
-    if ~ OK
-        return
-    end
-% figure(7)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 7) Download modules 1,2,4,5,6 line down in the first axis.
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,4,5,6])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,4,5,6]), Axis(7), Steps(7));
-
-    if ~ OK
-        return
-    end
-% figure(8)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 8) Upload module 1 row up.
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(1)] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd(1), Axis(8), Steps(8));
-
-    if ~ OK
-        return
-    end
-% figure(9)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 9) Upload modules 2,4,5,6 one line up.
-
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd([2,4,5,6])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([2,4,5,6]), Axis(9), Steps(9));
-
-    if ~ OK
-        return
-    end
-% figure(10)
-% PlotWorkSpace(NewWS,[],[]);
-
-WS = NewWS;
-tree = Newtree;
-ParentInd = NewParentInd;
-
+[WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 end
 
     
