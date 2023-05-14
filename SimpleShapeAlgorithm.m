@@ -76,11 +76,7 @@ while size(Task_Queue,1) > 0
     switch Task_Queue(end,:).ActionType
     
         case "TransitionModules"
-%             try
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = TransitionModules(WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
-%             catch me1
-%                 me1
-%             end
         case "DeleteLine"
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = DeleteLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
         case "Switch"
@@ -92,11 +88,6 @@ while size(Task_Queue,1) > 0
     try
     Task_Queue(end,:).Current_Line     
     end
-    % if Task_Queue(end,:).Finish
-    %     return
-    % else
-    %    [WS,Tree, ParentInd] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Task_Queue=T.Task_Queue);
-    % end
 end
 d=5;
 end

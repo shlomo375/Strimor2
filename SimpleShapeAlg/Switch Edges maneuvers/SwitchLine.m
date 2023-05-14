@@ -32,7 +32,8 @@ else
         Task_Queue(end+1,:) = NewTask;
         return
     end
-    
+    Step = zeros(1,11);
+    Axis = zeros(1,11);
     %% algorithm
     
     Bottom_GroupInd = GroupsInds{Line}{1};
@@ -43,96 +44,130 @@ else
     Moving_Log_Top = false(1,size(Top_GroupInd,2));
     if GroupsSizes(Line) < 0
         BaseSide = "Left";
-        Side_Sign = -1;
         
-        MAX_StepLeft = Edges(2,2,Line-1) - Edges(2,1,Line-2)
-        Step = [Step, 1];
-        Axis = [Axis, 2];
-        
-        Moving_Log_Bottom(4,1) = true;
-        Moving_Log_Top(4,1:2) = true;
+        Top_Step = floor(((Edges(2,1,Line+1)+(Edges(3,1,Line+1)==-1)) - (Edges(2,1,Line)+(Edges(3,1,Line)==1)))/2);
+        TopBottom_Step = floor(((Edges(2,2,Line+2)-(Edges(3,2,Line+2)==-1)) - (Edges(2,1,Line+1)+(Edges(3,1,Line+1)==1)))/2);
+        Step(1:2) = [Top_Step,TopBottom_Step];
+        Axis(1:2) = [1,1];
+        %%
+        Step(3) = -1;
+        Axis(3) = 3;
+        %%
+        Step(4) = -1;
+        Axis(4) = 2;  
+        %%
+        Step(5) = 1;
+        Axis(5) = 3;
+        %% 
+        Step(6) = -(Base_Num(GroupsSizes(Line+1),-1) + Base_Num(GroupsSizes(Line+2),1)-2);
+        Axis(6) = 1;
+        %%
+        Step(7) = 1;
+        Axis(7) = 2;
+        %%
+        Step(8) = (Base_Num(GroupsSizes(Line),1)-2);
+        Axis(8) = 1;
+        %%
+        Step(9) = -1;
+        Axis(9) = 3;
+        %%
+        Step(10) = -(Base_Num(GroupsSizes(Line),1)-2);
+        Axis(10) = 1;
+        %%
+        Step(11) = -1;
+        Axis(11) = 2;
+       
 
     else
         BaseSide = "Right";
-        Side_Sign = 1;
 
-        Top_Step = floor(Side_Sign*((Edges(2,2,Line+1)-(Edges(3,2,Line+1)==-1)) - (Edges(2,2,Line)-(Edges(3,2,Line)==1)))/2);
-        TopBottom_Step = floor(Side_Sign*((Edges(2,1,Line+2)+(Edges(3,1,Line+2)==-1)) - (Edges(2,2,Line+1)-(Edges(3,2,Line+1)==1)))/2);
-        Step = [Top_Step,TopBottom_Step];
-        Axis = [1,1];
-        
-        Moving_Log_Bottom(1:2,:) = true;
-        Moving_Log_Top(2,:) = true;
+        Top_Step = floor(((Edges(2,2,Line+1)-(Edges(3,2,Line+1)==-1)) - (Edges(2,2,Line)-(Edges(3,2,Line)==1)))/2);
+        TopBottom_Step = floor(((Edges(2,1,Line+2)+(Edges(3,1,Line+2)==-1)) - (Edges(2,2,Line+1)-(Edges(3,2,Line+1)==1)))/2);
+        Step(1:2) = [Top_Step,TopBottom_Step];
+        Axis(1:2) = [1,1];
 
         %%
         Step(3) = 1;
         Axis(3) = 2;
-        Moving_Log_Bottom(3,1:end-1) = true;
-        if EndIsAlpha(GroupsSizes(Line+1))
-            Moving_Log_Top(3,1:end-4) = true;
-        else
-            Moving_Log_Top(3,1:end-3) = true;
-        end
         %%
         Step(4) = 1;
         Axis(4) = 3;
-        Moving_Log_Bottom(4,end-1) = true;
-        
         %%
         Step(5) = -1;
         Axis(5) = 2;
-        Moving_Log_Bottom(5,1:end-2) = true;
-        if EndIsAlpha(GroupsSizes(Line+1))
-            Moving_Log_Top(5,1:end-4) = true;
-        else
-            Moving_Log_Top(5,1:end-3) = true;
-        end
-
         %% 
         Step(6) = Base_Num(GroupsSizes(Line+1),-1) + Base_Num(GroupsSizes(Line+2),1)-2;
         Axis(6) = 1;
-        Moving_Log_Bottom(6,:) = true;
-        Moving_Log_Top(6,:) = true;
-
         %%
         Step(7) = -1;
         Axis(7) = 3;
-        Moving_Log_Bottom(7,end-1:end) = true;
-        if EndIsAlpha(GroupsSizes(Line+1))
-            Moving_Log_Top(7,end-2:end) = true;
-        else
-            Moving_Log_Top(7,end-1:end) = true;
-        end
-
         %%
         Step(8) = -(Base_Num(GroupsSizes(Line),1)-2);
         Axis(8) = 1;
-        Moving_Log_Bottom(8,end-1:end) = true;
-        % Moving_Log_Top(8,1:end-3) = true;
-
         %%
         Step(9) = 1;
         Axis(9) = 2;
-        Moving_Log_Bottom(9,1) = true;
-        
         %%
         Step(10) = (Base_Num(GroupsSizes(Line),1)-2);
         Axis(10) = 1;
-        Moving_Log_Bottom(10,[1,end-1:end]) = true;
-        % Moving_Log_Top(8,1:end-3) = true;
-
         %%
         Step(11) = 1;
         Axis(11) = 3;
-        Moving_Log_Bottom(11,[1,end-1:end]) = true;
-        if EndIsAlpha(GroupsSizes(Line+1))
-            Moving_Log_Top(11,end-2:end) = true;
-        else
-            Moving_Log_Top(11,end-1:end) = true;
-        end
-
     end
-    
+
+Moving_Log_Bottom(1:2,:) = true;
+Moving_Log_Top(2,:) = true;
+%%
+Moving_Log_Bottom(3,1:end-1) = true;
+if EndIsAlpha(GroupsSizes(Line+1))
+    Moving_Log_Top(3,1:end-2) = true;
+else
+    Moving_Log_Top(3,1:end-3) = true;
+end
+
+Moving_Log_Bottom(4,end-1) = true;
+%%        
+Moving_Log_Bottom(5,1:end-2) = true;
+if EndIsAlpha(GroupsSizes(Line+1))
+    Moving_Log_Top(5,1:end-2) = true;
+else
+    Moving_Log_Top(5,1:end-3) = true;
+end
+
+%% 
+Moving_Log_Bottom(6,:) = true;
+Moving_Log_Top(6,:) = true;
+
+%%
+Moving_Log_Bottom(7,end-1:end) = true;
+if EndIsAlpha(GroupsSizes(Line+1))
+    Moving_Log_Top(7,end) = true;
+else
+    Moving_Log_Top(7,end-1:end) = true;
+end
+
+%%
+Moving_Log_Bottom(8,end-1:end) = true;
+
+%%
+Moving_Log_Bottom(9,1) = true;
+
+%%
+Moving_Log_Bottom(10,[1,end-1:end]) = true;
+
+%%
+Moving_Log_Bottom(11,[1,end-1:end]) = true;
+if EndIsAlpha(GroupsSizes(Line+1))
+    Moving_Log_Top(11,end) = true;
+else
+    Moving_Log_Top(11,end-1:end) = true;
+end
+
+if matches(BaseSide,"Left")
+    Moving_Log_Top = flip(Moving_Log_Top,2);
+    Moving_Log_Bottom = flip(Moving_Log_Bottom,2);
+end
+
 if ~Task.Downwards
     NewAxis = Axis;
     NewAxis(Axis==2) = 3;
@@ -148,6 +183,8 @@ Axis(RemoveStep) = [];
 Moving_Log(RemoveStep,:) = [];
 
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
+
+Task_Queue(end,:) = [];
 end
 
     

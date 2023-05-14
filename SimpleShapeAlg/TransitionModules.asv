@@ -7,9 +7,9 @@ arguments
     Task_Queue
     Plot = false;
 end
-if ParentInd >=310
-    d=5
-end
+% if ParentInd >=310
+%     d=5
+% end
 Task = Task_Queue(end,:);
 
 % Line = max(Task{1,["Current_Line_Alpha","Current_Line_Beta"]});
@@ -38,7 +38,11 @@ else
     Top_GroupInd = GroupsInds{Line+1}{1};
 end
 Mid_GroupInd = GroupsInds{Line}{1};
-Buttom_GroupInd = GroupsInds{Line-1}{1};
+if Line == numel(GroupsInds) || ~GroupsSizes(Line-1)
+    Buttom_GroupInd = [];
+else
+    Buttom_GroupInd = GroupsInds{Line-1}{1};
+end
 
 %%
 switch Task.Side
@@ -55,7 +59,7 @@ switch Task.Side
         [Step, Axis,AllModuleInd, Moving_Log,Task.Side,Decision,~,NewTask] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log,Direction,Decision,NewTask);
 end
 if size(NewTask,1)
-    Task_Queue(end+1,:) = NewTask;
+    Task_Queue(end+1:end+size(NewTask,1),:) = NewTask;
     return
 end
 
@@ -63,7 +67,7 @@ end
 PlotStep = false;
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 
-try
+% try
 Task = Update_CurrentLine_Of_ModuleReduced(Task,Decision);
 if Task.Current_Line_Alpha <0 || Task.Current_Line_Beta<0
     d=5
@@ -76,9 +80,9 @@ if Task.Finish
 else
     Task_Queue(end,:) = Task;
 end
-catch me2
-    me2
-end
+% catch me2
+%     me2
+% end
 
 end
 
@@ -117,16 +121,9 @@ if Task.Current_Line < 0
     Task.Current_Line = 0;
 end
 Task.Module_Num = sum([Task.Current_Line_Alpha~=Task.DestenationLine_Alpha,Task.Current_Line_Beta~=Task.DestenationLine_Beta]);
-Task.
-Task.Current_Line = ActiveLine(Task)
+
+Task.Current_Line = ActiveLine(Task);
 end
 
 
-function Line = ActiveLine(Task)
 
-OptionalLine = Task{1,["Current_Line_Alpha","Current_Line_Beta"]};
-Finish = Task{1,["Finish_Alpha","Finish_Beta"]};
-Line = max(OptionalLine(~Finish));
-
-
-end

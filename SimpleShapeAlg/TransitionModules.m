@@ -7,9 +7,9 @@ arguments
     Task_Queue
     Plot = false;
 end
-if ParentInd >=310
-    d=5
-end
+% if ParentInd >=310
+%     d=5
+% end
 Task = Task_Queue(end,:);
 
 % Line = max(Task{1,["Current_Line_Alpha","Current_Line_Beta"]});
@@ -38,7 +38,11 @@ else
     Top_GroupInd = GroupsInds{Line+1}{1};
 end
 Mid_GroupInd = GroupsInds{Line}{1};
-Buttom_GroupInd = GroupsInds{Line-1}{1};
+if Line == numel(GroupsInds) || ~GroupsSizes(Line-1)
+    Buttom_GroupInd = [];
+else
+    Buttom_GroupInd = GroupsInds{Line-1}{1};
+end
 
 %%
 switch Task.Side

@@ -12,7 +12,7 @@ arguments
     Addition.DisableSwitch = false;
 end
 [AbsDiff, AlphaDiff, BetaDiff, Switch] = GetGroupConfigDiff(StartConfig,TargetConfig);
-% try
+
 if numel(Addition.BetaDiff_Override) == 1 || numel(Addition.AlphaDiff_Override) == 1
     Temp = zeros(size(StartConfig));
     Temp(Line) = Addition.BetaDiff_Override;
@@ -22,9 +22,7 @@ if numel(Addition.BetaDiff_Override) == 1 || numel(Addition.AlphaDiff_Override) 
     Temp(Line) = Addition.AlphaDiff_Override;
     Addition.AlphaDiff_Override = Temp;
 end
-% catch mee3
-%     mee3
-% end
+
 if any(Addition.AlphaDiff_Override) && any(Addition.BetaDiff_Override)
     AlphaDiff_Override_Log = logical(Addition.AlphaDiff_Override);
     AlphaDiff(AlphaDiff_Override_Log) = Addition.AlphaDiff_Override(AlphaDiff_Override_Log);
@@ -58,6 +56,7 @@ TopLine = find(StartConfig,1,"last");
 
 DestenationLine_Alpha = max([0,find(AlphaDiff >= 1,1,"last")]);
 DestenationLine_Beta = max([0,find(BetaDiff >= 1,1,"last")]);
+% DestenationLine
 % Dest = [DestenationLine_Alpha,DestenationLine_Beta];
 
 
@@ -165,16 +164,6 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
     Downwards = ~Downwards;
 end
 
-% Remove Alpha Add Beta
-
-% Remove Beta Add Alpha
-
-
-
-
-
-
-
 end
 
 
@@ -211,9 +200,9 @@ end
 
     %% Stage 3
     if ReqiuerdType == -1
-        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Destenation_Line,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
+        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Final_Location,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
     else
-        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Destenation_Line,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
+        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Final_Location,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
     end
 
 
