@@ -45,6 +45,7 @@ else
 end
 
 %%
+try
 switch Task.Side
     case "Left" % Moving one specific module from a certain side
         [Step, Axis, AllModuleInd, Moving_Log,NewTask] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Task,Tree);
@@ -57,12 +58,15 @@ switch Task.Side
         [Step{1}, Axis{1}, AllModuleInd{1}, Moving_Log{1},NewTask{1}] = ComputeManuver(Decision{1}, Top_GroupInd,Mid_GroupInd,Buttom_GroupInd,Edges,Direction(1),Task, Tree);
         
         [Step, Axis,AllModuleInd, Moving_Log,Task.Side,Decision,~,NewTask] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log,Direction,Decision,NewTask);
+        % Task{1,"Side"} = Side;
 end
 if size(NewTask,1)
     Task_Queue(end+1:end+size(NewTask,1),:) = NewTask;
     return
 end
-
+catch eeee
+    eeee
+end
 [Moving_Log,AllModuleInd] = AddAboveModule(Line+1,AllModuleInd,GroupsInds,Step,Axis, Moving_Log, Task.Downwards);
 PlotStep = false;
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);

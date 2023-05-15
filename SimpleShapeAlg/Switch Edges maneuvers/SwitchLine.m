@@ -119,7 +119,7 @@ Moving_Log_Bottom(1:2,:) = true;
 Moving_Log_Top(2,:) = true;
 %%
 Moving_Log_Bottom(3,1:end-1) = true;
-if EndIsAlpha(GroupsSizes(Line+1))
+if (EndIsAlpha(GroupsSizes(Line+1)) && matches(BaseSide,"Right")) || (GroupsSizes(Line+1) > 0 && matches(BaseSide,"Left"))
     Moving_Log_Top(3,1:end-2) = true;
 else
     Moving_Log_Top(3,1:end-3) = true;
@@ -128,7 +128,7 @@ end
 Moving_Log_Bottom(4,end-1) = true;
 %%        
 Moving_Log_Bottom(5,1:end-2) = true;
-if EndIsAlpha(GroupsSizes(Line+1))
+if (EndIsAlpha(GroupsSizes(Line+1)) && matches(BaseSide,"Right")) || (GroupsSizes(Line+1) > 0 && matches(BaseSide,"Left"))
     Moving_Log_Top(5,1:end-2) = true;
 else
     Moving_Log_Top(5,1:end-3) = true;
@@ -140,7 +140,7 @@ Moving_Log_Top(6,:) = true;
 
 %%
 Moving_Log_Bottom(7,end-1:end) = true;
-if EndIsAlpha(GroupsSizes(Line+1))
+if (EndIsAlpha(GroupsSizes(Line+1)) && matches(BaseSide,"Right")) || (GroupsSizes(Line+1) > 0 && matches(BaseSide,"Left"))
     Moving_Log_Top(7,end) = true;
 else
     Moving_Log_Top(7,end-1:end) = true;
@@ -157,7 +157,7 @@ Moving_Log_Bottom(10,[1,end-1:end]) = true;
 
 %%
 Moving_Log_Bottom(11,[1,end-1:end]) = true;
-if EndIsAlpha(GroupsSizes(Line+1))
+if (EndIsAlpha(GroupsSizes(Line+1)) && matches(BaseSide,"Right")) || (GroupsSizes(Line+1) > 0 && matches(BaseSide,"Left"))
     Moving_Log_Top(11,end) = true;
 else
     Moving_Log_Top(11,end-1:end) = true;
@@ -240,14 +240,20 @@ LeftEdgeType = Edge(3,1,Line);
 % RightEdgeType = Edge(2,2,Line);
 
 if LeftEdgeType == 1
-    BetaDiff_Override = 1;
-    AlphaDiff_Override = -1;
+    % BetaDiff_Override = 1;
+    % AlphaDiff_Override = -1;
+
+    Task_Queue(end,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= 1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
+    Task_Queue(end+1,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override= -1, Side = "Right",WS=WS,ConfigShift=ConfigShift);
 else
-    BetaDiff_Override = -1;
-    AlphaDiff_Override = 1;
+    % BetaDiff_Override = -1;
+    % AlphaDiff_Override = 1;
+
+    Task_Queue(end,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= -1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
+    Task_Queue(end+1,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override= 1, Side = "Right",WS=WS,ConfigShift=ConfigShift);
 end
 
-Task_Queue(end+1,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override=AlphaDiff_Override,BetaDiff_Override= 0, Side = "Left",WS=WS,ConfigShift=ConfigShift);
-Task_Queue(end+1,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override=BetaDiff_Override, Side = "Right",WS=WS,ConfigShift=ConfigShift);
+% Task_Queue(end,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override=AlphaDiff_Override,BetaDiff_Override= 0, Side = "Left",WS=WS,ConfigShift=ConfigShift);
+% Task_Queue(end+1,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override=BetaDiff_Override, Side = "Right",WS=WS,ConfigShift=ConfigShift);
 
 end

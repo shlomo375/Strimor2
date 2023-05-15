@@ -23,14 +23,19 @@ switch Direction
             end
         end
 %         if matches(ManeuverType,"Reduce")
-            Displacment(1) = [];
+            
 %         else
 %             Displacment(1) = [];
 %         end
-        NotCare_Buttom = Displacment(1) < Displacement_Reqierd(1);
-        NotCare_Top = Displacment(3) > Displacement_Reqierd(3);
-        Step = (Displacement_Reqierd' - Displacment)/2; 
-        Step = ceil(abs(Step)).* sign(Step);
+        % if numel(Displacement_Reqierd) == 1 && Displacement_Reqierd
+            Displacment(1) = [];
+            NotCare_Buttom = Displacment(1) < Displacement_Reqierd(1);
+            NotCare_Top = Displacment(3) > Displacement_Reqierd(3);
+            Step = (Displacement_Reqierd' - Displacment)/2; 
+            Step = ceil(abs(Step)).* sign(Step);
+        % else
+        %     Step = Displacment;
+        % end
 
 
     case "Right"
@@ -45,16 +50,17 @@ switch Direction
             end
              
         end
-%         if matches(ManeuverType,"Reduce")
+        % if numel(Displacement_Reqierd) == 1 && Displacement_Reqierd
             Displacment(1) = [];
-%         else
-%             Displacment(4) = [];
-%         end
-        Displacement_Reqierd = -Displacement_Reqierd;
-        NotCare_Buttom = Displacment(1) > Displacement_Reqierd(1);
-        NotCare_Top = Displacment(3) < Displacement_Reqierd(3);
-        Step = (Displacement_Reqierd' - Displacment)/2; 
-        Step = -ceil(abs(Step)).* sign(Step); %minus sign will flip again in ComuteManuver function... 
+    
+            Displacement_Reqierd = -Displacement_Reqierd;
+            NotCare_Buttom = Displacment(1) > Displacement_Reqierd(1);
+            NotCare_Top = Displacment(3) < Displacement_Reqierd(3);
+            Step = (Displacement_Reqierd' - Displacment)/2; 
+            Step = -ceil(abs(Step)).* sign(Step); %minus sign will flip again in ComuteManuver function... 
+        % else
+        %     Step = Displacment;
+        % end
 end
 
 

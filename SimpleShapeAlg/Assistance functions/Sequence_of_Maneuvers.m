@@ -57,7 +57,9 @@ for Maneuver_ind = 1:length(Axis)
             
 %             PlotWorkSpace(WS,"Plot_CellInd",true);
         end
-%         pause(0.03)
+        if P.Plot < 1
+            pause(P.Plot)
+        end
         cla
         PlotWorkSpace(NewWS,"Plot_CellInd",false);
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 

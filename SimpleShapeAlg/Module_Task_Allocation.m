@@ -51,16 +51,6 @@ else
     end
 end
 
-
-TopLine = find(StartConfig,1,"last");
-
-DestenationLine_Alpha = max([0,find(AlphaDiff >= 1,1,"last")]);
-DestenationLine_Beta = max([0,find(BetaDiff >= 1,1,"last")]);
-% DestenationLine
-% Dest = [DestenationLine_Alpha,DestenationLine_Beta];
-
-
-
 % Switch edges
 % several tasks at ones
 if Switch(Line) && ~any(Addition.AlphaDiff_Override) && ~any(Addition.BetaDiff_Override)
@@ -69,33 +59,54 @@ if Switch(Line) && ~any(Addition.AlphaDiff_Override) && ~any(Addition.BetaDiff_O
 end
 
 
+TopLine = find(StartConfig,1,"last");
 
+DestenationLine = max([0,find(AlphaDiff >= 1 | BetaDiff >= 1,1,"last")]);
+
+AddNewLine = false;
+if ~StartConfig(DestenationLine)
+    LineToCreate = DestenationLine;
+    DestenationLine = DestenationLine + Downwards - (~Downwards);
+    
+    AddNewLine = true;
+end
+ReturnFlag = false;
 % Remove modules 
     % Whole line - based the nuber of alpha in the top line
         if Line == TopLine && ...
                 abs(AbsDiff(Line)) == abs(StartConfig(Line)) && ...
                 AlphaDiff(Line) == -1
-            Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
-            return
+            % Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
+            Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine,"DestenationLine_Beta",DestenationLine,"Side",Addition.Side);
+            ReturnFlag = true;
+            
         
     % One module
         elseif AlphaDiff(Line) == -1 && BetaDiff(Line) >= 0
-            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Downwards",Downwards,"Type",1,"DestenationLine_Alpha",DestenationLine_Alpha,"Side",Addition.Side);
-            return
+            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Downwards",Downwards,"Type",1,"DestenationLine_Alpha",Line-1,"Side",Addition.Side);
+            ReturnFlag = true;
+            
         elseif BetaDiff(Line) == -1  && AlphaDiff(Line) >= 0
-            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
-            return
+            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Line-1,"Side",Addition.Side);
+            ReturnFlag = true;
+            
     % Two module
         elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) <= -1
-            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
-            return
+            % Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
+            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine_Alpha",DestenationLine,"DestenationLine_Beta",DestenationLine,"Side",Addition.Side);
+            ReturnFlag = true;
+            
+        end
+        if ReturnFlag && AddNewLine
+            Task(2,:) = Task;
+            Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
         end
 
 % Adding modules
 if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
     Downwards = ~Downwards;
-    StartingLine_Alpha = max([0,find(AlphaDiff(1:Line) <= -1,1,"last")]);
-    StartingLine_Beta = max([0,find(BetaDiff(1:Line) <= -1,1,"last")]);
+    % StartingLine_Alpha = max([0,find(AlphaDiff(1:Line) <= -1,1,"last")]);
+    % StartingLine_Beta = max([0,find(BetaDiff(1:Line) <= -1,1,"last")]);
 %     StartLine = [StartingLine_Alpha,StartingLine_Beta];
     
     % Adding modules

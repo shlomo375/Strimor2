@@ -16,8 +16,7 @@ GroupSizes_B = ConfigGroupSizes(WS_B.Space.Status,WS_B.Space.Type,WS_B.R1);
 % Config_A_Shift = [1;1];
 % Config_B_Shift = [1;1];
 
-Unify_GroupMatrix = max(numel(GroupSizes_A)+P.Start_Shift-1,numel(GroupSizes_B)+P.Target_Shift-1);
-
+Unify_GroupMatrix = max(numel(GroupSizes_A),numel(GroupSizes_B));
 NewGroupSizes_A = zeros(Unify_GroupMatrix+2,1);
 NewGroupSizes_A(P.Start_Shift+(1:numel(GroupSizes_A))) = GroupSizes_A;
 Config_A.IsomorphismMatrices1{1} = NewGroupSizes_A;

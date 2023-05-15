@@ -1,4 +1,16 @@
-function [NewStep, NewAxis,NewAllModuleInd, NewMoving_Log, NewDirection,NewDecision,ReducedModuleNum,Tasks] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log, Direction,Decision,Tasks)
+function [NewStep, NewAxis,NewAllModuleInd, NewMoving_Log, NewDirection,NewDecision,ReducedModuleNum,NewTasks] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log, Direction,Decision,Tasks)
+if isempty(Step{1}) && isempty(Step{2})
+    NewTasks = Tasks{1};
+    NewStep = [];
+    NewAxis = [];
+    NewAllModuleInd = [];
+    NewMoving_Log = [];
+    NewDirection = "";
+    NewDecision = [];
+    ReducedModuleNum = [];
+    return
+end
+
 if size(Tasks{1},1) && ~size(Tasks{2},1)
     LowestCost_Loc = 2;
 elseif ~size(Tasks{1},1) && size(Tasks{2},1)
@@ -19,5 +31,5 @@ NewDirection = Direction(LowestCost_Loc);
 NewDecision = func2str(Decision{LowestCost_Loc});
 
 ReducedModuleNum = sum(NewMoving_Log(end,:));
-Tasks = Tasks{LowestCost_Loc};
+NewTasks = Tasks{LowestCost_Loc};
 end
