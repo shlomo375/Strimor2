@@ -10,9 +10,12 @@ arguments
 end
 
 if numel(GroupSizeRequired) == 2
-    if TopLineIdx ~= 1
+    if TopLineIdx ~= 1 %&& ~matches(Action,"Create")
         GroupSizeAvailable = permute(Edge(4,1,2:3),[3,1,2]);
         LineShift = TopLineIdx-2;
+    % elseif matches(Action,"Create")
+    %     GroupSizeAvailable = permute(Edge(4,1,1:2),[3,1,2]);
+    %     LineShift = TopLineIdx-1;
     else
         error("problem at PeripheralModuleExist func");
     end
@@ -64,9 +67,15 @@ end
 
 Topest_Line_To_Add = Topest_Line_To_Add + LineShift;
 
+
 StartConfig = Tree.Data{Tree.LastIndex,"IsomorphismMatrices1"}{1}(:,:,1);
 TargetConfig = Tree.EndConfig{1,"IsomorphismMatrices1"}{1}(:,:,1);
-Task = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Topest_Line_To_Add, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
+
+if ~Downwards
+    Topest_Line_To_Add = numel(StartConfig) - Topest_Line_To_Add + 1;
+end
+
+Task = Module_Task_Allocation(StartConfig, TargetConfig, Tree.Total_Downwards, Topest_Line_To_Add, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
 
 OK = false;
 

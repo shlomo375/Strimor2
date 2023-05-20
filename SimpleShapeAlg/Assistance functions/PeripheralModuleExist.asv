@@ -10,9 +10,12 @@ arguments
 end
 
 if numel(GroupSizeRequired) == 2
-    if TopLineIdx ~= 1
+    if TopLineIdx ~= 1 && ~matches(Action,"Create")
         GroupSizeAvailable = permute(Edge(4,1,2:3),[3,1,2]);
         LineShift = TopLineIdx-2;
+    elseif matches(Action,"Create")
+        GroupSizeAvailable = permute(Edge(4,1,1:2),[3,1,2]);
+        LineShift = TopLineIdx-1;
     else
         error("problem at PeripheralModuleExist func");
     end
@@ -27,19 +30,20 @@ if numel(GroupSizeRequired) == 3
     end
 end
 
-switch Action
-    case "Switch"
-        Addition(1,1) = abs(GroupSizeRequired(1)) - (GroupSizeAvailable(1));
-
-        Addition(2,1) = abs(GroupSizeRequired(2)) - abs(GroupSizeAvailable(2));
-        if GroupSizeRequired(2) == - GroupSizeAvailable(2)
-            Addition(2) = 1;
-        end
-        Addition(Addition<0) = 0;
-    otherwise
+% switch Action
+%     case "Switch"
+%         Addition(1,1) = abs(GroupSizeRequired(1)) - (GroupSizeAvailable(1));
+% 
+%         Addition(2,1) = abs(GroupSizeRequired(2)) - abs(GroupSizeAvailable(2));
+%         if GroupSizeRequired(2) == - GroupSizeAvailable(2)
+%             Addition(2) = 1;
+%         end
+%         Addition(Addition<0) = 0;
+%         Downwards = ~Downwards;
+%     otherwise
         Addition = abs(GroupSizeRequired)' - abs(GroupSizeAvailable);
         Addition(Addition<0) = 0;
-end
+% end
 
 [Topest_Line_To_Add,~,Num_Module_Added] = find(Addition,1);
 

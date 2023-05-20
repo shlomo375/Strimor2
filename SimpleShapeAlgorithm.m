@@ -22,12 +22,14 @@ Target_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_B);
 figure("Name","TargetConfig","Position",[-1.9182e+03 265.8000 766.4000 732.8000])
 PlotWorkSpace(Target_WS,"Plot_CellInd",false)
 
-[StartConfig, TargetConfig,ConfigShift] = GroupMatrixMatching(StartConfig,Start_WS,TargetConfig,Target_WS,"Start_Shift",8);
+[StartConfig, TargetConfig,ConfigShift] = GroupMatrixMatching(StartConfig,Start_WS,TargetConfig,Target_WS,"Start_Shift",9);
+% [StartConfig, TargetConfig,ConfigShift] = GroupMatrixMatching(StartConfig,Start_WS,TargetConfig,Target_WS);
 
 Tree = TreeClass("", N, 1000, StartConfig,"EndConfig",TargetConfig,"ZoneMatrix",false);
 
 Downwards = true;
-Ploting = 0.05;
+Tree.Total_Downwards = true; %very importent value
+Ploting = 1;
 %% start algorithm
 ParentInd = 1;
 % Module_Task_Allocation(WS, Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}, TargetConfig.IsomorphismMatrices1{1}, ConfigShift,13)
@@ -73,7 +75,7 @@ while size(Task_Queue,1) > 0
     % if ~Task_Queue{end,"Downwards"}
     %     d=5
     % end
-    if ParentInd == 32
+    if ParentInd >= 819
             d=5
     end
     switch Task_Queue(end,:).ActionType

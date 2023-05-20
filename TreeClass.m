@@ -8,6 +8,7 @@ classdef TreeClass
         StartTime
         LastNodeTime
         NumOfIsomorphismAxis
+        Total_Downwards
     end
     properties (SetAccess = private)
         

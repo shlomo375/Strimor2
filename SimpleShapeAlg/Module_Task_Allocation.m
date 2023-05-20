@@ -63,6 +63,10 @@ TopLine = find(StartConfig,1,"last");
 
 DestenationLine = max([0,find(AlphaDiff >= 1 | BetaDiff >= 1,1,"last")]);
 
+if ~DestenationLine
+    DestenationLine = Line - 1;
+end
+
 AddNewLine = false;
 if ~StartConfig(DestenationLine)
     LineToCreate = DestenationLine;
@@ -99,7 +103,10 @@ ReturnFlag = false;
         end
         if ReturnFlag && AddNewLine
             Task(2,:) = Task;
-            Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
+            LineToCreate = numel(StartConfig)-LineToCreate+1;
+            Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
+
+            % Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
         end
 
 % Adding modules
@@ -113,8 +120,9 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
         % whole line
             if Line == (TopLine + 1) && ...
                     abs(StartConfig(Line)) == 0
-                
-                Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
+                Line = numel(StartConfig)-Line+1;
+                Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
+                % Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
                 return
         % One module
             elseif xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1)
@@ -137,9 +145,15 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 
 %                 Addition.Side = ["Left","Right"];
                 if AlphaDiff(Line) == 1 && BetaDiff(Line) <= 0
-                    ReqiuerdType = 1*UpsideDown;
+                    ReqiuerdType = 1*UpsideDown; % alpha in the regular look
                 else
-                    ReqiuerdType = -1*UpsideDown;
+                    ReqiuerdType = -1*UpsideDown; % beta in the regular look
+                    
+                end
+                if sign(StartConfig(DestenationLine)) == ReqiuerdType && ~mod(abs(StartConfig(DestenationLine)),2)
+                    Addition.Side = "Right";
+                elseif ~mod(abs(StartConfig(DestenationLine)),2)
+                    Addition.Side = "Left";
                 end
                 Direction = ["Left","Right"];
                 switch Addition.Side
@@ -179,6 +193,8 @@ end
 
 
 function Task_Queue = Get_Module_From_The_Other_Side(First_Right,DestenationLine,Side,ReqiuerdType,Downwards,Edges,AbsDiff)
+
+
 NotCompleteLine = logical(AbsDiff);
 
 if matches(Side,"Left")
@@ -201,22 +217,29 @@ end
     FirstStage_Current_Line = size(Edges,1)-(FirstStage_Init_Location-1);
     FirstStage_Destenation_Line = size(Edges,1)-(FirstStage_Final_Location-1);
     if ReqiuerdType == -1
-        Task_Queue(3,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",FirstStage_Side);
+        Task_Remove = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",FirstStage_Side);
     else
-        Task_Queue(3,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",FirstStage_Side);
+        Task_Remove = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",FirstStage_Side);
     end
 
     %% Stage 2
-    Task_Queue(2,:) = CreatTaskAllocationTable([],"ActionType","Switch","Current_Line",FirstStage_Destenation_Line,"Downwards",~Downwards);
+    Task_Switch = CreatTaskAllocationTable([],"ActionType","Switch","Current_Line",FirstStage_Destenation_Line,"Downwards",~Downwards);
 
     %% Stage 3
     if ReqiuerdType == -1
-        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Final_Location,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
+        Task_Add = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Final_Location,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
     else
-        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Final_Location,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
+        Task_Add = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Final_Location,"Downwards",Downwards,"Type",-ReqiuerdType,"DestenationLine",DestenationLine,"Side",Side);
     end
 
-
+% test the option to switch the base line and that it...
+BaseLine = find(Edges(:,1),1,"last");
+if Edges(BaseLine,1) ~= Edges(BaseLine,2)
+    Task_Remove.DestenationLine = FirstStage_Current_Line-1;
+    Task_Queue = [Task_Add;Task_Remove;Task_Switch]; %solve form end to start
+else
+    Task_Queue = [Task_Add;Task_Switch;Task_Remove]; %solve form end to start
+end
 end
 
 

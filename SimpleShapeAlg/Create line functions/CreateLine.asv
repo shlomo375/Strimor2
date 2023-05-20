@@ -51,11 +51,11 @@ if OK
         ConfigShift(1,1) = ConfigShift(1,1) - 1;
         
     end
-    if Task.Downwards
-        Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(end,:,:) = [];
-    else
-        Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(1,:,:) = [];
-    end
+%     if Task.Downwards
+%         Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},[0;1]);
+%     else
+%         Tree.Data{ParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1},[1;0]);
+%     end
     Task_Queue(end,:) = [];
 else
     error("bad manuvers");

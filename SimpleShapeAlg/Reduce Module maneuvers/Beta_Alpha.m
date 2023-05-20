@@ -1,8 +1,16 @@
 function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx,Module_Num)
 Task = [];
+Step = [];
+Axis = [];
 
 if ~isempty(Edges)
-    GroupSizeRequired = [2,-2];
+    if Edges(1,1,4)
+        % NotTested("not fully tested")
+        GroupSizeRequired = [2,-3];
+    else
+        GroupSizeRequired = [2,-2];
+    end
+    
     [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return

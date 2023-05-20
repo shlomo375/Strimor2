@@ -1,19 +1,19 @@
-function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Alpha_Beta_to_Alpha_Beta(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,MovmentDirection,Downwards,Tree,TopLineIdx)
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Create_Alpha_Beta_2(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,MovmentDirection,Downwards,Tree,TopLineIdx)
 Step = [];
 Axis = [];
 Task = [];
 
 
 if ~isempty(Edges)
-    NotTested("Not Tested: Alpha_Beta_to_Alpha_Beta")
+    NotTested("Not Tested: Create_Alpha_Beta_2")
     
-    GroupSizeRequired = [3,-3];
+    GroupSizeRequired = [-3,3];
     [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return
     end
 
-    Position_relative_buttom_group = [inf;0];
+    Position_relative_buttom_group = [inf;0;2]; %article: [0;0;-inf]
     [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
  
     Moving_Log_Buttom(1:2,:) = true;

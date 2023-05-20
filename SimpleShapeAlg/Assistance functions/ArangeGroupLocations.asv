@@ -72,8 +72,6 @@ end
 if NotCare_Top && matches(ManeuverType,"Reduce")
     Step(3) = 0;
 end
-if matches(ManeuverType,"Create")
-    Step(3) = [];
-end
+
 Axis = ones(size(Step));
 end

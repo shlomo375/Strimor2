@@ -3,7 +3,7 @@ arguments
     Task
 end
 arguments (Repeating)
-    Name (1,1) {mustBeTextScalar,matches(Name,["Current_Line","Module_Num","Side","Downwards","DestenationLine","Type","ActionType","Finish_Alpha","Finish_Beta"])}
+    Name (1,1) {mustBeTextScalar,matches(Name,["Current_Line","Module_Num","Side","Downwards","DestenationLine","Type","ActionType","Finish_Alpha","Finish_Beta","Total_Downwards"])}
     Value (1,:)
 end
     
