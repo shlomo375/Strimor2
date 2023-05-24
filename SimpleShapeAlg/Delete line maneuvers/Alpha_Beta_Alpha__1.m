@@ -8,7 +8,7 @@ if ~isempty(Edges)
     Position_relative_buttom_group = [-3,0,2];
 
     GroupSizeRequired = [5,-4,1];
-    [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
+    [OK, Task] = PeripheralModuleExist(Tree,MovmentDirection,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return
     end

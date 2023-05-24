@@ -7,7 +7,7 @@ if ~isempty(Edges)
     
     % NotTested("need to change the movments");
     GroupSizeRequired = [-1,5,1];
-    [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
+    [OK, Task] = PeripheralModuleExist(Tree,MovmentDirection,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return
     end

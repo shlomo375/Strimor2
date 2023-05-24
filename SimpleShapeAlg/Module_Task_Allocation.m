@@ -154,10 +154,12 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                     ReqiuerdType = -1*UpsideDown; % beta in the regular look
                     
                 end
-                if sign(StartConfig(DestenationLine)) == ReqiuerdType && ~mod(abs(StartConfig(DestenationLine)),2)
-                    Addition.Side = "Right";
-                elseif ~mod(abs(StartConfig(DestenationLine)),2)
-                    Addition.Side = "Left";
+                if matches(Addition.Side,"")
+                    if sign(StartConfig(DestenationLine)) == ReqiuerdType && ~mod(abs(StartConfig(DestenationLine)),2) 
+                        Addition.Side = "Right";
+                    elseif ~mod(abs(StartConfig(DestenationLine)),2)
+                        Addition.Side = "Left";
+                    end
                 end
                 Direction = ["Left","Right"];
                 switch Addition.Side

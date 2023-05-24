@@ -5,7 +5,7 @@ TestFile = dir("SimpleShapeAlg\Experiments");
 TestFile([TestFile.isdir]) = [];
 
 for ii = 1:numel(TestFile)
-    if contains(TestFile(ii).name,TestType)
+    if contains(TestFile(ii).name,TestType) && str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 50
         load(fullfile(TestFile(ii).folder,TestFile(ii).name),"Exp","BasicWS","Solution")
         N = str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_")));
         

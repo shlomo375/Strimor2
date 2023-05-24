@@ -6,7 +6,7 @@ Task = [];
 if ~isempty(Edges)
     
     GroupSizeRequired = [-1,-4,2];
-    [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
+    [OK, Task] = PeripheralModuleExist(Tree,MovmentDirection,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return
     end

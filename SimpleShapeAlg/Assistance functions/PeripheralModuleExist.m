@@ -1,7 +1,8 @@
-function [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edge,GroupSizeRequired,Action)
+function [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edge,GroupSizeRequired,Action)
 arguments
 
     Tree
+    Direction
     Downwards
     TopLineIdx
     Edge
@@ -53,16 +54,30 @@ if isempty(Topest_Line_To_Add)
     return
 end
 
-
+if matches(Direction,"Left")
+    Direction = "Right";
+else
+    Direction = "Left";
+end
 if Num_Module_Added >= 2
     AlphaDiff = 1;
     BetaDiff = 1;
 elseif EndIsAlpha(GroupSizeAvailable(Topest_Line_To_Add))
-    BetaDiff = 1;
-    AlphaDiff = 0;
+    if Downwards
+        BetaDiff = 1;
+        AlphaDiff = 0;
+    else
+        AlphaDiff = 1;
+        BetaDiff = 0;
+    end
 else
-    AlphaDiff = 1;
-    BetaDiff = 0;
+    if Downwards
+        AlphaDiff = 1;
+        BetaDiff = 0;
+    else
+        BetaDiff = 1;
+        AlphaDiff = 0;
+    end
 end
 
 Topest_Line_To_Add = Topest_Line_To_Add + LineShift;

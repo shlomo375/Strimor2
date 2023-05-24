@@ -10,21 +10,27 @@
 function [Tree,error] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode)
 dbstop in NotTested at 12
 dbstop if error
-dbstop if caught error
+% dbstop if caught error
 % N = sum(logical(StartNode{1,"ConfigMat"}{:}),'all');
 % Size = [N, 2*N];
 % BasicWS = WorkSpace(Size,"RRT*");
 error = false;
+Ploting = 1;
 try
 ConfigStruct_A = Node2ConfigStruct(StartNode);
 Start_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
-% figure("Name","StartConfig","Position",[-1.1502e+03 265.8000 766.4000 732.8000])
-% PlotWorkSpace(Start_WS,"Plot_CellInd",false)
+
+
 % 
 ConfigStruct_B = Node2ConfigStruct(TargetNode);
 Target_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_B);
-% figure("Name","TargetConfig","Position",[-1.9182e+03 265.8000 766.4000 732.8000])
-% PlotWorkSpace(Target_WS,"Plot_CellInd",false)
+
+if Ploting
+    figure("Name","StartConfig","Position",[-1.1502e+03 265.8000 766.4000 732.8000])
+    PlotWorkSpace(Start_WS,"Plot_CellInd",false)
+    figure("Name","TargetConfig","Position",[-1.9182e+03 265.8000 766.4000 732.8000])
+    PlotWorkSpace(Target_WS,"Plot_CellInd",false)
+end
 
 % [StartConfig, TargetConfig,ConfigShift] = GroupMatrixMatching(StartConfig,Start_WS,TargetConfig,Target_WS,"Start_Shift",7);
 [StartNode, TargetNode,ConfigShift] = GroupMatrixMatching(StartNode,Start_WS,TargetNode,Target_WS);
@@ -34,7 +40,7 @@ Tree = TreeClass("", N, 1000, StartNode,"EndConfig",TargetNode,"ZoneMatrix",fals
 Downwards = true;
 Tree.Total_Downwards = true; %very importent value
 WS.DoSplittingCheck = false;
-Ploting = 0;
+
 %% start algorithm
 ParentInd = 1;
 
@@ -71,7 +77,7 @@ end
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 787
+    if ParentInd >= 24
             d=5;
     end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);

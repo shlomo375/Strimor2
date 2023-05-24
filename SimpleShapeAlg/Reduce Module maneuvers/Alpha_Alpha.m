@@ -18,7 +18,7 @@ if ~isempty(Edges)
     end
     
     % GroupSizeRequired = [2,3];
-    [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
+    [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return
     end

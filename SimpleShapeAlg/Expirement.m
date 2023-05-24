@@ -5,7 +5,7 @@ t=CreateNode(2000);
 Solution = cell(1000,1);
 for file_idx = 1:size(files,1)
     load(fullfile(files(file_idx).folder,files(file_idx).name),"Nodes");
-    Nodes = [Nodes,t(:,["Manuver","Manuver_num"])];
+    % Nodes = [Nodes,t(:,["Manuver","Manuver_num"])];
     N = nnz(Nodes.ConfigMat{1});
     Size = [N,N*2];
     BasicWS = WorkSpace(Size,"RRT*");
