@@ -12,7 +12,7 @@ Task = Task_Queue(end,:);
 % try
 
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
-TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
+TargetGroupSize = Tree.EndConfig.IsomorphismMatrices1{1};
 
 Line = Task.Current_Line;
 
@@ -183,6 +183,8 @@ Axis(RemoveStep) = [];
 Moving_Log(RemoveStep,:) = [];
 
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
+
+Tree = AddManuversInfo(Tree,"Switch",numel(Step));
 
 Task_Queue(end,:) = [];
 end

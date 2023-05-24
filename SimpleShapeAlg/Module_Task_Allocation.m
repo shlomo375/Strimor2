@@ -79,18 +79,22 @@ ReturnFlag = false;
     % Whole line - based the nuber of alpha in the top line
         if Line == TopLine && ...
                 abs(AbsDiff(Line)) == abs(StartConfig(Line)) && ...
-                AlphaDiff(Line) == -1
+                AlphaDiff(Line) == -1 && BetaDiff(Line) >= -1
             % Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
             Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine,"DestenationLine_Beta",DestenationLine,"Side",Addition.Side);
             ReturnFlag = true;
-            
+        elseif Line == TopLine && ...
+                abs(AbsDiff(Line)) == abs(StartConfig(Line)) && ...
+                AlphaDiff(Line) == -1 && BetaDiff(Line) == -2
+            Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Line-1,"Side",Addition.Side);
+            ReturnFlag = true;
         
     % One module
-        elseif AlphaDiff(Line) == -1 && BetaDiff(Line) >= 0
+        elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) >= 0
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Downwards",Downwards,"Type",1,"DestenationLine_Alpha",Line-1,"Side",Addition.Side);
             ReturnFlag = true;
             
-        elseif BetaDiff(Line) == -1  && AlphaDiff(Line) >= 0
+        elseif BetaDiff(Line) <= -1  && AlphaDiff(Line) >= 0
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Line-1,"Side",Addition.Side);
             ReturnFlag = true;
             
@@ -235,7 +239,7 @@ end
 % test the option to switch the base line and that it...
 BaseLine = find(Edges(:,1),1,"last");
 if Edges(BaseLine,1) ~= Edges(BaseLine,2)
-    Task_Remove.DestenationLine = FirstStage_Current_Line-1;
+    % Task_Remove.DestenationLine = FirstStage_Current_Line-1;
     Task_Queue = [Task_Add;Task_Remove;Task_Switch]; %solve form end to start
 else
     Task_Queue = [Task_Add;Task_Switch;Task_Remove]; %solve form end to start

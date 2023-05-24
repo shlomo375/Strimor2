@@ -16,7 +16,7 @@ Unify_GroupMatrix = max(numel(GroupSizes_A)+P.Start_Shift-1,numel(GroupSizes_B)+
 
 NewGroupSizes_A = zeros(Unify_GroupMatrix+2,1);
 % NewGroupSizes_A(P.Start_Shift+(1:numel(GroupSizes_A))) = GroupSizes_A;
-NewGroupSizes_A((end-numel(GroupSizes_A)):end-1) = GroupSizes_A;
+NewGroupSizes_A(end) = GroupSizes_A;
 Config_A.IsomorphismMatrices1{1} = NewGroupSizes_A;
 Config_A{1,"IsomorphismStr1"} = join(string(Config_B.IsomorphismMatrices1{1}(:))',"");
 Config_A{1,["IsoSiz1r","IsoSiz1c"]} = size(Config_B.IsomorphismMatrices1{1});

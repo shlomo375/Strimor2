@@ -31,8 +31,9 @@ for Maneuver_ind = 1:length(Axis)
 
 
     if ~ OK
-        fprintf("Maneuver num %d faild, enter to puse mode",Maneuver_ind);
-        pause
+        error("Maneuver num %d faild, enter to puse mode",Maneuver_ind);
+        % pause
+        
         break
     end
     if P.Plot

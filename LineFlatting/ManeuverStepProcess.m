@@ -13,7 +13,7 @@ end
 [PrimaryOK, Configuration, Movement, WS1] = MakeAMove(WS,PrimaryAxis,PrimaryStep, PrimaryModuleInd);
 
 if PrimaryOK
-    [Exists, tree, ParentInd] = SaveMoveToTree(tree,Configuration,Movement,ParentInd);
+    [Exists, tree, ParentInd] = SaveMoveToTree(tree,WS,Configuration,Movement,ParentInd);
 %     if Exists
 %         return
 %     end

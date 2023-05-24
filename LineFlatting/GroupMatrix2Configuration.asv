@@ -1,4 +1,4 @@
-function Node = GroupMatrix2Configuration(Node,Groups,WS)
+function Node = GroupMatrix2Configuration(Groups,WS)
 Groups(~Groups) = [];
 N = sum(abs(Groups(:)));
 
@@ -33,12 +33,9 @@ for Line = 2:numel(Groups)
         WS.Space.Status(Line,pos) = zeros(1,abs(Groups(Line)));
         
         WS.Space.Status(Line,1+pos) = ones(1,abs(Groups(Line)));
-        Lines = [Line,Line-1];
-        OK = CheckLineConnected(WS,Lines);
-        % OK = SplittingCheck(WS,find(WS.Space.Status,1),true);
-        % if OK ~=OK1
-        %     d=5
-        % end
+        
+        CheckLineConnected(WS,Lines)
+        OK = SplittingCheck(WS,find(WS.Space.Status,1),true,);
 
         if ~OK
             WS.Space.Status(Line,1+pos) = zeros(1,abs(Groups(Line)));
@@ -49,23 +46,18 @@ for Line = 2:numel(Groups)
     
     
 end
-% if SplittingCheck(WS,find(WS.Space.Status,1),true)
+if SplittingCheck(WS,find(WS.Space.Status,1),true)
     Config = GetConfiguration(WS);
-    Node = ConfigStruct2Node(Node,Config);
-% else
-%     Node = [];
-% end
+    Node = ConfigStruct2Node(Config);
+else
+    Node = [];
+end
 end
 
-function OK = CheckLineConnected(WS,Lines)
+function CheckLineConnected(WS,Lines)
 
-TopLineModuelInd = find(WS.Space.Status(Lines(1),:));
-baseLineModuelInd = find(WS.Space.Status(Lines(2),:));
-
-TopLineModuelInd(WS.Space.Type(Lines(1),TopLineModuelInd)==-1) = [];
-baseLineModuelInd(WS.Space.Type(Lines(2),baseLineModuelInd)==1) = [];
-
-OK = any(ismember(TopLineModuelInd,baseLineModuelInd));
+TopLineModuelInd = find(WS.Space.Status(Lines(2),:));
+    
 
 end
 

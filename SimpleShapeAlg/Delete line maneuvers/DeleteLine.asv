@@ -40,8 +40,6 @@ end
 
 [WS, Tree, ParentInd , OK] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 
-Tree = AddManuversInfo(Tree,func2str(Decision),numel(Step));
-
 if OK
     if Task.Downwards
         ConfigShift(2,1) = ConfigShift(2,1) + 1;
@@ -105,34 +103,33 @@ if Three_Line_Edges(3,1,4) ~= 1
     LineEdgesRight = join(string([Three_Line_Edges(3,2,4), ...
                              Three_Line_Edges(3,2,3), ...
                              Three_Line_Edges(3,2,2)]),"_");
-    ManeuverRequired = str2func(join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__"));
-    Direction = "Right";
+    Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
 elseif Three_Line_Edges(3,2,4) ~= 1
     LineEdgesLeft = join(string([Three_Line_Edges(3,1,4), ...
                                  Three_Line_Edges(3,1,3), ...
                                  Three_Line_Edges(3,1,2)]),"_");
-    ManeuverRequired = str2func(join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__"));
-    Direction = "Left";
+    Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
+
 else
 
 
-    LineEdgesLeft = join(string([Three_Line_Edges(3,1,4), ...
-                                     Three_Line_Edges(3,1,3), ...
-                                     Three_Line_Edges(3,1,2)]),"_");
-    LineEdgesRight = join(string([Three_Line_Edges(3,2,4), ...
-                                 Three_Line_Edges(3,2,3), ...
-                                 Three_Line_Edges(3,2,2)]),"_");
-    Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
-    Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
-    
-    if Maneuver_Cost.(Right) < Maneuver_Cost.(Left)
-        ManeuverRequired = str2func(Right);
-        Direction = "Right";
-    else
-        ManeuverRequired = str2func(Left);
-        Direction = "Left";
-    end
+LineEdgesLeft = join(string([Three_Line_Edges(3,1,4), ...
+                                 Three_Line_Edges(3,1,3), ...
+                                 Three_Line_Edges(3,1,2)]),"_");
+LineEdgesRight = join(string([Three_Line_Edges(3,2,4), ...
+                             Three_Line_Edges(3,2,3), ...
+                             Three_Line_Edges(3,2,2)]),"_");
+Right = join([LineEdgesRight.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
+Left = join([LineEdgesLeft.replace("-1","Beta").replace("1","Alpha"),string(abs(NumModule_TopLine))],"__");
+
+if Maneuver_Cost.(Right) < Maneuver_Cost.(Left)
+    ManeuverRequired = str2func(Right);
+    Direction = "Right";
+else
+    ManeuverRequired = str2func(Left);
+    Direction = "Left";
 end
+
 end
 
 

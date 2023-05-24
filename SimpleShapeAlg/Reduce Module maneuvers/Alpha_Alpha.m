@@ -9,7 +9,15 @@ if Module_Num == 1
     return
 end
 if ~isempty(Edges)
-    GroupSizeRequired = [2,2];
+    
+    if Edges(1,1,4)
+        % NotTested("not fully tested")
+        GroupSizeRequired = [2,4];
+    else
+        GroupSizeRequired = [2,3];
+    end
+    
+    % GroupSizeRequired = [2,3];
     [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
     if ~OK
         return

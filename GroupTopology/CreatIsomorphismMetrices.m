@@ -3,7 +3,8 @@ arguments
     ConfigMat
     ConfigType
     RotationMatrices = [];
-    P.ZoneMatrix {mustBeNumericOrLogical} = true;
+    P.ZoneMatrix {mustBeNumericOrLogical} = false;
+    P.GroupMatrix_23_axis = false;
 end
 
 DeleteFirstLine = false;
@@ -35,20 +36,22 @@ end
 
 IsoMetrices = IsomorphismMetrices{1}(:,:,1);
 IsomorphismStr(1) = join(string(IsoMetrices(:))',"");
-for Axis = 2:3
-    Temp = GetConfigProjection(ConfigMat,RotationMatrices,Axis); 
-    TempType = -1*GetConfigProjection(ConfigType,RotationMatrices,Axis); 
-    [IsomorphismMetrices{Axis},GroupIndexes] = ConfigGroupSizes(Temp,TempType);
-    
-    IsomorpSizes(Axis,1:2) = size(IsomorphismMetrices{Axis});
-    if P.ZoneMatrix 
-        IsomorphismMetrices{Axis}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{Axis},Temp,TempType,GroupIndexes);
-    end
-    IsoMetrices = IsomorphismMetrices{Axis}(:,:,1);
-    IsomorphismStr(Axis) = join(string(IsoMetrices(:))',"");
-    
-end
 
+if P.GroupMatrix_23_axis
+    for Axis = 2:3
+        Temp = GetConfigProjection(ConfigMat,RotationMatrices,Axis); 
+        TempType = -1*GetConfigProjection(ConfigType,RotationMatrices,Axis); 
+        [IsomorphismMetrices{Axis},GroupIndexes] = ConfigGroupSizes(Temp,TempType);
+        
+        IsomorpSizes(Axis,1:2) = size(IsomorphismMetrices{Axis});
+        if P.ZoneMatrix 
+            IsomorphismMetrices{Axis}(:,:,2:3) = CreatGroupZoneMatrix2(IsomorphismMetrices{Axis},Temp,TempType,GroupIndexes);
+        end
+        IsoMetrices = IsomorphismMetrices{Axis}(:,:,1);
+        IsomorphismStr(Axis) = join(string(IsoMetrices(:))',"");
+        
+    end
+end
 % ~any(IsomorphismMetrices{1}(:,:,1))
 
 end

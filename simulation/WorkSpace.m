@@ -7,6 +7,7 @@ classdef WorkSpace
         R3
         Algoritem
         MovmentColorIdx = 4
+        DoSplittingCheck = false
         
     end
     
@@ -108,34 +109,67 @@ classdef WorkSpace
             R = [];
             n2 = 2.5:2:((2*NewRow)+1);
             [i,j] = meshgrid(1:Col,1:Row);
-            for k = 1:length(n2)
+
+
+            ind = cell(length(n2),1);
+            parfor k = 1:length(n2)
+                fprintf("axis 2: %d/%d\n",k,length(n2));
                 [ro,co] = find(abs(j-line(i,-1,n2(k)))<=.5);
                 loc = flip(sortrows([ro,co],[2 1],{'descend' 'ascend'}),1);
-                ind = sub2ind(Size,loc(:,1),loc(:,2));
-                if isempty(ind)
-                    break
-                end
-                if k>1
-                    target = sub2ind(Size,loc(end,1),loc(end,2)-1);
-                    shift = 1;
-                    if find(ind==target)
-                        target = sub2ind(Size,loc(end,1),loc(end,2)-2);
-                        shift = 2;
-                    end
-    
-%                     [row,col] = find(R==target);
-
-                    R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
-                    [row,col] = find(R==target);
-                    R(row+1,col+shift-length(ind):col+(shift==2)) = ind';
-                    
-                    
-                else
-                    R = [R, zeros(NewRow,length(ind))];
-                    R(k,:) = ind';
-                end
+                ind{k} = sub2ind(Size,loc(:,1),loc(:,2));
+                % if isempty(ind{k})
+                %     break
+                % end
             end
-            R(:,sum(R)==0) = []; 
+            
+            R = zeros(NewRow,sum(Size));
+            Left = ceil(Size(1)/2);
+            if ~mod(Size(1),2)
+                R(Left,Left-Left+1:Left-Left+numel(ind{Left})) = ind{Left}';
+                Left = Left+1;
+                
+            end
+            for Line = Left:numel(ind)
+                R(Line,Line-Left+1:Line-Left+numel(ind{Line})) = ind{Line}';
+            end
+            
+            Right = find(R(Left,:),1,"last");
+            for Line = Left-1:-1:1
+                R(Line,Right-(Left-Line)+1-numel(ind{Line}):Right-(Left-Line)) = ind{Line}';
+            end
+            R(:,sum(R)==0) = [];
+            % R1=R;
+            
+%             R = [];
+%             for k = 1:length(n2)
+%                 fprintf("axis 2: %d/%d\n",k,length(n2));
+%                 [ro,co] = find(abs(j-line(i,-1,n2(k)))<=.5);
+%                 loc = flip(sortrows([ro,co],[2 1],{'descend' 'ascend'}),1);
+%                 ind = sub2ind(Size,loc(:,1),loc(:,2));
+%                 if isempty(ind)
+%                     break
+%                 end
+%                 if k>1
+%                     target = sub2ind(Size,loc(end,1),loc(end,2)-1);
+%                     shift = 1;
+%                     if find(ind==target)
+%                         target = sub2ind(Size,loc(end,1),loc(end,2)-2);
+%                         shift = 2;
+%                     end
+% 
+% %                     [row,col] = find(R==target);
+% 
+%                     R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
+%                     [row,col] = find(R==target);
+%                     R(row+1,col+shift-length(ind):col+(shift==2)) = ind';
+% 
+% 
+%                 else
+%                     R = [R, zeros(NewRow,length(ind))];
+%                     R(k,:) = ind';
+%                 end
+%             end
+%             R(:,sum(R)==0) = []; 
             WS.R2 = R;
             
             
@@ -146,35 +180,75 @@ classdef WorkSpace
                 n3 = n3(1:NewRow);
             end
             [i,j] = meshgrid(1:Col,1:Row);
-            for k = 1:length(n3)
+
+
+            ind = cell(length(n3),1);
+            parfor k = 1:length(n3)
+                fprintf("axis 3: %d/%d\n",k,length(n3));
                 [ro,co] = find(abs(i-line(j,1,n3(k)))<=.5);
                 loc = sortrows([ro,co],1,'ascend');
-                ind = sub2ind(Size,loc(:,1),loc(:,2));
-            
-                if isempty(ind)
-                    break
-                end
-                if k>1
-                    target = sub2ind(Size,loc(1,1),loc(1,2)+1);
-                    shift = 1;
-                    if find(ind==target)
-                        target = sub2ind(Size,loc(1,1),loc(1,2)+2);
-                        shift = 2;
-                    end
-    
-%                     [row,col] = find(R==target);
-
-                    R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
-                    [row,col] = find(R==target);
-                    R(row+1,col-(shift==2):col-(shift==2)+length(ind)-1) = ind';
-                    
-                    
-                else
-                    R = [R, zeros(NewRow,length(ind))];
-                    R(k,:) = ind';
-                end
+                ind{k} = sub2ind(Size,loc(:,1),loc(:,2));
+                % if isempty(ind{k})
+                %     break
+                % end
             end
-            R(:,sum(R)==0) = []; 
+            
+            R = zeros(NewRow,sum(Size));
+            Left = floor(Size(2)/2);
+            % if mod(Size(1),2)
+            %     R(Left,Left-Left+1:Left-Left+numel(ind{Left})) = ind{Left}';
+            %     Left = Left+1;  
+            % end
+
+            for Line = Left:-1:1
+                R(Line,Left-Line+1:Left-Line+numel(ind{Line})) = ind{Line}';
+            end
+            
+            if mod(Size(1),2)
+                
+                Left = Left+1;
+                R(Left,Left-Left+1:Left-Left+numel(ind{Left})) = ind{Left}';
+            end
+            Right = find(R(Left,:),1,"last");
+            for Line = Left:numel(ind)
+                R(Line,Right-(Line-Left)+1-numel(ind{Line}):Right-(Line-Left)) = ind{Line}';
+            end
+            
+            
+            
+            R(:,sum(R)==0) = [];
+%             R1=R;
+%             R = [];
+%             for k = 1:length(n3)
+%                 fprintf("axis 3: %d/%d\n",k,length(n3));
+%                 [ro,co] = find(abs(i-line(j,1,n3(k)))<=.5);
+%                 loc = sortrows([ro,co],1,'ascend');
+%                 ind = sub2ind(Size,loc(:,1),loc(:,2));
+% 
+%                 if isempty(ind)
+%                     break
+%                 end
+%                 if k>1
+%                     target = sub2ind(Size,loc(1,1),loc(1,2)+1);
+%                     shift = 1;
+%                     if find(ind==target)
+%                         target = sub2ind(Size,loc(1,1),loc(1,2)+2);
+%                         shift = 2;
+%                     end
+% 
+% %                     [row,col] = find(R==target);
+% 
+%                     R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
+%                     [row,col] = find(R==target);
+%                     R(row+1,col-(shift==2):col-(shift==2)+length(ind)-1) = ind';
+% 
+% 
+%                 else
+%                     R = [R, zeros(NewRow,length(ind))];
+%                     R(k,:) = ind';
+%                 end
+%             end
+            % R(:,sum(R)==0) = []; 
             WS.R3 = R;
         end
 
@@ -758,9 +832,17 @@ classdef WorkSpace
 %             end
         
 
-        function [Approve, Alert] = SplittingCheck(WS,Loc)
+        function [Approve, Alert] = SplittingCheck(WS,Loc,DoSplittingCheck)
+            arguments
+                WS
+                Loc
+                DoSplittingCheck = false;
+            end
             Alert = "not spliting";
             Approve = true;
+            if ~WS.DoSplittingCheck && ~DoSplittingCheck
+                return
+            end
             ScannedAgent = ~WS.Space.Status(:);
             ScannedAgent = ScanningAgents(WS, ScannedAgent, Loc(1));
 %             Approve = ScanningAgentsFast(WS, ScannedAgent);

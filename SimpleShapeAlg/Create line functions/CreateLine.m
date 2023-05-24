@@ -27,9 +27,8 @@ if matches(func2str(Decision),"Create_Alpha_Beta")
     Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line);
     return
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%until here
-% fprintf("until here");
-% pause
+
+
 Top_GroupInd = GroupsInds{Line-1}{1};
 Mid_GroupInd = [];
 Buttom_GroupInd = GroupsInds{Line-2}{1};
@@ -42,6 +41,8 @@ if size(NewTask,1)
 end
 
 [WS, Tree, ParentInd , OK] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
+
+Tree = AddManuversInfo(Tree,Decision,numel(Step));
 
 if OK
     if Task.Downwards

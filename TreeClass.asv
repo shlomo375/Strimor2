@@ -336,7 +336,6 @@ classdef TreeClass
                 StartConfig
                 P.EndConfig
                 P.ZoneMatrix = true;
-                P.WSEndConfig = [];
             end
             
 
@@ -387,10 +386,10 @@ classdef TreeClass
             end
            if isfield(P,"EndConfig")
                tree.EndConfig = P.EndConfig;
-               if isempty(P.WSEndConfig)
-                   P.WSEndConfig = WorkSpace(size(P.EndConfig.ConfigMat{:}),"RRT*");
-               end
-                   tree.EndConfig_RotationMatrices = {P.WSEndConfig.R1, P.WSEndConfig.R2, P.WSEndConfig.R3};
+               
+                   WSEndConfig = WorkSpace(size(P.EndConfig.ConfigMat{:}),"RRT*");
+    
+                   tree.EndConfig_RotationMatrices = {WSEndConfig.R1, WSEndConfig.R2, WSEndConfig.R3};
                     
                    % FullType = GetFullType(P.EndConfig.ConfigMat{:},P.EndConfig.Type);
                % if isempty(P.EndConfig{1,"IsomorphismMatrices1"})
@@ -402,7 +401,7 @@ classdef TreeClass
                % end
            end
 
-           tree.StartTime = datetime("now","Format","HH:mm:ss.SSS");
+           
         end
         
         function tree = SetEndConfig(tree,NewConfig,ZoneMatrix)
@@ -511,17 +510,16 @@ classdef TreeClass
                 if numel(ConfigIndex)>1
                     ConfigIndex = find(ConfigIndex,1);
                 end
-                NodeTime = duration(datetime("now","Format","HH:mm:ss.SSS") - tree.StartTime, 'Format', 'hh:mm:ss.SSS');
-                % NodeTime = datetime("now","Format","HH:mm:ss.SSS")-tree.StartTime;
-                % if isempty(NodeTime)
-                %     NodeTime = datetime-tree.StartTime;
-                % end
+                NodeTime = datetime-tree.StartTime;
+                if isempty(NodeTime)
+                    NodeTime = datetime;
+                end
                 tree.LastNodeTime = NodeTime;
                 
                 %%
                 [IsomorphismMetrices, IsomorphismStr,IsomorpSizes] = CreatIsomorphismMetrices(logical(Config.Status),Config.CompleteType,{WS.R1,WS.R2,WS.R3},"ZoneMatrix",P.ZoneMatrix);
                 %%
-                tree.Data(ConfigIndex,:) = table(string(NodeTime),ConfigIndex,Parent,...
+                tree.Data(ConfigIndex,:) = table(NodeTime,ConfigIndex,Parent,...
                     Config.Type,Level,Cost,Movment.dir,Movment.step,Config.Row,...
                     Config.Col,ParentRow,ParentCol,1,CostToTarget,string(Config.Str),...
                     ParentStr,{Config.Status},{ParentMat}, ...

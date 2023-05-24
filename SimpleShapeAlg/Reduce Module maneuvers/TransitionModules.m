@@ -7,18 +7,22 @@ arguments
     Task_Queue
     Plot = false;
 end
-if ParentInd >=569
-    d=5
-end
+% if ParentInd >=569
+%     d=5
+% end
 Task = Task_Queue(end,:);
-
+Task = FinishTask(Task);
+if Task.Finish
+    Task_Queue(end,:) = [];
+    return
+end
 % Line = max(Task{1,["Current_Line_Alpha","Current_Line_Beta"]});
 Line = ActiveLine(Task);
 
 %%
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
 % TargetGroupSize = Tree.EndConfig_IsomorphismMetrices{1};
-if Line > 2
+if Line > ConfigShift(1,1) + 1
     if Line < numel(GroupsInds) && GroupsSizes(Line+1)
         Edges = Get_GroupEdges(GroupsSizes(Line-2:Line+1),GroupIndexes(Line-2:Line+1),GroupsInds(Line-2:Line+1));
     else
@@ -68,9 +72,10 @@ catch eeee
     eeee
 end
 [Moving_Log,AllModuleInd] = AddAboveModule(Line+1,AllModuleInd,GroupsInds,Step,Axis, Moving_Log, Task.Downwards);
-PlotStep = false;
+
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 
+Tree = AddManuversInfo(Tree,Decision,numel(Step));
 % try
 Task = Update_CurrentLine_Of_ModuleReduced(Task,Decision);
 if Task.Current_Line_Alpha <0 || Task.Current_Line_Beta<0
