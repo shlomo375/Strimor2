@@ -1,5 +1,7 @@
 %% Run Simple Shape expirements
 clear
+close all
+AddDirToPath
 TestType = "C2C";
 TestFile = dir("SimpleShapeAlg\Experiments");
 TestFile([TestFile.isdir]) = [];
@@ -15,9 +17,9 @@ for ii = 1:numel(TestFile)
                 TargetNode = Exp{k}{2};
                 [Tree,error] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode);
                 if error
-                    Solution{k} = "error";
+                    Solution{k} = "error"
                 else
-                    Solution{k} = {Tree};
+                    Solution{k} = {Tree.Data(1:Tree.LastIndex,:)};
                 end
             else
                 StartNode = Exp{k}{1};
@@ -32,7 +34,7 @@ for ii = 1:numel(TestFile)
                 if error2 || error1
                     Solution{k} = "error"
                 else
-                    Solution{k} = {Tree1,Tree2};
+                    Solution{k} = {Tree1.Data(1:Tree.LastIndex,:),Tree2.Data(1:Tree.LastIndex,:);};
                 end
             end
         end

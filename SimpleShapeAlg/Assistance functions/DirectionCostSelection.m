@@ -1,6 +1,8 @@
 function [NewStep, NewAxis,NewAllModuleInd, NewMoving_Log, NewDirection,NewDecision,ReducedModuleNum,NewTasks] = DirectionCostSelection(Step, Axis,AllModuleInd, Moving_Log, Direction,Decision,Tasks)
 if isempty(Step{1}) && isempty(Step{2})
-    NewTasks = Tasks{1};
+    [~,CheepTask] = min([size(Tasks{1},1),size(Tasks{2},1)]);
+    NewTasks = Tasks{CheepTask};
+    % NewTasks = Tasks{1};
     NewStep = [];
     NewAxis = [];
     NewAllModuleInd = [];

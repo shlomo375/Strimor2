@@ -211,7 +211,7 @@ if abs(GroupSize(SwitchLine)) < abs(GroupSizeRequired(1))
         BetaDiff = 0;
     end
     OK = false;
-    Task = Module_Task_Allocation(GroupSize, TargetGroupSize, ~Downwards, SwitchLine, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
+    Task = Module_Task_Allocation(GroupSize, TargetGroupSize, Downwards, SwitchLine, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
     return 
 
 elseif abs(GroupSize(SwitchLine+1)) < abs(GroupSizeRequired(2)) || GroupSize(SwitchLine+1) == -GroupSizeRequired(2) 
@@ -238,33 +238,64 @@ end
 
 function Task_Queue = MiddleLineSwitch(StartConfig, TargetConfig, Downwards, Line,Edge,WS,ConfigShift,Task_Queue)
 
-LeftEdgeType = Edge(3,1,Line);
+RightEdgeRequred = -Edge(3,2,Line);
+LeftEdgeRequred  = -Edge(3,1,Line);
+if ~isempty(find(Edge(3,1,1:Line-1)==LeftEdgeRequred,1)) && ~isempty(find(Edge(3,2,1:Line-1)==RightEdgeRequred,1)) %there is a module in the same side
+    
+    LeftEdgeType = Edge(3,1,Line);
+    
+    if LeftEdgeType == 1
+        % BetaDiff_Override = 1;
+        % AlphaDiff_Override = -1;
+        
+        TasksUp = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override= -1, Side = "Right",WS=WS,ConfigShift=ConfigShift);
+        Task_Queue(end:end+size(TasksUp,1)-1,:) = TasksUp;
+        
+        if size(TasksUp,1) == 1
+            TasksDown = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= 1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
+            Task_Queue(end+1:end+size(TasksDown,1),:) = TasksDown;
+        end
+    else
+        % BetaDiff_Override = -1;
+        % AlphaDiff_Override = 1;
+        
+        TasksUp = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override= 1, Side = "Right",WS=WS,ConfigShift=ConfigShift);
+        Task_Queue(end:end+size(TasksUp,1)-1,:) = TasksUp;
+        
+        if size(TasksUp,1) == 1
+            TasksDown = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= -1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
+            Task_Queue(end+1:end+size(TasksDown,1),:) = TasksDown;
+        end 
+    end
+else % there isnt module in the same side
+    [BaseGroupLoc,~,BaseGroupSize] = find(StartConfig,1,"first");
+    if ~mod(BaseGroupSize,2) %base group are even: made switch first
+        Task_Queue = CreatTaskAllocationTable([],"ActionType","Switch","Current_Line",BaseGroupLoc,"Downwards",Downwards,"Type",0);
+    else %base group are odd: download module, than switch group
+        
+        if abs(StartConfig(Line)) < 4
+            Task_Queue(end+1,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 1 ,BetaDiff_Override= 1,WS=WS,ConfigShift=ConfigShift);
+            return
+        end
 
-if LeftEdgeType == 1
-    % BetaDiff_Override = 1;
-    % AlphaDiff_Override = -1;
-    
-    TasksUp = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override= -1, Side = "Right",WS=WS,ConfigShift=ConfigShift);
-    Task_Queue(end:end+size(TasksUp,1)-1,:) = TasksUp;
-    
-    if size(TasksUp,1) == 1
-        TasksDown = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= 1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
-        Task_Queue(end+1:end+size(TasksDown,1),:) = TasksDown;
+
+        if BaseGroupSize>0
+            if StartConfig(Line) > 0
+                Side = "Right";
+            else
+                Side = "Left";
+            end
+            Task_Queue(2,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= -1, Side = Side,WS=WS,ConfigShift=ConfigShift);
+        else
+            if StartConfig(Line) > 0
+                Side = "Left";
+            else
+                Side = "Right";
+            end
+            Task_Queue(2,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= -1 ,BetaDiff_Override= 0, Side = Side,WS=WS,ConfigShift=ConfigShift);
+        end
+        % Task_Queue(2,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= -1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
+        Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","Switch","Current_Line",BaseGroupLoc,"Downwards",Downwards,"Type",0);
     end
-else
-    % BetaDiff_Override = -1;
-    % AlphaDiff_Override = 1;
-    
-    TasksUp = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0, BetaDiff_Override= 1, Side = "Right",WS=WS,ConfigShift=ConfigShift);
-    Task_Queue(end:end+size(TasksUp,1)-1,:) = TasksUp;
-    
-    if size(TasksUp,1) == 1
-        TasksDown = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= -1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
-        Task_Queue(end+1:end+size(TasksDown,1),:) = TasksDown;
-    end
-    
-    
-    
 end
-
 end

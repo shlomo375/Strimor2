@@ -10,6 +10,7 @@
 function [Tree,error] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode)
 dbstop in NotTested at 12
 dbstop if error
+close all
 % dbstop if caught error
 % N = sum(logical(StartNode{1,"ConfigMat"}{:}),'all');
 % Size = [N, 2*N];
@@ -44,7 +45,9 @@ WS.DoSplittingCheck = false;
 %% start algorithm
 ParentInd = 1;
 
-for Line = size(StartNode.IsomorphismMatrices1{1},1):-1:1
+% for Line = size(StartNode.IsomorphismMatrices1{1},1):-1:1
+while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:))
+    Line = find(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:),1,"last");
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetNode.IsomorphismMatrices1{1}(Line,:)) 
         [Start_WS,Tree, ParentInd,ConfigShift] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting);
 %         close all
@@ -77,7 +80,7 @@ end
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 24
+    if ParentInd >= 278
             d=5;
     end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
@@ -86,13 +89,21 @@ end
     end
     % end
 while size(Task_Queue,1) > 0
-    if ParentInd >= 1812
+    if ParentInd >= 282
             d=5;
     end    
+    if Task_Queue(end,:).Current_Line < Task_Queue(end,:).DestenationLine && Task_Queue(end,:).Downwards
+        d=5;
+    end
     % if ~Task_Queue{end,"Downwards"}
     %     d=5
     % end
     try
+        % Line
+        % l=find(Tree.Data.IsomorphismMatrices1{Tree.LastIndex}~=TargetConfig_GroupMatrix,1,"Last")
+        % if Line~=l
+        %     d=4
+        % end
     switch Task_Queue(end,:).ActionType
     
         case "TransitionModules"

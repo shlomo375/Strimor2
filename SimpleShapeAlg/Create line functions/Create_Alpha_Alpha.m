@@ -8,7 +8,7 @@ if ~isempty(Edges)
     % NotTested("Not Tested: Create_Alpha_Alpha")
     
     GroupSizeRequired = [4,3]; % articl
-    [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edges,GroupSizeRequired);
+    [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edges,GroupSizeRequired,"Create");
     if ~OK
         return
     end

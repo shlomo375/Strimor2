@@ -24,7 +24,7 @@ Edges = Get_GroupEdges(GroupsSizes(Line-3:Line-1),GroupIndexes(Line-3:Line-1),Gr
 
 
 if matches(func2str(Decision),"Create_Alpha_Beta")
-    Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line);
+    Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line,Direction);
     return
 end
 
@@ -42,7 +42,7 @@ end
 
 [WS, Tree, ParentInd , OK] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 
-Tree = AddManuversInfo(Tree,Decision,numel(Step));
+Tree = AddManuversInfo(Tree,func2str(Decision),numel(Step));
 
 if OK
     if Task.Downwards
@@ -82,12 +82,12 @@ function [ManeuverRequired, Direction] = CheapCreateManeuver(Three_Line_Edges,Ta
 
 Maneuver_Cost = struct("Create_Alpha_Alpha",1,...
                        ...
-                       "Create_Alpha_Beta",1,... 
+                       "Create_Alpha_Beta",2,... 
                        ...% "Create_Alpha_Beta_2",1,...
                        ...
                        "Create_Beta_Alpha",1,...
                         ...
-                       "Create_Beta_Beta",3);
+                       "Create_Beta_Beta",1);
 
 LineEdgesLeft = join(string([Three_Line_Edges(3,1,2), ...
                                  Three_Line_Edges(3,1,3)]),"_");

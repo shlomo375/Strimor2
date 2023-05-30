@@ -1,4 +1,18 @@
-function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx,Module_Num)
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx,A)
+arguments
+    Moving_Log_Top
+    Moving_Log_Mid
+    Moving_Log_Buttom
+    Edges
+    Direction
+    Downwards
+    Tree
+    TopLineIdx
+    A.Module_Num = [];
+    A.Task = [];
+end
+
+
 Task = [];
 Step = [];
 Axis = [];

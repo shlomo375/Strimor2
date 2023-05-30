@@ -10,6 +10,7 @@ arguments
     Addition.ConfigShift = [];
     Addition.Side = "";
     Addition.DisableSwitch = false;
+    Addition.Task = [];
 end
 [AbsDiff, AlphaDiff, BetaDiff, Switch] = GetGroupConfigDiff(StartConfig,TargetConfig);
 
@@ -50,6 +51,7 @@ else
         AbsDiff(BetaDiff_Override_Log) = Addition.BetaDiff_Override(BetaDiff_Override_Log);
     end
 end
+
 
 % Switch edges
 % several tasks at ones
@@ -92,25 +94,40 @@ ReturnFlag = false;
     % One module
         elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) >= 0
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Downwards",Downwards,"Type",1,"DestenationLine_Alpha",Line-1,"Side",Addition.Side);
-            ReturnFlag = true;
+            % ReturnFlag = true;
+            return
             
         elseif BetaDiff(Line) <= -1  && AlphaDiff(Line) >= 0
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Line-1,"Side",Addition.Side);
-            ReturnFlag = true;
+            % ReturnFlag = true;
+            return
             
     % Two module
         elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) <= -1
             % Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
+            if Line < DestenationLine
+                Downwards = ~Downwards;
+                Line = size(StartConfig,1)-(Line-1);
+                DestenationLine = size(StartConfig,1)-(DestenationLine-1);
+            end
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine_Alpha",DestenationLine,"DestenationLine_Beta",DestenationLine,"Side",Addition.Side);
             ReturnFlag = true;
             
         end
         if ReturnFlag && AddNewLine
+            % if Task.DestenationLine_Beta
+            %     Task.DestenationLine_Beta = Task.DestenationLine_Beta+1;
+            % end
+            % if Task.DestenationLine_Alpha
+            %     Task.DestenationLine_Alpha = Task.DestenationLine_Alpha+1;
+            % end
+            % if Task.DestenationLine
+            %     Task.DestenationLine = Task.DestenationLine+1;
+            % end
             Task(2,:) = Task;
             LineToCreate = numel(StartConfig)-LineToCreate+1;
             Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
 
-            % Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
         end
 
 % Adding modules
@@ -126,10 +143,9 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                     abs(StartConfig(Line)) == 0
                 Line = numel(StartConfig)-Line+1;
                 Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
-                % Task = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
                 return
         % One module
-            elseif xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1)
+            elseif xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1) || (AlphaDiff(Line) == 2 && BetaDiff(Line) == 0) || (AlphaDiff(Line) == 0 && BetaDiff(Line) == 2)
 %                 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(Addition.WS, Addition.ConfigShift,Downwards);
 %                 Edges1 = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
                 
@@ -148,7 +164,7 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
 %                 DestenationLine = size(Edges,1)-(Line-1);
                 
 %                 Addition.Side = ["Left","Right"];
-                if AlphaDiff(Line) == 1 && BetaDiff(Line) <= 0
+                if AlphaDiff(Line) >= 1 && BetaDiff(Line) <= 0
                     ReqiuerdType = 1*UpsideDown; % alpha in the regular look
                 else
                     ReqiuerdType = -1*UpsideDown; % beta in the regular look
@@ -164,14 +180,14 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 Direction = ["Left","Right"];
                 switch Addition.Side
                     case "Left"
-                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);
+                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);% & abs(StartConfig((DestenationLine+1):size(Edges,1))) > 2,1);
                         First_Right = inf;
                     case "Right"
-                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);
+                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);%& abs(StartConfig((DestenationLine+1):size(Edges,1))) > 2,1);
                         First_Left = inf;
                     otherwise
-                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);
-                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);
+                        First_Left = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),1) == ReqiuerdType,1);% & abs(StartConfig((DestenationLine+1):size(Edges,1))) > 2,1);
+                        First_Right = DestenationLine + find(Edges((DestenationLine+1):size(Edges,1),2) == ReqiuerdType,1);% & abs(StartConfig((DestenationLine+1):size(Edges,1))) > 2,1);
                 end
                 if (isempty(First_Right) && isinf(First_Left)) || (isempty(First_Left) && isinf(First_Right))
                     Task = Get_Module_From_The_Other_Side(First_Right,DestenationLine,Addition.Side,ReqiuerdType,Downwards,Edges,AbsDiff);
@@ -188,10 +204,21 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
         % Two module
             elseif AlphaDiff(Line) >= 1 && BetaDiff(Line) >= 1
                 DestenationLine = size(StartConfig,1)-(Line-1);
-                StartLine = size(StartConfig,1)+1 - find(abs(StartConfig(1:Line-1))>=4,1,"last"); % When you need to bring 2 to fill a missing row, take from the closest row below it which has 4 modules or more.
+                StartLine = find(abs(StartConfig(1:Line-1))>=4,1,"last");
+                
+                StartLine = size(StartConfig,1)+1 - StartLine; % When you need to bring 2 to fill a missing row, take from the closest row below it which has 4 modules or more.
+                if isempty(StartLine)
+                    if ~Downwards
+                        StartConfig = flip(StartConfig);
+                    end
+                    StartLine = Line+ find(abs(StartConfig(Line+1:end))>=4,1,"first");
+                    DestenationLine = Line;
+                    Downwards = ~Downwards;
+                end
                 Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",StartLine,"Current_Line_Beta",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",DestenationLine,"Side",Addition.Side);
                 return
             end
+
     Downwards = ~Downwards;
 end
 
@@ -210,6 +237,28 @@ else
 end
 
 %% Stage 1
+if isempty(First_Right)
+    
+    FirstStage_Init_Location = find(Edges(:,2) == ReqiuerdType & NotCompleteLine,1,"first");
+    % FirstStage_Final_Location = find(Edges(:,2),1,"last");
+    
+else
+    FirstStage_Init_Location = find(Edges(:,1) == ReqiuerdType & NotCompleteLine,1,"first");
+    % FirstStage_Final_Location = find(Edges(:,2),1,"last"); 
+end
+if ~isempty(FirstStage_Init_Location)
+    FirstStage_Current_Line = size(Edges,1)-(FirstStage_Init_Location-1);
+    FirstStage_Destenation_Line = size(Edges,1)-(DestenationLine-1);
+
+    if ReqiuerdType == -1
+        Task_Queue = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",Side);
+    else
+        Task_Queue = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",Side);
+    end
+    return
+end
+
+
 if isempty(First_Right)
     
     FirstStage_Init_Location = find(Edges(:,1) == ReqiuerdType & NotCompleteLine,1,"last");

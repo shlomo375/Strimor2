@@ -38,7 +38,7 @@ for Line = 1:size(ReduceConfig,1)
         if Col == size(ReduceConfig,2) && ReduceConfig(Line,Col)
             if ~StartGroup
                 GroupInd{Line}{GroupNum} = IndConfig(Line,StartCol:Col);
-                GroupIndexes{Line}{GroupNum} =  ColShift + (StartCol:Col);
+                    GroupIndexes{Line}{GroupNum} =  ColShift + (StartCol:Col);
                 GroupsSizes(Line,GroupNum) = GroupsSizes(Line,GroupNum)*ConfigType(IndConfig(Line,StartCol));
             end
             StartGroup = true;

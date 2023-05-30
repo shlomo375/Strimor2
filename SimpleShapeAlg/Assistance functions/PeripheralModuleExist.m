@@ -1,4 +1,4 @@
-function [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edge,GroupSizeRequired,Action)
+function [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edge,GroupSizeRequired,Action,A)
 arguments
 
     Tree
@@ -8,15 +8,16 @@ arguments
     Edge
     GroupSizeRequired
     Action = "";
+    A.Task = [];
 end
 
 if numel(GroupSizeRequired) == 2
-    if TopLineIdx ~= 1 %&& ~matches(Action,"Create")
+    if TopLineIdx ~= 1 && ~matches(Action,"Create")
         GroupSizeAvailable = permute(Edge(4,1,2:3),[3,1,2]);
         LineShift = TopLineIdx-2;
-    % elseif matches(Action,"Create")
-    %     GroupSizeAvailable = permute(Edge(4,1,1:2),[3,1,2]);
-    %     LineShift = TopLineIdx-1;
+    elseif matches(Action,"Create")
+        GroupSizeAvailable = permute(Edge(4,1,2:3),[3,1,2]);
+        LineShift = TopLineIdx-2;
     else
         error("problem at PeripheralModuleExist func");
     end
@@ -54,29 +55,50 @@ if isempty(Topest_Line_To_Add)
     return
 end
 
-if matches(Direction,"Left")
-    Direction = "Right";
-else
-    Direction = "Left";
-end
+% if matches(Direction,"Left")
+%     Direction = "Right";
+% else
+%     Direction = "Left";
+% end
 if Num_Module_Added >= 2
     AlphaDiff = 1;
     BetaDiff = 1;
-elseif EndIsAlpha(GroupSizeAvailable(Topest_Line_To_Add))
-    if Downwards
-        BetaDiff = 1;
-        AlphaDiff = 0;
+elseif matches(Direction,"Left")
+    if EndIsAlpha(GroupSizeAvailable(Topest_Line_To_Add))
+        if Downwards
+            BetaDiff = 1;
+            AlphaDiff = 0;
+        else
+            AlphaDiff = 1;
+            BetaDiff = 0;
+        end
     else
-        AlphaDiff = 1;
-        BetaDiff = 0;
+        if Downwards
+            AlphaDiff = 1;
+            BetaDiff = 0;
+        else
+            BetaDiff = 1;
+            AlphaDiff = 0;
+        end
     end
-else
-    if Downwards
-        AlphaDiff = 1;
-        BetaDiff = 0;
+else %Right
+
+    if GroupSizeAvailable(Topest_Line_To_Add)>0
+        if Downwards
+            BetaDiff = 1;
+            AlphaDiff = 0;
+        else
+            AlphaDiff = 1;
+            BetaDiff = 0;
+        end
     else
-        BetaDiff = 1;
-        AlphaDiff = 0;
+        if Downwards
+            AlphaDiff = 1;
+            BetaDiff = 0;
+        else
+            BetaDiff = 1;
+            AlphaDiff = 0;
+        end
     end
 end
 
@@ -90,7 +112,7 @@ if ~Downwards
     Topest_Line_To_Add = numel(StartConfig) - Topest_Line_To_Add + 1;
 end
 
-Task = Module_Task_Allocation(StartConfig, TargetConfig, Tree.Total_Downwards, Topest_Line_To_Add, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
+Task = Module_Task_Allocation(StartConfig, TargetConfig, Tree.Total_Downwards, Topest_Line_To_Add, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff,"Task",A.Task);
 
 OK = false;
 

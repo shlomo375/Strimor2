@@ -1,15 +1,18 @@
 % function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Create_Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,MovmentDirection,Downwards,Tree,TopLineIdx,varargin)
-function Task = Create_Alpha_Beta(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line)
+function Task = Create_Alpha_Beta(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line,Side)
 
 Step = [];
 Axis = [];
 
 Destenation_Line = Line - 2;
+if ~Downwards
+    Destenation_Line = size(StartConfig,1) - Destenation_Line+1;
+end
 AlphaDiff = zeros(size(StartConfig));
 BetaDiff = zeros(size(StartConfig));
 AlphaDiff(Destenation_Line) = 1;
 
-Task = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Destenation_Line, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
+Task = Module_Task_Allocation(StartConfig, TargetConfig, ~Downwards, Destenation_Line, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff,"Side",Side);
 Task.Downwards = ~Task.Downwards;
 return
 % if ~isempty(Edges)
