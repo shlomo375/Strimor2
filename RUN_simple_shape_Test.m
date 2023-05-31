@@ -7,19 +7,22 @@ TestFile = dir("SimpleShapeAlg\Experiments");
 TestFile([TestFile.isdir]) = [];
 
 for ii = 1:numel(TestFile)
-    if contains(TestFile(ii).name,TestType) && str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 50
+    if contains(TestFile(ii).name,TestType) && str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 100
         load(fullfile(TestFile(ii).folder,TestFile(ii).name),"Exp","BasicWS","Solution")
         N = str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_")));
         
-        for k = 1:numel(Exp)
+        for k = 5:numel(Exp)
             if numel(Exp{k}) == 2
                 StartNode = Exp{k}{1};
                 TargetNode = Exp{k}{2};
+                if StartNode.ConfigRow > 7
                 [Tree,error] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode);
+                
                 if error
                     Solution{k} = "error"
                 else
                     Solution{k} = {Tree.Data(1:Tree.LastIndex,:)};
+                end
                 end
             else
                 StartNode = Exp{k}{1};

@@ -89,7 +89,7 @@ end
     end
     % end
 while size(Task_Queue,1) > 0
-    if ParentInd >= 282
+    if ParentInd >= 162
             d=5;
     end    
     if Task_Queue(end,:).Current_Line < Task_Queue(end,:).DestenationLine && Task_Queue(end,:).Downwards

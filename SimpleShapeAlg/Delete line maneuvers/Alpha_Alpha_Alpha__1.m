@@ -1,4 +1,4 @@
-function NewTask = Alpha_Alpha_Alpha__1(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line)
+function NewTask = Alpha_Alpha_Alpha__1(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line,Direction)
 
 % StartConfig, TargetConfig, Downwards, Line
 % ModuleType = -1;

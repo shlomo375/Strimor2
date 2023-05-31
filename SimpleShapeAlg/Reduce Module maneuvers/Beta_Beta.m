@@ -1,22 +1,10 @@
-function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Beta_Beta(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx,A)
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Beta_Beta(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx,Module_Num)
 
-arguments
-    Moving_Log_Top
-    Moving_Log_Mid
-    Moving_Log_Buttom
-    Edges
-    Direction
-    Downwards
-    Tree
-    TopLineIdx
-    A.Module_Num = [];
-    A.Task = [];
-end
 
 Task = [];
 Step = [];
 Axis = [];
-if A.Module_Num == 1
+if Module_Num == 1
     StartConfig = Tree.Data{Tree.LastIndex,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig = Tree.EndConfig{1,"IsomorphismMatrices1"}{1}(:,:,1);
     Task = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, TopLineIdx-1, "AlphaDiff_Override",1,"BetaDiff_Override",0,Side=Direction);

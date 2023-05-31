@@ -1,30 +1,9 @@
-function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Alpha_Beta_Beta__1(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,MovmentDirection,Downwards,Tree,TopLineIdx,Module_Num)
-Step = [];
-Axis = [];
-Task = [];
+function NewTask = Alpha_Beta_Beta__1(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line,Direction)
 
-if ~isempty(Edges)
+% Alpha_Override = zeros(size(StartConfig));
+% Beta_Override = zeros(size(StartConfig));
+% Beta_Override(Line) = -1;
 
-    GroupSizeRequired = [-1,-4,1];
-    [OK, Task] = PeripheralModuleExist(Tree,MovmentDirection,Downwards,TopLineIdx,Edges,GroupSizeRequired);
-    if ~OK
-        return
-    end
-
-    Position_relative_buttom_group = [0;-3;0];
-    [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
- 
-    Moving_Log_Buttom(1,:) = true;
-    Moving_Log_Mid(1:2,:) = true;
-    Moving_Log_Top(1:3,:) = true;
-end
-
-
-Step = [Step, 1];
-Axis = [Axis, 2];
-
-Moving_Log_Top(4,1) = true;
-Moving_Log_Mid(4,1:2) = true;
-
-
+% NewTask = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line-1, AlphaDiff_Override=Alpha_Override,BetaDiff_Override=Beta_Override,WS=WS,ConfigShift=ConfigShift);
+NewTask = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line-1,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Line-2,"Side",Direction);
 end

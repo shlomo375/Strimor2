@@ -4,7 +4,7 @@ ProblemNum = 2e3;
 N = 100;
 TEMP = cell(7,1);
 
-for N = 50
+for N = 100
   
     BasicWS = WorkSpace([N,N*2],"RRT*");
     % TEMP(NN) = {BasicWS};
@@ -29,7 +29,7 @@ end
 function GroupSize = Create_GroupSize(ModuleNum,ProblemNum)
 GroupSize = [];    
 for ii = linspace(ModuleNum/10,ModuleNum*9/10,9)
-    GroupSize = [GroupSize, 1+randi(round(ii),ModuleNum/2,round(ProblemNum/8))];
+    GroupSize = [GroupSize, 5+randi(round(ii),ModuleNum/2,round(ProblemNum/8))];
 end
 Total_Module_In_Config = cumsum(GroupSize,1);
 GroupSize(Total_Module_In_Config>ModuleNum) = 0;
@@ -81,4 +81,6 @@ for Col = 1:size(GroupSize,2)
 end
 deleteGroup = randperm(size(GroupSize,2),abs(ProblemNum-size(GroupSize,2)));
 GroupSize(:,deleteGroup) = [];
+Shafle = randperm(size(GroupSize,2));
+GroupSize = GroupSize(:,Shafle);
 end

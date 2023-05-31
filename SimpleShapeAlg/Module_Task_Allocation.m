@@ -79,9 +79,9 @@ end
 ReturnFlag = false;
 % Remove modules 
     % Whole line - based the nuber of alpha in the top line
-        if Line == TopLine && ...
-                abs(AbsDiff(Line)) == abs(StartConfig(Line)) && ...
-                AlphaDiff(Line) == -1 && BetaDiff(Line) >= -1
+        if Line == TopLine && ~TargetConfig(Line) && StartConfig(Line)==1% &&...
+                %abs(AbsDiff(Line)) == abs(StartConfig(Line)) && ...
+                %AlphaDiff(Line) == -1 && BetaDiff(Line) >= -1
             % Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine_Alpha,"DestenationLine_Beta",DestenationLine_Beta,"Side",Addition.Side);
             Task = CreatTaskAllocationTable([],"ActionType","DeleteLine","Current_Line",Line,"Downwards",Downwards,"DestenationLine_Alpha",DestenationLine,"DestenationLine_Beta",DestenationLine,"Side",Addition.Side);
             ReturnFlag = true;
@@ -237,26 +237,26 @@ else
 end
 
 %% Stage 1
-if isempty(First_Right)
-    
-    FirstStage_Init_Location = find(Edges(:,2) == ReqiuerdType & NotCompleteLine,1,"first");
-    % FirstStage_Final_Location = find(Edges(:,2),1,"last");
-    
-else
-    FirstStage_Init_Location = find(Edges(:,1) == ReqiuerdType & NotCompleteLine,1,"first");
-    % FirstStage_Final_Location = find(Edges(:,2),1,"last"); 
-end
-if ~isempty(FirstStage_Init_Location)
-    FirstStage_Current_Line = size(Edges,1)-(FirstStage_Init_Location-1);
-    FirstStage_Destenation_Line = size(Edges,1)-(DestenationLine-1);
-
-    if ReqiuerdType == -1
-        Task_Queue = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",Side);
-    else
-        Task_Queue = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",Side);
-    end
-    return
-end
+% if isempty(First_Right)
+% 
+%     FirstStage_Init_Location = find(Edges(:,2) == ReqiuerdType & NotCompleteLine,1,"first");
+%     % FirstStage_Final_Location = find(Edges(:,2),1,"last");
+% 
+% else
+%     FirstStage_Init_Location = find(Edges(:,1) == ReqiuerdType & NotCompleteLine,1,"first");
+%     % FirstStage_Final_Location = find(Edges(:,2),1,"last"); 
+% end
+% if ~isempty(FirstStage_Init_Location)
+%     FirstStage_Current_Line = size(Edges,1)-(FirstStage_Init_Location-1);
+%     FirstStage_Destenation_Line = size(Edges,1)-(DestenationLine-1);
+% 
+%     if ReqiuerdType == -1
+%         Task_Queue = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",Side);
+%     else
+%         Task_Queue = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",FirstStage_Current_Line,"Downwards",~Downwards,"Type",-ReqiuerdType,"DestenationLine",FirstStage_Destenation_Line,"Side",Side);
+%     end
+%     return
+% end
 
 
 if isempty(First_Right)
