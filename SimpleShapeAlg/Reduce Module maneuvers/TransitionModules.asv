@@ -33,7 +33,7 @@ else
 end
 
 
-[Decision, Direction] = SelectReduceManeuver(Edges); %manuver top to buttom
+[Decision, Direction] = SelectReduceManeuver(Edges);
 
 %%
 if Line == numel(GroupsInds) || ~GroupsSizes(Line+1)
@@ -41,11 +41,7 @@ if Line == numel(GroupsInds) || ~GroupsSizes(Line+1)
 else
     Top_GroupInd = GroupsInds{Line+1}{1};
 end
-try
 Mid_GroupInd = GroupsInds{Line}{1};
-catch e_Mid_GroupInd
-    e_Mid_GroupInd
-end
 if Line == numel(GroupsInds) || ~GroupsSizes(Line-1)
     Buttom_GroupInd = [];
 else

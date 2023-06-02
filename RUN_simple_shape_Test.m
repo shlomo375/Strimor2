@@ -10,15 +10,19 @@ for ii = 1:numel(TestFile)
     if contains(TestFile(ii).name,TestType) && str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 100
         load(fullfile(TestFile(ii).folder,TestFile(ii).name),"Exp","BasicWS","Solution")
         N = str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_")));
-        
-        for k = 5:numel(Exp)
+        BasicWS = WorkSpace(15*[N,2*N],"RRT*");
+        problemSolve = 0;
+        for k = 1:numel(Exp)
             if numel(Exp{k}) == 2
                 StartNode = Exp{k}{1};
                 TargetNode = Exp{k}{2};
-                if StartNode.ConfigRow > 7
-                [Tree,error] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode);
                 
+                if StartNode.ConfigRow > TargetNode.ConfigRow
+                [Tree,error] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode);
+                problemSolve = problemSolve+1;
                 if error
+                    
+                    NotTested
                     Solution{k} = "error"
                 else
                     Solution{k} = {Tree.Data(1:Tree.LastIndex,:)};

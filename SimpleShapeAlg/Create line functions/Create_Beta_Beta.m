@@ -5,7 +5,7 @@ Task = [];
 
 
 if ~isempty(Edges)
-    NotTested("Not Tested: Create_Beta_Beta")
+    % NotTested("Not Tested: Create_Beta_Beta")
     
     GroupSizeRequired = [4,3]; % article [-3,-4]
     [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,CurrentLine,Edges,GroupSizeRequired,"Create");

@@ -52,6 +52,8 @@ end
 % if SplittingCheck(WS,find(WS.Space.Status,1),true)
     Config = GetConfiguration(WS);
     Node = ConfigStruct2Node(Node,Config);
+
+   
 % else
 %     Node = [];
 % end

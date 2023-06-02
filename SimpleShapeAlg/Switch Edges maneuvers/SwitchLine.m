@@ -17,9 +17,11 @@ TargetGroupSize = Tree.EndConfig.IsomorphismMatrices1{1};
 Line = Task.Current_Line;
 
 FirstConfigLine = find(GroupsSizes,1,"first");
+LastConfigLine = find(GroupsSizes,1,"last");
+
 
 Edges = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
-if Line ~= FirstConfigLine
+if (Line ~= FirstConfigLine && Task.Downwards) || (Line ~= LastConfigLine && ~Task.Downwards)
     %% Middle line switch
     
     Task_Queue = MiddleLineSwitch(GroupsSizes, TargetGroupSize, Task.Downwards, Line,Edges,WS,ConfigShift,Task_Queue);
@@ -82,7 +84,7 @@ else
         BaseSide = "Right";
 
         Top_Step = floor(((Edges(2,2,Line+1)-(Edges(3,2,Line+1)==-1)) - (Edges(2,2,Line)-(Edges(3,2,Line)==1)))/2);
-        TopBottom_Step = floor(((Edges(2,1,Line+2)+(Edges(3,1,Line+2)==-1)) - (Edges(2,2,Line+1)-(Edges(3,2,Line+1)==1)))/2);
+        TopBottom_Step = floor(((Edges(2,1,Line+2)+(Edges(3,1,Line+2)==-1)) - (Edges(2,2,Line+1)-(Edges(3,2,Line+1)==1)))/2);     
         Step(1:2) = [Top_Step,TopBottom_Step];
         Axis(1:2) = [1,1];
 
@@ -214,13 +216,13 @@ if abs(GroupSize(SwitchLine)) < abs(GroupSizeRequired(1))
     Task = Module_Task_Allocation(GroupSize, TargetGroupSize, Downwards, SwitchLine, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
     return 
 
-elseif abs(GroupSize(SwitchLine+1)) < abs(GroupSizeRequired(2)) || GroupSize(SwitchLine+1) == -GroupSizeRequired(2) 
+elseif abs(GroupSize(SwitchLine+1-2*(~Downwards))) < abs(GroupSizeRequired(2)) || GroupSize(SwitchLine+1-2*(~Downwards)) == -GroupSizeRequired(2) 
     
-    Addition = abs(GroupSizeRequired(2)) - abs(GroupSize(SwitchLine+1));
+    Addition = abs(GroupSizeRequired(2)) - abs(GroupSize(SwitchLine+1-2*(~Downwards)));
     if Addition >= 2
         AlphaDiff = 1;
         BetaDiff = 1;
-    elseif EndIsAlpha(GroupSize(SwitchLine+1))
+    elseif EndIsAlpha(GroupSize(SwitchLine+1-2*(~Downwards)))
         BetaDiff = 1;
         AlphaDiff = 0;
     else
@@ -228,7 +230,7 @@ elseif abs(GroupSize(SwitchLine+1)) < abs(GroupSizeRequired(2)) || GroupSize(Swi
         BetaDiff = 0;
     end
     OK = false;
-    Task = Module_Task_Allocation(GroupSize, TargetGroupSize, ~Downwards, SwitchLine+1, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
+    Task = Module_Task_Allocation(GroupSize, TargetGroupSize, ~Downwards, SwitchLine+1-2*(~Downwards), "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
     return
 
 end

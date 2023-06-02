@@ -6,7 +6,7 @@ Task = [];
 % Task = Module_Task_Allocation(GroupSize, TargetGroupSize, ~Downwards, SwitchLine, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
 if ~isempty(Edges)
     if Downwards
-        NotTested("Not Tested: Create_Alpha_Beta_1 Downwards==1")
+        % NotTested("Not Tested: Create_Alpha_Beta_1 Downwards==1")
     end
     
     GroupSizeRequired = [-3,3];
