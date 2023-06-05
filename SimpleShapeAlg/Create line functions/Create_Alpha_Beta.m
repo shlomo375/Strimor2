@@ -1,42 +1,33 @@
 % function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Create_Beta_Alpha(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,MovmentDirection,Downwards,Tree,TopLineIdx,varargin)
-function Task = Create_Alpha_Beta(WS, StartConfig, TargetConfig,ConfigShift, Downwards, Line,Side)
-
+function [Step, Axis, Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Task] = Create_Alpha_Beta(Moving_Log_Top,Moving_Log_Mid,Moving_Log_Buttom,Edges,Direction,Downwards,Tree,TopLineIdx,varargin)
 Step = [];
 Axis = [];
+Task = [];
 
-Destenation_Line = Line - 2;
-if ~Downwards
-    Destenation_Line = size(StartConfig,1) - Destenation_Line+1;
+% Task = Module_Task_Allocation(GroupSize, TargetGroupSize, ~Downwards, SwitchLine, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff);
+if ~isempty(Edges)
+    if Downwards
+        % NotTested("Not Tested: Create_Alpha_Beta_1 Downwards==1")
+    end
+    
+    GroupSizeRequired = [-2,2];
+    [OK, Task] = PeripheralModuleExist(Tree,Direction,Downwards,TopLineIdx,Edges,GroupSizeRequired,"Create");
+    if ~OK
+        return
+    end
+
+    Position_relative_buttom_group = [-2;0;inf]; %article [2;0;inf]
+    [Step, Axis] = ArangeGroupLocations(Direction,Edges,Position_relative_buttom_group,"Create");
+ 
+    Moving_Log_Buttom(1,:) = true;
+    Moving_Log_Top(1:2,:) = true;
 end
-AlphaDiff = zeros(size(StartConfig));
-BetaDiff = zeros(size(StartConfig));
-AlphaDiff(Destenation_Line) = 1;
 
-Task = Module_Task_Allocation(StartConfig, TargetConfig, ~Downwards, Destenation_Line, "AlphaDiff_Override",AlphaDiff,"BetaDiff_Override",BetaDiff,"Side",Side);
-Task.Downwards = ~Task.Downwards;
-return
-% if ~isempty(Edges)
-%     NotTested("Not Tested: Create_Beta_Alpha - spacial atention")
-% 
-%     GroupSizeRequired = [4,3];
-%     [OK, Task] = PeripheralModuleExist(Tree,Downwards,TopLineIdx,Edges,GroupSizeRequired);
-%     if ~OK
-%         return
-%     end
-% 
-%     Position_relative_buttom_group = [1;2];
-%     [Step, Axis] = ArangeGroupLocations(MovmentDirection,Edges,Position_relative_buttom_group);
-% 
-%     Moving_Log_Buttom(1:2,:) = true;
-%     Moving_Log_Top(2,:) = true;
-% end
-% 
-% Step = [Step, 1];
-% Axis = [Axis, 3];
-% 
-% Moving_Log_Buttom(3,1:2) = true;
-% Moving_Log_Top(3,1:2) = true;
+Step = [Step, -1];
+Axis = [Axis, 2];
 
+Moving_Log_Top(3,1) = true;
+Moving_Log_Buttom(3,1:2) = true;
 
 
 end

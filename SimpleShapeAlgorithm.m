@@ -45,18 +45,23 @@ WS.DoSplittingCheck = false;
 %% start algorithm
 ParentInd = 1;
 
-% for Line = size(StartNode.IsomorphismMatrices1{1},1):-1:1
+Start_WS.Center_Of_Area = centerOfArea(Start_WS)
+
 while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:))
     Line = find(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:),1,"last");
     if Line ==3
         d=5;
     end
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetNode.IsomorphismMatrices1{1}(Line,:)) 
-        [Start_WS,Tree, ParentInd,ConfigShift] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting);
-%         close all
+        [Start_WS,Tree, ParentInd,ConfigShift,LineCreated] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting);
+        if LineCreated
+            break
+        end
     end
 end
-
+if ParentInd == 377
+    d=4;
+end
 
 [Start_WS,Tree, ParentInd,ConfigShift] = MatchingStage(Start_WS,Target_WS,Tree, ParentInd,ConfigShift,Ploting);
 catch e
@@ -65,7 +70,7 @@ end
 
 end
 
-function [WS,Tree, ParentInd,ConfigShift] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Ploting)
+function [WS,Tree, ParentInd,ConfigShift,LineCreated] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Ploting)
 
 arguments
     WS
@@ -79,11 +84,11 @@ arguments
 end
 % Ploting = false;
 % Ploting = true;
-
+    LineCreated = false;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 150
+    if ParentInd >= 113
             d=5;
     end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
@@ -92,7 +97,7 @@ end
     end
     % end
 while size(Task_Queue,1) > 0
-    if ParentInd >= 162
+    if ParentInd >= 130
             d=5;
     end    
   
@@ -115,10 +120,17 @@ while size(Task_Queue,1) > 0
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = SwitchLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
         case "CreateLine"
             [WS,Tree, ParentInd,ConfigShift,Task_Queue] = CreateLine(   WS, Tree, ParentInd, ConfigShift, Task_Queue,Ploting);
+            LineCreated = true;
     end
-    ParentInd
+
+    fprintf("Config number: %d\n",ParentInd)
+    NewCA = centerOfArea(WS);
+    CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
+    if CorrectionSteps >= Tree.N/5
+        [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);[WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);
+    end
     catch memanuvers
-        
+        memanuvers
     % Task_Queue(end,:).Current_Line     
     end
 end

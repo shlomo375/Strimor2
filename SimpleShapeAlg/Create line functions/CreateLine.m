@@ -23,10 +23,10 @@ Edges = Get_GroupEdges(GroupsSizes(Line-3:Line-1),GroupIndexes(Line-3:Line-1),Gr
 [Decision, Direction] = CheapCreateManeuver(Edges,Task);
 
 
-if matches(func2str(Decision),"Create_Alpha_Beta")
-    Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line,Direction);
-    return
-end
+% if matches(func2str(Decision),"Create_Alpha_Beta")
+%     Task_Queue(end+1,:) = Decision(WS,GroupsSizes,Tree.EndConfig.IsomorphismMatrices1{:,:,1},ConfigShift,Task.Downwards, Line,Direction);
+%     return
+% end
 
 
 Top_GroupInd = GroupsInds{Line-1}{1};
@@ -89,10 +89,10 @@ Maneuver_Cost = struct("Create_Alpha_Alpha",1,...
                         ...
                        "Create_Beta_Beta",1);
 
-LineEdgesLeft = join(string([Three_Line_Edges(3,1,2), ...
-                                 Three_Line_Edges(3,1,3)]),"_");
-LineEdgesRight = join(string([Three_Line_Edges(3,2,2), ...
-                             Three_Line_Edges(3,2,3)]),"_");
+LineEdgesLeft = join(string([Three_Line_Edges(3,1,3), ...
+                                 Three_Line_Edges(3,1,2)]),"_");
+LineEdgesRight = join(string([Three_Line_Edges(3,2,3), ...
+                             Three_Line_Edges(3,2,2)]),"_");
 Right = join(["Create",LineEdgesRight.replace("-1","Beta").replace("1","Alpha")],"_");
 Left = join(["Create",LineEdgesLeft.replace("-1","Beta").replace("1","Alpha")],"_");
 % if ~isfield(Maneuver_Cost,Right) && ~ isfield(Maneuver_Cost,Left)

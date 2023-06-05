@@ -134,10 +134,7 @@ ReturnFlag = false;
 % Adding modules
 if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
     Downwards = ~Downwards;
-    % StartingLine_Alpha = max([0,find(AlphaDiff(1:Line) <= -1,1,"last")]);
-    % StartingLine_Beta = max([0,find(BetaDiff(1:Line) <= -1,1,"last")]);
-%     StartLine = [StartingLine_Alpha,StartingLine_Beta];
-    
+
     % Adding modules
         % whole line
             if Line == (TopLine + 1) && ...
@@ -178,7 +175,7 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                         Addition.Side = "Right";
                     elseif ~mod(abs(StartConfig(DestenationLine)),2)
                         Addition.Side = "Left";
-                    elseif sign(TargetConfig(DestenationLine)) == sign(StartConfig(DestenationLine))
+                    elseif sign(TargetConfig(DestenationLine)) == sign(StartConfig(DestenationLine)) 
                         Addition.Side = "Right";
                     else
                         Addition.Side = "Left";
@@ -203,7 +200,7 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                         AbsDiff = flip(AbsDiff);
                         
                     end
-                    Task = Get_Module_From_The_Other_Side(First_Right,Line-1,Addition.Side,-ReqiuerdType,Addition.totalDownwards,Downwards,Edges,AbsDiff);
+                    Task = Get_Module_From_The_Other_Side(First_Right,Line,Addition.Side,-ReqiuerdType,Addition.totalDownwards,Downwards,Edges,AbsDiff);
                           
                     % Task = Get_Module_From_The_Other_Side(First_Right,DestenationLine,Addition.Side,ReqiuerdType,Addition.totalDownwards,Edges,AbsDiff);
 
@@ -298,7 +295,7 @@ end
     end
 
 % test the option to switch the base line and that it...
-BaseLine = find(Edges(:,1),1,"last");
+BaseLine = find(Edges(:,1),1,"first");
 if Edges(BaseLine,1) ~= Edges(BaseLine,2)
     % Task_Remove.DestenationLine = FirstStage_Current_Line-1;
     Task_Queue = [Task_Switch]; %solve form end to start

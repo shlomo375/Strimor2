@@ -28,7 +28,7 @@ Moving_Log_Buttom = [Moving_Log_Buttom; false(NumStep-size(Moving_Log_Buttom,1),
 
 Moving_Log = [Moving_Log_Top, Moving_Log_Mid, Moving_Log_Buttom];
 
-
+Moving_Log(numel(Step)+1:end,:) = [];
 
 if matches(Side,"Right")
     Step = -Step;

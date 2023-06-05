@@ -8,6 +8,7 @@ classdef WorkSpace
         Algoritem
         MovmentColorIdx = 4
         DoSplittingCheck = false
+        Center_Of_Area
         
     end
     
@@ -88,6 +89,15 @@ classdef WorkSpace
             temp(2:2:end) = -1;
             WS.Space.Type = WS.Space.Type.*temp;
 
+        end
+        
+        function CA = centerOfArea(WS)
+
+            [~,RightCol] = find(WS.Space.Status,1,'last');
+            [~,LeftCol] = find(WS.Space.Status,1,'first');
+            
+            CA = LeftCol+fix((RightCol-LeftCol)/2);
+        
         end
 
         function WS = AxisRotationMatrixNew(WS)
@@ -488,7 +498,7 @@ classdef WorkSpace
 
         function CM = CenterOfMass(WS)
             
-            l = find([WS.Space.Status] == 1);
+            l = find(WS.Space.Status);
             [y,x] = ind2sub(WS.SpaceSize,l);
             CM = [mean(y) mean(x)];
 %             ind = sub2ind(WS.SpaceSize,CM(1),CM(2));

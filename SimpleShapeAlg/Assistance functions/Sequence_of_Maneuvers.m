@@ -1,4 +1,4 @@
-function [NewWS, Newtree, NewParentInd, OK] = Sequence_of_Maneuvers(WS,tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShifts,P)
+function [WS, tree, ParentInd, OK] = Sequence_of_Maneuvers(WS,tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShifts,P)
 
 arguments
     WS
@@ -10,9 +10,16 @@ arguments
     Step {mustBeInteger,mustBeVector}
     ConfigShifts (2,1) {mustBeInteger,mustBeVector} = false;
     P.Plot (1,1) {mustBeNumericOrLogical} = false;
+    P.GoBackStep (1,1) = true;
     
 end
-
+try
+    % if P.GoBackStep
+    %     [Step,Axis,Moving_Log] = AddGoBackSteps(Step,Axis,Moving_Log);
+    % end
+catch ff
+    d=4;
+end
 NewWS = WS;
 Newtree = tree;
 NewParentInd = ParentInd;
@@ -25,16 +32,18 @@ for Maneuver_ind = 1:length(Axis)
                 ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
                     AllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
     
-    if any(ConfigShifts)
-        Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1}, ConfigShifts);
-    end
+    
 
 
     if ~ OK
-        error("Maneuver num %d faild, enter to puse mode",Maneuver_ind);
-        % pause
+        if P.Plot
+            fprintf("Maneuver num %d faild, enter to puse mode\n",Maneuver_ind);
+        end
         
         break
+    end
+    if any(ConfigShifts)
+        Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1} = AddConfigShifts(Newtree.Data{NewParentInd,"IsomorphismMatrices1"}{1}, ConfigShifts);
     end
     if P.Plot
 
@@ -66,6 +75,8 @@ for Maneuver_ind = 1:length(Axis)
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end
 end
-
+WS = NewWS;
+tree = Newtree;
+ParentInd = NewParentInd;
 
 end

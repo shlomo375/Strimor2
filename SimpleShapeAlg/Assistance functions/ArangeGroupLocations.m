@@ -20,6 +20,12 @@ switch Direction
                 else
                     Displacment(Line) = inf;
                 end
+            else
+                if Line==2
+                    Displacment(Line) = -inf;
+                elseif Line == size(Edges,3)
+                    Displacment(Line) = inf;
+                end
             end
         end
 %         if matches(ManeuverType,"Reduce")
@@ -45,6 +51,12 @@ switch Direction
                 if Edges(1,1,Line)
                     Displacment(Line) = floor(Edges(2,2,Line) - (Edges(2,2,Line-1)));
                 else
+                    Displacment(Line) = -inf;
+                end
+            else
+                if Line==2
+                    Displacment(Line) = inf;
+                elseif Line == size(Edges,3)
                     Displacment(Line) = -inf;
                 end
             end

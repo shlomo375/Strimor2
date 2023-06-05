@@ -5,7 +5,7 @@ function [OK, Configuration, Movment, WS1, CollidingAgent] = MakeAMove(WS,dir,st
 
     [OK, MoveAgent2Ind, CollidingAgent, Alert] = ApproveMovment(WS,Movment,"Slide");
     if ~matches(Alert,"all good")
-    disp(Alert);
+        disp(Alert);
     end
     if OK
 

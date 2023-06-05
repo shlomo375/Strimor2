@@ -13,24 +13,38 @@ for file_idx = 1:size(files,1)
 
     %% Config to Config
     Exp = cell(size(Nodes,1)/2,1);
+
+    groupedTablesInd = accumarray(Nodes.ConfigRow, 1:size(Nodes,1), [], @(x) {x});
+    RowNum = unique(Nodes.ConfigRow);
+    
+    groupedTablesInd(RowNum==1|RowNum==N) = [];
+    RowNum(RowNum==1|RowNum==N) = [];
+    
+    PosibleDiff = 1:(max(RowNum)-2);
+
+    for DiffRow = PosibleDiff
+
+    end
+    
+
     for k = 1:numel(Exp)
         Exp{k} = {Nodes(2*k-1,:),Nodes(2*k,:)};
         fprintf("%s: %d\n",files(file_idx).name,k);
     end
     save(fullfile("SimpleShapeAlg","Experiments",join([extractBefore(files(file_idx).name,".mat"),"C2C.mat"],"_")),"Exp","BasicWS","Solution");
     
-    %% Config to Line to Config
-    
-    FlatWS = BasicWS;
-    FlatWS.Space.Status(1,1:N-1) = 1;
-    FlatWS.Space.Status(2,1) = 1;
-    Config = GetConfiguration(FlatWS);
-    Node = CreateNode(1);
-    Flat = ConfigStruct2Node(Node,Config);
-    Exp = cell(size(Nodes,1)/2,1);
-    for k = 1:numel(Exp)
-        Exp{k} = {Nodes(2*k-1,:),Flat,Nodes(2*k,:)};
-        fprintf("%s: %d\n",files(file_idx).name,k);
-    end
-    save(fullfile("SimpleShapeAlg","Experiments",join([extractBefore(files(file_idx).name,".mat"),"C2F.mat"],"_")),"Exp","BasicWS","Solution");
+    % %% Config to Line to Config
+    % 
+    % FlatWS = BasicWS;
+    % FlatWS.Space.Status(1,1:N-1) = 1;
+    % FlatWS.Space.Status(2,1) = 1;
+    % Config = GetConfiguration(FlatWS);
+    % Node = CreateNode(1);
+    % Flat = ConfigStruct2Node(Node,Config);
+    % Exp = cell(size(Nodes,1)/2,1);
+    % for k = 1:numel(Exp)
+    %     Exp{k} = {Nodes(2*k-1,:),Flat,Nodes(2*k,:)};
+    %     fprintf("%s: %d\n",files(file_idx).name,k);
+    % end
+    % save(fullfile("SimpleShapeAlg","Experiments",join([extractBefore(files(file_idx).name,".mat"),"C2F.mat"],"_")),"Exp","BasicWS","Solution");
 end

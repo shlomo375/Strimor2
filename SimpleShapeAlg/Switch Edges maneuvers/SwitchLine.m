@@ -13,6 +13,7 @@ Task = Task_Queue(end,:);
 
 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(WS, ConfigShift(:,1),Task.Downwards);
 TargetGroupSize = Tree.EndConfig.IsomorphismMatrices1{1};
+NumLine = nnz(GroupsSizes);
 
 Line = Task.Current_Line;
 
@@ -31,7 +32,7 @@ else
     GroupSizeRequired = [4,3];
     [OK, NewTask] = GroupSizeAsNeeded(GroupsSizes,TargetGroupSize,GroupSizeRequired,Line,Task.Downwards);
     if ~OK
-        Task_Queue(end+1,:) = NewTask;
+        Task_Queue((end+1):(end+size(NewTask,1)),:) = NewTask;
         return
     end
     Step = zeros(1,11);
@@ -51,6 +52,8 @@ else
         TopBottom_Step = floor(((Edges(2,2,Line+2)-(Edges(3,2,Line+2)==-1)) - (Edges(2,1,Line+1)+(Edges(3,1,Line+1)==1)))/2);
         Step(1:2) = [Top_Step,TopBottom_Step];
         Axis(1:2) = [1,1];
+
+       
         %%
         Step(3) = -1;
         Axis(3) = 3;
@@ -87,7 +90,8 @@ else
         TopBottom_Step = floor(((Edges(2,1,Line+2)+(Edges(3,1,Line+2)==-1)) - (Edges(2,2,Line+1)-(Edges(3,2,Line+1)==1)))/2);     
         Step(1:2) = [Top_Step,TopBottom_Step];
         Axis(1:2) = [1,1];
-
+        
+        
         %%
         Step(3) = 1;
         Axis(3) = 2;
@@ -178,7 +182,10 @@ if ~Task.Downwards
 end
 Moving_Log = [Moving_Log_Bottom, Moving_Log_Top];
 
-
+if NumLine<=2
+    Step(2) = 0;
+    Step(6) = 0;
+end
 RemoveStep = ~Step;
 Step(RemoveStep) = [];
 Axis(RemoveStep) = [];

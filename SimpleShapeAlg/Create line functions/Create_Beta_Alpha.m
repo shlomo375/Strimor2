@@ -15,19 +15,25 @@ if ~isempty(Edges)
         return
     end
 
-    Position_relative_buttom_group = [inf;0;-inf]; %article [2;0;inf]
+    Position_relative_buttom_group = [-1;0;-inf]; %article [2;0;inf]
     [Step, Axis] = ArangeGroupLocations(Direction,Edges,Position_relative_buttom_group,"Create");
  
     Moving_Log_Buttom(1,:) = true;
     Moving_Log_Top(1:2,:) = true;
 end
 
-Step = [Step, 1];
+Step = [Step, -1];
 Axis = [Axis, 3];
 
-Moving_Log_Buttom(3,1) = true;
-Moving_Log_Top(3,1:2) = true;
+Moving_Log_Top(3,1) = true;
 
+Step(4) = -1;
+Axis(4) = 1;
+Moving_Log_Top(4,2:end) = true;
 
+Step(5) = -1;
+Axis(5) = 2;
+Moving_Log_Top(5,1:2) = true;
+Moving_Log_Buttom(5,1) = true;
 
 end
