@@ -301,7 +301,8 @@ else % there isnt module in the same side
             else
                 Side = "Right";
             end
-            Task_Queue(2,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= -1 ,BetaDiff_Override= 0, Side = Side,WS=WS,ConfigShift=ConfigShift);
+            % BaseGroupLoc = size(StartConfig,1) - (BaseGroupLoc-1);
+            Task_Queue(2,:) = Module_Task_Allocation(StartConfig, TargetConfig, ~Downwards, BaseGroupLoc, AlphaDiff_Override= 1 ,BetaDiff_Override= 0, Side = Side,WS=WS,ConfigShift=ConfigShift);
         end
         % Task_Queue(2,:) = Module_Task_Allocation(StartConfig, TargetConfig, Downwards, Line, AlphaDiff_Override= 0 ,BetaDiff_Override= -1, Side = "Left",WS=WS,ConfigShift=ConfigShift);
         Task_Queue(1,:) = CreatTaskAllocationTable([],"ActionType","Switch","Current_Line",BaseGroupLoc,"Downwards",Downwards,"Type",0);

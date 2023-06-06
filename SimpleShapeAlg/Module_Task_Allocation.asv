@@ -200,7 +200,7 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                         AbsDiff = flip(AbsDiff);
                         
                     end
-                    Task = Get_Module_From_The_Other_Side(First_Right,Line,Addition.Side,-ReqiuerdType,Addition.totalDownwards,Downwards,Edges,[AbsDiff,Switch]);
+                    Task = Get_Module_From_The_Other_Side(First_Right,Line,Addition.Side,-ReqiuerdType,Addition.totalDownwards,Downwards,Edges,[AbsDiff,AlphaDiff,BetaDiff]);
                           
                     % Task = Get_Module_From_The_Other_Side(First_Right,DestenationLine,Addition.Side,ReqiuerdType,Addition.totalDownwards,Edges,AbsDiff);
 

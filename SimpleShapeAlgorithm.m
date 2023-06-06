@@ -96,9 +96,9 @@ LastTreeInd = Tree.LastIndex;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    % if ParentInd >= 113
-    %         d=5;
-    % end    
+    if ParentInd >= 318
+            d=5;
+    end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
     catch me
         me
