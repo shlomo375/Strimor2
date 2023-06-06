@@ -7,7 +7,7 @@
 % %% init
 % load;
 
-function [Tree,Error,msg] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode)
+function [Tree,Error,msg] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode,Ploting)
 % dbstop in NotTested at 12
 % dbstop if error
 % close all
@@ -16,7 +16,7 @@ function [Tree,Error,msg] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode)
 % Size = [N, 2*N];
 % BasicWS = WorkSpace(Size,"RRT*");
 Error = false;
-Ploting = 1;
+% Ploting = 1;
 try
 ConfigStruct_A = Node2ConfigStruct(StartNode);
 Start_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
@@ -96,7 +96,7 @@ LastTreeInd = Tree.LastIndex;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 318
+    if ParentInd >= 20
             d=5;
     end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
@@ -119,7 +119,7 @@ while size(Task_Queue,1) > 0
         LastTreeInd = Tree.LastIndex;
         KillSwitch = tic;
     end
-    if ParentInd >= 110
+    if ParentInd >= 22
             d=5;
     end    
   

@@ -6,28 +6,35 @@ AddDirToPath
 TestFile = dir("SimpleShapeAlg\Experiments");
 TestFile([TestFile.isdir]) = [];
 Num_Problem_In_Batch = 50;
+Ploting = 0;
 
 for ii = 1:numel(TestFile)
+    File_N(ii) = str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_")));
+end
+[~,loc] = sort(File_N);
+SortedTestFile = TestFile(loc);
+
+for ii = 1:numel(SortedTestFile)
     % if str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 100
-        load(fullfile(TestFile(ii).folder,TestFile(ii).name),"Exp","Solution")
+        load(fullfile(SortedTestFile(ii).folder,SortedTestFile(ii).name),"Exp","Solution")
         if size(Solution,2) == 1 
             Solution = cell(Num_Problem_In_Batch,(numel(Exp)/Num_Problem_In_Batch));
         end
         
-        N = str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_")));
+        N = str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_")));
         BasicWS = WorkSpace(2*[N,2*N],"RRT*");
         
         % problemSolve = 0;
-        parfor k = 0:(numel(Exp)/Num_Problem_In_Batch)
+        for k = 7:(numel(Exp)/Num_Problem_In_Batch)
             % if numel(Exp{k}) == 2
             tempSolution = cell(50, 1);  % Temporary variable to store results
-            for jj = 1:50
+            for jj = 12:50
                 stratTime = tic;
                 StartNode = Exp{Num_Problem_In_Batch*k+jj}{1};
                 TargetNode = Exp{Num_Problem_In_Batch*k+jj}{2};
                 
                 % if StartNode.ConfigRow < TargetNode.ConfigRow
-                [Tree, error,msg] = SimpleShapeAlgorithm(BasicWS, N, StartNode, TargetNode);
+                [Tree, error,msg] = SimpleShapeAlgorithm(BasicWS, N, StartNode, TargetNode,Ploting);
                 
                 if error
                     % NotTested("error!!!!!!!!\n");
