@@ -16,7 +16,7 @@ function [Tree,Error,msg] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode)
 % Size = [N, 2*N];
 % BasicWS = WorkSpace(Size,"RRT*");
 Error = false;
-Ploting = 0;
+Ploting = 1;
 try
 ConfigStruct_A = Node2ConfigStruct(StartNode);
 Start_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
@@ -87,8 +87,8 @@ arguments
     Ploting = false;
     KillSwitch = inf;
 end
-% Ploting = false;
-Ploting = true;
+
+
 LastTreeInd = Tree.LastIndex;
     Error = false;
     msg = "";
@@ -113,15 +113,15 @@ while size(Task_Queue,1) > 0
         if toc(KillSwitch) > 10
             Error = true;
             msg = "TimeOut";
-            return
+            % return
         end
     else
         LastTreeInd = Tree.LastIndex;
         KillSwitch = tic;
     end
-    % if ParentInd >= 130
-    %         d=5;
-    % end    
+    if ParentInd >= 110
+            d=5;
+    end    
   
     % if ~Task_Queue{end,"Downwards"}
     %     d=5

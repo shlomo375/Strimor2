@@ -18,10 +18,10 @@ for ii = 1:numel(TestFile)
         BasicWS = WorkSpace(2*[N,2*N],"RRT*");
         
         % problemSolve = 0;
-        for k = 4:(numel(Exp)/Num_Problem_In_Batch)
+        for k = 3:(numel(Exp)/Num_Problem_In_Batch)
             % if numel(Exp{k}) == 2
             tempSolution = cell(50, 1);  % Temporary variable to store results
-            for jj = 5:50
+            for jj = 1:50
                 stratTime = tic;
                 StartNode = Exp{Num_Problem_In_Batch*k+jj}{1};
                 TargetNode = Exp{Num_Problem_In_Batch*k+jj}{2};
@@ -30,9 +30,10 @@ for ii = 1:numel(TestFile)
                 [Tree, error,msg] = SimpleShapeAlgorithm(BasicWS, N, StartNode, TargetNode);
                 
                 if error
-                    NotTested("error!!!!!!!!\n");
+                    % NotTested("error!!!!!!!!\n");
                     % beep
                     tempSolution(jj) = {msg};
+                    disp(msg)
                     fprintf("batch: %d, problem idx: %d , error!!!!!!!!\n", k+1,jj);
                 else
                     tempSolution(jj) = {Tree.Data(1:Tree.LastIndex, :)};
