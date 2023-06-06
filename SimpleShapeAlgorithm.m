@@ -113,7 +113,7 @@ while size(Task_Queue,1) > 0
         if toc(KillSwitch) > 10
             Error = true;
             msg = "TimeOut";
-            % return
+            return
         end
     else
         LastTreeInd = Tree.LastIndex;
@@ -127,11 +127,6 @@ while size(Task_Queue,1) > 0
     %     d=5
     % end
     try
-        % Line
-        % l=find(Tree.Data.IsomorphismMatrices1{Tree.LastIndex}~=TargetConfig_GroupMatrix,1,"Last")
-        % if Line~=l
-        %     d=4
-        % end
     switch Task_Queue(end,:).ActionType
     
         case "TransitionModules"
@@ -145,7 +140,6 @@ while size(Task_Queue,1) > 0
             LineCreated = true;
     end
 
-    % fprintf("Config number: %d\n",ParentInd)
     NewCA = centerOfArea(WS);
     CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
     if CorrectionSteps >= Tree.N/5
@@ -156,17 +150,12 @@ while size(Task_Queue,1) > 0
         Error = true;
         msg = memanuvers;
         return
-    % Task_Queue(end,:).Current_Line     
+        
     end
 
-    %%
-    % if toc(KillSwitch) > 5
-    %     Error = true;
-    %     msg = "TimeOut";
-    %     return
-    % end
+    
 end
-% d=5;
+
 end
 
 

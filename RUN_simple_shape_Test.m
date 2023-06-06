@@ -8,7 +8,7 @@ TestFile([TestFile.isdir]) = [];
 Num_Problem_In_Batch = 50;
 
 for ii = 1:numel(TestFile)
-    if str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 100
+    % if str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 100
         load(fullfile(TestFile(ii).folder,TestFile(ii).name),"Exp","Solution")
         if size(Solution,2) == 1 
             Solution = cell(Num_Problem_In_Batch,(numel(Exp)/Num_Problem_In_Batch));
@@ -18,10 +18,10 @@ for ii = 1:numel(TestFile)
         BasicWS = WorkSpace(2*[N,2*N],"RRT*");
         
         % problemSolve = 0;
-        for k = 6:(numel(Exp)/Num_Problem_In_Batch)
+        parfor k = 0:(numel(Exp)/Num_Problem_In_Batch)
             % if numel(Exp{k}) == 2
             tempSolution = cell(50, 1);  % Temporary variable to store results
-            for jj = 5:50
+            for jj = 1:50
                 stratTime = tic;
                 StartNode = Exp{Num_Problem_In_Batch*k+jj}{1};
                 TargetNode = Exp{Num_Problem_In_Batch*k+jj}{2};
@@ -65,5 +65,5 @@ for ii = 1:numel(TestFile)
         
 
 
-    end
+    % end
 end
