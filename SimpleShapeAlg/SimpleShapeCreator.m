@@ -1,15 +1,13 @@
 %% simple shape creator
-AddDirToPath()
-ProblemNum = 2e3;
-N = 100;
-TEMP = cell(7,1);
+% AddDirToPath()
+% ProblemNum = 2e3;
+% N = 100;
+% TEMP = cell(7,1);
 
-for N = 100
+function [Nodes] = SimpleShapeCreator(N,ProblemNum)
   
     BasicWS = WorkSpace([N,N*2],"RRT*");
-    RotationMatrices = {BasicWS.R1,BasicWS.R2,BasicWS.R3};
-    % TEMP(NN) = {BasicWS};
-    % save(join(["BasicWS",string(N)],"_"),"BasicWS");
+
     GroupSize = Create_GroupSize(N,ProblemNum);
     % timeit(@()Create_GroupSize(N,ProblemNum))
     
@@ -33,8 +31,9 @@ end
 
 
 function GroupSize = Create_GroupSize(ModuleNum,ProblemNum)
-GroupSize = [];    
-for ii = linspace(ModuleNum/10,ModuleNum*9/10,9)
+GroupSize = [];
+
+for ii = [linspace(ModuleNum/10,ModuleNum*5/10,7),linspace(ModuleNum*6/10,ModuleNum*9/10,2)]
     GroupSize = [GroupSize, 5+randi(round(ii),ModuleNum/2,round(ProblemNum/8))];
 end
 Total_Module_In_Config = cumsum(GroupSize,1);
