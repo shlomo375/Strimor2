@@ -75,7 +75,7 @@ end
 
 [Moving_Log,AllModuleInd] = AddAboveModule(Line+1,AllModuleInd,GroupsInds,Step,Axis, Moving_Log, Task.Downwards);
 catch eeee
-    eeee
+    throw(eeee)
 end
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
 

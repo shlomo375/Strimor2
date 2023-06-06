@@ -46,14 +46,14 @@ WS.DoSplittingCheck = false;
 ParentInd = 1;
 
 Start_WS.Center_Of_Area = centerOfArea(Start_WS);
-KillSwitch = tic;
+
 while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:))
     Line = find(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:),1,"last");
     % if Line ==3
     %     d=5;
     % end
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetNode.IsomorphismMatrices1{1}(Line,:)) 
-        [Start_WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting,KillSwitch);
+        [Start_WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting);
         if LineCreated
             break
         end
@@ -88,7 +88,8 @@ arguments
     KillSwitch = inf;
 end
 % Ploting = false;
-% Ploting = true;
+Ploting = true;
+LastTreeInd = Tree.LastIndex;
     Error = false;
     msg = "";
     LineCreated = false;
@@ -101,9 +102,23 @@ end
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
     catch me
         me
+        Error = true;
+        msg = me;
+        return
     end
     % end
+KillSwitch = tic;
 while size(Task_Queue,1) > 0
+    if LastTreeInd == Tree.LastIndex
+        if toc(KillSwitch) > 10
+            Error = true;
+            msg = "TimeOut";
+            return
+        end
+    else
+        LastTreeInd = Tree.LastIndex;
+        KillSwitch = tic;
+    end
     % if ParentInd >= 130
     %         d=5;
     % end    
@@ -138,15 +153,18 @@ while size(Task_Queue,1) > 0
     end
     catch memanuvers
         memanuvers
+        Error = true;
+        msg = memanuvers;
+        return
     % Task_Queue(end,:).Current_Line     
     end
 
     %%
-    if toc(KillSwitch) > 5
-        Error = true;
-        msg = "TimeOut";
-        return
-    end
+    % if toc(KillSwitch) > 5
+    %     Error = true;
+    %     msg = "TimeOut";
+    %     return
+    % end
 end
 % d=5;
 end
