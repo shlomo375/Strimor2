@@ -96,7 +96,7 @@ LastTreeInd = Tree.LastIndex;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 20
+    if ParentInd >= 77
             d=5;
     end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
@@ -104,7 +104,9 @@ LastTreeInd = Tree.LastIndex;
         me
         Error = true;
         msg = me;
-        return
+        if ~Ploting
+            return
+        end
     end
     % end
 KillSwitch = tic;
@@ -119,7 +121,7 @@ while size(Task_Queue,1) > 0
         LastTreeInd = Tree.LastIndex;
         KillSwitch = tic;
     end
-    if ParentInd >= 22
+    if ParentInd >= 80
             d=5;
     end    
   

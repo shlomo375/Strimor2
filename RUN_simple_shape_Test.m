@@ -25,7 +25,7 @@ for ii = 1:numel(SortedTestFile)
         BasicWS = WorkSpace(2*[N,2*N],"RRT*");
         
         % problemSolve = 0;
-        for k = 7:(numel(Exp)/Num_Problem_In_Batch)
+        parfor k = 7:(numel(Exp)/Num_Problem_In_Batch)
             % if numel(Exp{k}) == 2
             tempSolution = cell(50, 1);  % Temporary variable to store results
             for jj = 12:50

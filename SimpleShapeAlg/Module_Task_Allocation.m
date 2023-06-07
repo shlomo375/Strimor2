@@ -117,9 +117,11 @@ ReturnFlag = false;
         end
         if ReturnFlag && AddNewLine
             
-            Task(2,:) = Task;
+            % Task(2,:) = Task;
 
-            Task(1,:) = CreateLineTask(StartConfig,LineToCreate,Downwards,Addition.Side,AbsDiff);
+            TempTask = CreateLineTask(StartConfig,LineToCreate,Downwards,Addition.Side,AbsDiff);
+            Task = [TempTask;Task];
+
             % LineToCreate = numel(StartConfig)-LineToCreate+1;
             % Task(1,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",LineToCreate,"Current_Line_Beta",LineToCreate,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Addition.Side);
 
@@ -303,18 +305,32 @@ end
 
 function Task = CreateLineTask(StartConfig,Line,Downwards,Side,AbsDiff)
 
-    Line = numel(StartConfig)-Line+1;
-    Task(2,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",Line,"Current_Line_Beta",Line,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Side);
+    DestenationLine = numel(StartConfig)-Line+1;
+    Task(4,:) = CreatTaskAllocationTable([],"ActionType","CreateLine","Current_Line_Alpha",DestenationLine,"Current_Line_Beta",DestenationLine,"Downwards",~Downwards,"Type",0,"DestenationLine",0,"Side",Side);
     
 
-    DestenationLine = Line; %size(StartConfig,1)-(Line-1);
+    % DestenationLine = Line; %size(StartConfig,1)-(Line-1);
     
-    StartLine = find(AbsDiff(1:Line-1)<0,1,"last");
-    % StartLine = find(abs(StartConfig(Line+1:end))>=4,1,"last");
-    StartLine = size(StartConfig,1)+1 - StartLine; 
+    for ii = 3:-1:2
+        StartLine = find(AbsDiff<0,1,"first");
+        AbsDiff(StartLine) = AbsDiff(StartLine) +2;
+        % StartLine = find(abs(StartConfig(Line+1:end))>=4,1,"last");
+        % StartLine = size(StartConfig,1)+1 - StartLine; 
+    
+        Task(ii,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",StartLine,"Current_Line_Beta",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",Line,"Side",Side);
+    end  
+    
+    
+    if matches(Side,"Right")
+        Edges = EndIsAlpha(StartConfig);
+        StartLine = find(Edges==0,1,"first");
+    else
+        Edges = StartConfig<0;
+        StartLine = find(Edges,1,"first");
+    end
+    Task(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",Line,"Side",Side);
+     
 
-    Task(1,:) = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",StartLine,"Current_Line_Beta",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",DestenationLine,"Side",Side);
-                
 
 end
 
