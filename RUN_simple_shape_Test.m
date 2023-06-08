@@ -2,13 +2,14 @@
 clear
 close all
 AddDirToPath
-% TestType = "C2C";
+
 TestFile = dir("SimpleShapeAlg\Experiments");
 SolutionFolder = fullfile(pwd,"SimpleShapeAlg\Solutions");
 mkdir(SolutionFolder);
 TestFile([TestFile.isdir]) = [];
-Num_Problem_In_Batch = 50;
+Num_Problem_In_Batch = 100;
 Ploting = 0;
+FevalArray = 100;
 
 File_N=[];
 for ii = 1:numel(TestFile)
@@ -17,45 +18,36 @@ end
 [~,loc] = sort(File_N);
 SortedTestFile = TestFile(loc);
 
+f(1:FevalArray) = parallel.FevalFuture;
+LastTask = 1;
+F_idx = 1;
 for ii = 1:numel(SortedTestFile)
-    % if str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_"))) == 100
-        load(fullfile(SortedTestFile(ii).folder,SortedTestFile(ii).name),"Exp","Solution")
-        if size(Solution,2) == 1 
-            Solution = cell(Num_Problem_In_Batch,(numel(Exp)/Num_Problem_In_Batch));
-        end
-        
-        N = str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_")));
-        BasicWS = WorkSpace(2*[N,2*N],"RRT*");
-
-        % problemSolve = 0;
-        parfor k = 0:(numel(Exp)/Num_Problem_In_Batch-1)
-            % if numel(Exp{k}) == 2
-            tempSolution = cell(50, 1);  % Temporary variable to store results
-            for jj = 1:50
-                stratTime = tic;
-                StartNode = Exp{Num_Problem_In_Batch*k+jj}{1};
-                TargetNode = Exp{Num_Problem_In_Batch*k+jj}{2};
-                
-                % if StartNode.ConfigRow < TargetNode.ConfigRow
-                [Tree, error,msg] = SimpleShapeAlgorithm(BasicWS, N, StartNode, TargetNode,Ploting);
-                
-                if error
-                    % NotTested("error!!!!!!!!\n");
-                    % beep
-                    
-                    tempSolution(jj) = {msg};
-                    disp(msg)
-                    fprintf("batch: %d, problem idx: %d , error!!!!!!!!\n", k+1,jj);
-                else
-                    tempSolution(jj) = {Tree.Data(1:Tree.LastIndex, :)};
-                    % problemSolve = problemSolve+1;
-                    fprintf("batch: %d, problem idx: %d , time: %.1f\n", k+1,jj,toc(stratTime));
-                end
-            end
-            Solution(:,k+1) = {tempSolution};  % Assign results outside the parfor loop
-        end
-
+    if str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_"))) == 100
+    load(fullfile(SortedTestFile(ii).folder,SortedTestFile(ii).name),"Exp","Solution")
+    if size(Solution,2) == 1 
+        Solution = cell(Num_Problem_In_Batch,(numel(Exp)/Num_Problem_In_Batch));
+    end
     
-        save(fullfile(SolutionFolder,join(["N",string(N),".mat"])),"Solution");
-   
+    N = str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_")));
+    BasicWS = WorkSpace(2*[N,2*N],"RRT*");
+    
+    if F_idx+size(Exp,2) > size(f,1)
+        f(end+1:end+FevalArray) = parallel.FevalFuture;
+    end
+    
+    for idx = 1:size(Exp,2)
+        
+        f(F_idx) = parfeval(@SolveBatchSimpleProblem,0,Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
+        % [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
+        F_idx = F_idx + 1
+    end
+    end
+end
+f(F_idx:end) = [];
+
+% magicResults = cell(1,10);
+for idx = 1:F_idx
+    completedIdx = fetchNext(f);
+    disp(f)
+    fprintf('Got result with index: %d/%d, working time: %s.\n', completedIdx,F_idx,f(completedIdx).RunningDuration);
 end
