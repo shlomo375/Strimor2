@@ -22,11 +22,9 @@ f(1:FevalArray) = parallel.FevalFuture;
 LastTask = 1;
 F_idx = 1;
 for ii = 1:numel(SortedTestFile)
-    if str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_"))) == 100
+    % if str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_"))) == 100
     load(fullfile(SortedTestFile(ii).folder,SortedTestFile(ii).name),"Exp","Solution")
-    if size(Solution,2) == 1 
-        Solution = cell(Num_Problem_In_Batch,(numel(Exp)/Num_Problem_In_Batch));
-    end
+    
     
     N = str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_")));
     BasicWS = WorkSpace(2*[N,2*N],"RRT*");
@@ -41,7 +39,7 @@ for ii = 1:numel(SortedTestFile)
         % [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
         F_idx = F_idx + 1
     end
-    end
+    % end
 end
 f(F_idx:end) = [];
 
