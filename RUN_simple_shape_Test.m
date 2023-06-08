@@ -4,6 +4,8 @@ close all
 AddDirToPath
 % TestType = "C2C";
 TestFile = dir("SimpleShapeAlg\Experiments");
+SolutionFolder = fullfile(pwd,"Solutions");
+mkdir(SolutionFolder);
 TestFile([TestFile.isdir]) = [];
 Num_Problem_In_Batch = 50;
 Ploting = 0;
@@ -52,5 +54,7 @@ for ii = 1:numel(SortedTestFile)
             Solution(:,k+1) = {tempSolution};  % Assign results outside the parfor loop
         end
 
-     
+    
+        save(fullfile(SolutionFolder,join(["N",string(N),".mat"])),"Solution");
+   
 end
