@@ -4,6 +4,7 @@ Solution = cell(Num_Problem_In_Batch,1);
 ErrorProblem = cell(1,1);
 ii = 1;
 for jj = 1:Num_Problem_In_Batch
+    try
     stratTime = tic;
     StartNode = Exp{jj}{1};
     TargetNode = Exp{jj}{2};
@@ -13,7 +14,7 @@ for jj = 1:Num_Problem_In_Batch
 
     if error 
         Solution(jj) = {msg};
-        ErrorProblem(ii) = {StartNode;TargetNode};
+        ErrorProblem(ii) =  {{StartNode,TargetNode}};
         ii = ii + 1;
         disp(msg)
         fprintf("batch: %d, problem idx: %d , error!!!!!!!!\n", Batch_idx,jj);
@@ -21,6 +22,9 @@ for jj = 1:Num_Problem_In_Batch
         Solution(jj) = {Tree.Data(1:Tree.LastIndex, :)};
         % problemSolve = problemSolve+1;
         fprintf("batch: %d, problem idx: %d , time: %.1f\n", Batch_idx,jj,toc(stratTime));
+    end
+    catch e
+        e
     end
 end
 
