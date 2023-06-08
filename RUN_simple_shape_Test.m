@@ -4,12 +4,13 @@ close all
 AddDirToPath
 % TestType = "C2C";
 TestFile = dir("SimpleShapeAlg\Experiments");
-SolutionFolder = fullfile(pwd,"Solutions");
+SolutionFolder = fullfile(pwd,"SimpleShapeAlg\Solutions");
 mkdir(SolutionFolder);
 TestFile([TestFile.isdir]) = [];
 Num_Problem_In_Batch = 50;
 Ploting = 0;
 
+File_N=[];
 for ii = 1:numel(TestFile)
     File_N(ii) = str2double(cell2mat(extractBetween(TestFile(ii).name,"N_","_")));
 end
@@ -27,7 +28,7 @@ for ii = 1:numel(SortedTestFile)
         BasicWS = WorkSpace(2*[N,2*N],"RRT*");
 
         % problemSolve = 0;
-        parfor k = 0:(numel(Exp)/Num_Problem_In_Batch)
+        parfor k = 0:(numel(Exp)/Num_Problem_In_Batch-1)
             % if numel(Exp{k}) == 2
             tempSolution = cell(50, 1);  % Temporary variable to store results
             for jj = 1:50
