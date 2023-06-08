@@ -23,12 +23,12 @@ for ii = 1:numel(SortedTestFile)
         
         N = str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_")));
         BasicWS = WorkSpace(2*[N,2*N],"RRT*");
-        
+
         % problemSolve = 0;
-        parfor k = 7:(numel(Exp)/Num_Problem_In_Batch)
+        for k = 0:(numel(Exp)/Num_Problem_In_Batch)
             % if numel(Exp{k}) == 2
             tempSolution = cell(50, 1);  % Temporary variable to store results
-            for jj = 12:50
+            for jj = 1:50
                 stratTime = tic;
                 StartNode = Exp{Num_Problem_In_Batch*k+jj}{1};
                 TargetNode = Exp{Num_Problem_In_Batch*k+jj}{2};
@@ -52,25 +52,5 @@ for ii = 1:numel(SortedTestFile)
             Solution(:,k+1) = {tempSolution};  % Assign results outside the parfor loop
         end
 
-                % end
-            % else
-            %     StartNode = Exp{k}{1};
-            %     TargetNode = Exp{k}{2};
-            %     [Tree1,error1] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode);
-            % 
-            % 
-            %     StartNode = Exp{k}{3};
-            %     TargetNode = Exp{k}{2};
-            %     [Tree2,error2] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode);
-            % 
-            %     if error2 || error1
-            %         Solution{k} = "error"
-            %     else
-            %         Solution{k} = {Tree1.Data(1:Tree.LastIndex,:),Tree2.Data(1:Tree.LastIndex,:);};
-            %     end
-            % end
-        
-
-
-    % end
+     
 end

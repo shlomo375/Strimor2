@@ -96,7 +96,7 @@ LastTreeInd = Tree.LastIndex;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 77
+    if ParentInd >= 282
             d=5;
     end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
@@ -111,17 +111,19 @@ LastTreeInd = Tree.LastIndex;
     % end
 KillSwitch = tic;
 while size(Task_Queue,1) > 0
-    if LastTreeInd == Tree.LastIndex
-        if toc(KillSwitch) > 10
+    if LastTreeInd == Tree.LastIndex 
+        if toc(KillSwitch) > 10 && ~Ploting
             Error = true;
             msg = "TimeOut";
+             
             return
+            
         end
     else
         LastTreeInd = Tree.LastIndex;
         KillSwitch = tic;
     end
-    if ParentInd >= 80
+    if ParentInd >= 284
             d=5;
     end    
   
@@ -144,8 +146,8 @@ while size(Task_Queue,1) > 0
 
     NewCA = centerOfArea(WS);
     CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
-    if CorrectionSteps >= Tree.N/5
-        [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);[WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);
+    if CorrectionSteps >= Tree.N/6
+        [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);
     end
     catch memanuvers
         memanuvers

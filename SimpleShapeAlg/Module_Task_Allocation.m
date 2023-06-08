@@ -218,14 +218,14 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 StartLine = find(AbsDiff(1:Line-1)<0,1,"last");
                 % StartLine = find(abs(StartConfig(Line+1:end))>=4,1,"last");
                 StartLine = size(StartConfig,1)+1 - StartLine; % When you need to bring 2 to fill a missing row, take from the closest row below it which has 4 modules or more.
-                % if isempty(StartLine)
-                %     if ~Downwards
-                %         StartConfig = flip(StartConfig);
-                %     end
-                %     StartLine = Line+ find(abs(StartConfig(Line+1:end))>=4,1,"first");
-                %     DestenationLine = Line;
-                %     Downwards = ~Downwards;
-                % end
+                if isempty(StartLine)
+                    if ~Downwards
+                        StartConfig = flip(StartConfig);
+                    end
+                    StartLine = find(AbsDiff<0,1,"first");
+                    DestenationLine = Line;
+                    Downwards = ~Downwards;
+                end
                 Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",StartLine,"Current_Line_Beta",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",DestenationLine,"Side",Addition.Side);
                 return
             end

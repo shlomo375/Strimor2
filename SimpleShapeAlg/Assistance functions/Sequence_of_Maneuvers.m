@@ -28,14 +28,14 @@ for Maneuver_ind = 1:length(Axis)
 %     if Maneuver_ind==6
 %         d=5
 %     end
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(Moving_Log(Maneuver_ind,:))] =...
+    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(Moving_Log(Maneuver_ind,:)),Error] =...
                 ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
                     AllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
-    
     
 
 
     if ~ OK
+        
         if P.Plot
             fprintf("Maneuver num %d faild, enter to puse mode\n",Maneuver_ind);
         end
@@ -75,6 +75,7 @@ for Maneuver_ind = 1:length(Axis)
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end
 end
+
 WS = NewWS;
 tree = Newtree;
 ParentInd = NewParentInd;
