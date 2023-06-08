@@ -4,9 +4,9 @@ function [OK, Configuration, Movment, WS1, CollidingAgent,Alert] = MakeAMove(WS,
     Movment = WorkSpace.MovmentStructure(dir,step,Agent);
 
     [OK, MoveAgent2Ind, CollidingAgent, Alert] = ApproveMovment(WS,Movment,"Slide");
-    if matches(Alert,"movment outside workspace area.")
-        disp(Alert);
-    end
+    % if matches(Alert,"movment outside workspace area.")
+    %     disp(Alert);
+    % end
     if OK
 
         WS1 = ChangeAgentLoc(WS,MoveAgent2Ind,Movment.Agent);
