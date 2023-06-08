@@ -1,5 +1,6 @@
 function IsAlpha = FirstIsAlpha(GroupSize)
 
-IsAlpha = GroupSize>0;
+IsAlpha = double(GroupSize>0);
+IsAlpha(~GroupSize) = nan;
 
 end

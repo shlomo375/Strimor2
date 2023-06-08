@@ -1,14 +1,23 @@
 %% Line flattening algorithm
 
 
-function [Sucsses, Path] = OneGroupLineFlatteningAlgorithm(Config,Flat)
+function [Sucsses, Path] = OneGroupLineFlatteningAlgorithm(Config,Flat,TimeOut,TimerON)
 %%
+
+arguments 
+    Config
+    Flat
+    TimeOut
+    TimerON = true;
+end
+
+
 Sucsses = true;
 N = sum(logical(Config.ConfigMat{:}),"all");
 
 ConfigStruct = Node2ConfigStruct(Config);
-% PlotWorkSpace(WS,[]);
-WsSize = [N, 2*N];
+% PlotWorkSpace(WS);
+WsSize = [N, 4*N];
 BasicWS = WorkSpace(WsSize,"RRT*");
 WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
 %%
@@ -16,31 +25,37 @@ WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
 Tree = TreeClass("", N, 1e3, Config,Flat);
 
 % figure(1)
-% PlotWorkSpace(WS,[],[]);
+% PlotWorkSpace(WS,[]);
 %%
-SpreadingDir = -1;
+SpreadingDir = "Left_Right";
 ParentInd = 1;
 OldWS = WS;
 Break = 0;
+
+TimeOut_Clock = tic;
 while 1
-
-[WS, Tree,  ParentInd] = SpreadingAllAtOnes(WS,Tree,ParentInd,SpreadingDir);
-% figure(2)
-% PlotWorkSpace(WS,[],[]);
-% [tree,WS, GroupInd] = SpreadingOneGroupInLine(WS,Tree,GroupInd,1,1,1);
-% PlotWorkSpace(WS,[],[]);
-
-[WS,Tree, ParentInd] = ReducingRowsOneGroupInLine(WS, Tree, ParentInd, SpreadingDir);
+try
+if toc(TimeOut_Clock) > TimeOut && TimerON
+    Sucsses = false;
+    Path = Tree.Data(1:Tree.LastIndex,:);
+    return
+end
 % figure(3)
-% PlotWorkSpace(WS,[],[]);
+% PlotWorkSpace(WS,[]);
+[WS,Tree, ParentInd] = SpreadAndReduce(WS,Tree, ParentInd,SpreadingDir);
+% PlotWorkSpace(WS,"Plot_CellInd",true)
+[WS,Tree, ParentInd] = Expend(WS,Tree, ParentInd,SpreadingDir);
 
 [WS,Tree, ParentInd] = FlatteningSpecialLines(WS,Tree, ParentInd);
+
 % figure(4)
-% PlotWorkSpace(WS,[],[]);
+% PlotWorkSpace(WS,[]);
 
 [WS,Tree, ParentInd] =  GroupsUnification(WS, Tree, ParentInd);
+
+[WS,Tree, ParentInd] =  BaseUnification(WS, Tree, ParentInd);
 % figure(5)
-% PlotWorkSpace(WS,[],[]);
+% PlotWorkSpace(WS,[]);
 
 [WS,Tree, ParentInd] =  DualModuleOnly(WS, Tree, ParentInd);
 
@@ -56,8 +71,11 @@ if isequal(WS.Space.Status,OldWS.Space.Status)
     end
 end
 % figure(6)
-% PlotWorkSpace(WS,[],[]);
-SpreadingDir = -SpreadingDir;
+% PlotWorkSpace(WS,[]);
+SpreadingDir = setdiff(["Left_Right","Right_Left"],SpreadingDir);
+catch eee
+    eee
+end
 end
 
 Path = Tree.Data(1:Tree.LastIndex,:);

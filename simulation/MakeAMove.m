@@ -1,13 +1,15 @@
-function [OK, Configuration, Movement, WS1, CollidingAgent] = MakeAMove(WS,dir,step, Agent)
+function [OK, Configuration, Movment, WS1, CollidingAgent,Alert] = MakeAMove(WS,dir,step, Agent)
     Configuration = [];
-    WS1 = [];
-    Movement = WorkSpace.MovmentStructure(dir,step,Agent);
+    
+    Movment = WorkSpace.MovmentStructure(dir,step,Agent);
 
-    [OK, MoveAgent2Ind, CollidingAgent, Alert] = ApproveMovment(WS,Movement,"Slide");
-
+    [OK, MoveAgent2Ind, CollidingAgent, Alert] = ApproveMovment(WS,Movment,"Slide");
+    % if matches(Alert,"movment outside workspace area.")
+    %     disp(Alert);
+    % end
     if OK
 
-        WS1 = ChangeAgentLoc(WS,MoveAgent2Ind,Movement.Agent);
+        WS1 = ChangeAgentLoc(WS,MoveAgent2Ind,Movment.Agent);
 
         try
         [OK, Alert] = SplittingCheck(WS1,MoveAgent2Ind(1));
@@ -20,5 +22,7 @@ function [OK, Configuration, Movement, WS1, CollidingAgent] = MakeAMove(WS,dir,s
             Configuration = GetConfiguration(WS1);
 
         end
+    else
+        WS1=WS;
     end
 end

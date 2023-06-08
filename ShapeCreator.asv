@@ -1,33 +1,36 @@
 clear
 SoftwareLocation = pwd;
-AddDirToPath;
-cd(SoftwareLocation);
+% addpath(genpath(SoftwareLocation));
 
-PairsNum = 200;
+PairsNum = 2;
 Stock = [];
 ConfigPairs = [];
-for AgentNum = 24:40
-    CP = GetConfigPairs(AgentNum,PairsNum);
-    mkdir(fullfile(SoftwareLocation,"configuration\OptimalConfigPairs"));
-    try
-        load(strcat("configuration\OptimalConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
-    catch
-        save(strcat("configuration\OptimalConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
-    end
-    ConfigPairs = [ConfigPairs,CP];
-    save(strcat("configuration\OptimalConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+AgentNum = 100;
+MaxConfigNum = 100000;
+WS = WorkSpace([AgentNum,AgentNum*2],"RRT*");
+
+for N = AgentNum
+    for ConfigNum = 1:MaxConfigNum
 end
 
-function ConfigPairs = GetConfigPairs(N,NumOfPairs)
+% for AgentN = AgentNum
+%     CP = GetConfigPairs(WS,AgentNum,PairsNum);
+%     try
+%         load(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+%     end
+%     ConfigPairs = [ConfigPairs,CP];
+%     save(strcat("configuration\ConfigPairs\N",string(AgentNum),".mat"),"ConfigPairs");
+% end
+
+function ConfigPairs = GetConfigPairs(WS,N,NumOfPairs)
     Stock = [];
     ConfigPairs = [];
-    WS = WorkSpace([N,N*2],"RRT*");
     while size(ConfigPairs,2) < NumOfPairs
         try    
-        Config = CreatShape(N,WS);
-        flag2 = false;
+            [Config,NewWS] = CreatShape(WS,N);
+            flag2 = false;
         catch e
-            e;
+            e
         end
             if isempty(Stock)
                 Stock{1} = Config;
@@ -45,24 +48,19 @@ function ConfigPairs = GetConfigPairs(N,NumOfPairs)
                 end
             end
             
-            for ii = 1:numel(Stock)
-                try
+            for ii = 1:size(Stock)
                 if isequal(Config,Stock{ii})
                     break
                 end
-                catch eee
-                    eee
-                end
                 Cost = Cost2Target(Config.Status,Config.Type,Stock{ii}.Status,Stock{ii}.Type);
-                if Cost <=0.9*N
+                if Cost <=0.75*N
                     flag2 = true;
                 end
-                if Cost <= 0.7*N
+                if Cost <= 0.5*N
                     ConfigPairs{end+1} = {Config,Stock{ii}};
                     Stock(ii) = [];
-                    fprintf("N: " + N+"   pairs found: "+numel(ConfigPairs)+" stock size"+numel(Stock)+"\n");
+                    fprintf("N: " + N+"   pairs found: "+numel(ConfigPairs)+"\n");
                     flag2 = false;
-                    break
                 end
                 
             end
@@ -77,72 +75,43 @@ function ConfigPairs = GetConfigPairs(N,NumOfPairs)
 end
 
 
-function Config = CreatShape(N,BasicWS)
-    space = zeros(N,N*2);
-    space(ceil(N/2),N) = 1;
-    male = 1;
-    female = 0;
-   
-    NumAlpha = ceil(N/2)+floor(0.125*N);
-    NumBeta = floor(N/2)+floor(0.125*N);
-    space = AddAgent(space,1);
+function [Config,NewWS] = CreatShape(WS,N)
+WS.Space.Status(floor(WS.SpaceSize(1)/2),floor(WS.SpaceSize(2)/2):floor(WS.SpaceSize(2)/2)+1) = 1;
+male = 1;
 
-    while (male<NumAlpha) || (female<NumBeta)
-        type = randi(2,1);
-        switch type
-            case 1
-                if male<NumAlpha
-                    space = AddAgent(space,-1);
+female = 1;
+
+while (male<N/2) || (female<N/2)
+    type = randi(2,1);
+    switch type
+        case 1
+            if male<N/2
+                [WS,Sucsses] = AddAgent(WS,-1);
+                if Sucsses
+                    male = male+1;
+                end
+            end
+            
+        case 2
+            if female<N/2
+                [WS,Sucsses] = AddAgent(WS,1);
+                if Sucsses
+                    female = female+1;
                 end
                 
-            case 2
-                if female<NumBeta
-                    space = AddAgent(space,1);
-                end     
-        end
-        male = sum(space==1,"all");
-        female = sum(space==-1,"all");
-    
+            end     
     end
-    
-    RemoveNumAlpha = NumAlpha - ceil(N/2);
-    RemoveNumBeta = NumBeta - floor(N/2);
-%     i=0
-    for idx = 1:100
-%         sum(abs(space),"all")
-        NewSpace = RemoveAgent(space,1,RemoveNumAlpha);
-        NewSpace = RemoveAgent(NewSpace,-1,RemoveNumBeta);
-   
-        type = ones(size(NewSpace,1),1);
-        type(2:2:end) = -1;
-        temp = ones(1,size(NewSpace,2));
-        temp(2:2:end) = -1;
-        type = type.*temp;
-    
-        agent = find(NewSpace==1,1);
-        if type(agent) ~= NewSpace(agent)
-            type = -type;
-        end
-     
-        
-        Config.Status = double(logical(NewSpace));
-        Config.Type = type(find(Config.Status,1));
-        WS = SetConfigurationOnSpace(BasicWS,Config);
-        Config = GetConfiguration(WS);
-    %     PlotWorkSpace(WS,[]);
-    
-        [OK, Alert] = SplittingCheck(WS,find(WS.Space.Status,1));
-%         i=i+1
-        if OK && sum(abs(WS.Space.Status),"all")==N
-            break
-        end
-    end
-    if O
-        
+
 end
 
-function space = AddAgent(space,type)
-    [rows,cols] = find(space==type);
+Config = GetConfiguration(WS);
+NewWS = WS;
+%     PlotWorkSpace(WS,[]);
+end
+
+function [WS,Sucsses] = AddAgent(WS,type)
+    Sucsses = false;
+    [rows,cols] = find((WS.Space.Type ==type & logical(WS.Space.Status)));
     try
     agent = randi(numel(rows),1);
     catch e
@@ -154,24 +123,29 @@ function space = AddAgent(space,type)
     dir = randi(3,1)-2;
     switch dir
         case 1
-            space(row,col+1) = -type;
+            if ~WS.Space.Status(row,col+1)
+                WS.Space.Status(row,col+1) = 1;
+                Sucsses=true;
+            end
+           
         case -1
-            space(row,col-1) = -type;
+            if ~WS.Space.Status(row,col-1)
+                WS.Space.Status(row,col-1) = 1;
+                Sucsses=true;
+            end
         case 0
             if type==1
-                space(row-1,col) =-type;
+                if ~WS.Space.Status(row-1,col)
+                    WS.Space.Status(row-1,col) = 1;
+                    Sucsses=true;
+                end
             else
-                space(row+1,col) = -type;
+                if ~WS.Space.Status(row+1,col)
+                    WS.Space.Status(row+1,col) = 1;
+                    Sucsses=true;
+                end
             end
     end
 
-
-end
-
-function space = RemoveAgent(space,Type,num)
-
-Loc = find(space==Type);
-deleteLoc = Loc(randi(numel(Loc),num));
-space(deleteLoc) = 0;
 
 end

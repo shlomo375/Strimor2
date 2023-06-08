@@ -1,1 +1,7 @@
 # List of untracked files to ignore
+*.png
+*.jpg
+*.mat
+*.avi
+ArticleMovie/*.avi
+!/LineFlatting/**

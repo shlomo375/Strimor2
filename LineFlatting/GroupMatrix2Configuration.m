@@ -1,7 +1,8 @@
-function Node = GroupMatrix2Configuration(Groups)
-N = sum(abs(Groups(1,:)));
-BesicWS = WorkSpace([N,N*2],"RRT*");
-WS = BesicWS;
+function Node = GroupMatrix2Configuration(Node,Groups,WS)
+Groups(~Groups) = [];
+N = sum(abs(Groups(:)));
+
+
 
 WS.Space.Status(1,floor(((2*N-abs(Groups(1)))/2):(abs(Groups(1))-1+(2*N-abs(Groups(1)))/2))) = ones(1,abs(Groups(1)));
 
@@ -23,28 +24,50 @@ for Line = 2:numel(Groups)
     catch ee
         ee
     end
-    WS.Space.Status(Line,floor(Beta-0.5*abs(Groups(Line)):Beta+0.5*abs(Groups(Line))-1)) = ones(1,abs(Groups(Line)));
-    if sign(Groups(Line)) ~= WS.Space.Type(Line,floor(Beta-0.5*abs(Groups(Line))))
-        WS.Space.Status(Line,floor(Beta-0.5*abs(Groups(Line)):Beta+0.5*abs(Groups(Line))-1)) = zeros(1,abs(Groups(Line)));
+    pos = floor(Beta-0.5*abs(Groups(Line)):(Beta+0.5*abs(Groups(Line))-1));
+    if any(pos<1)
+        pos = pos + abs(min(pos))+1;
+    end
+    WS.Space.Status(Line,pos) = ones(1,abs(Groups(Line)));
+    if sign(Groups(Line)) ~= WS.Space.Type(Line,pos(1))
+        WS.Space.Status(Line,pos) = zeros(1,abs(Groups(Line)));
         
-        WS.Space.Status(Line,1+floor(Beta-0.5*abs(Groups(Line)):Beta+0.5*abs(Groups(Line))-1)) = ones(1,abs(Groups(Line)));
-        
-        OK = SplittingCheck(WS,find(WS.Space.Status,1));
+        WS.Space.Status(Line,1+pos) = ones(1,abs(Groups(Line)));
+        Lines = [Line,Line-1];
+        OK = CheckLineConnected(WS,Lines);
+        % OK = SplittingCheck(WS,find(WS.Space.Status,1),true);
+        % if OK ~=OK1
+        %     d=5
+        % end
 
         if ~OK
-            WS.Space.Status(Line,1+floor(Beta-0.5*abs(Groups(Line)):Beta+0.5*abs(Groups(Line))-1)) = zeros(1,abs(Groups(Line)));
+            WS.Space.Status(Line,1+pos) = zeros(1,abs(Groups(Line)));
        
-            WS.Space.Status(Line,-1+floor(Beta-0.5*abs(Groups(Line)):Beta+0.5*abs(Groups(Line))-1)) = ones(1,abs(Groups(Line)));
+            WS.Space.Status(Line,-1+pos) = ones(1,abs(Groups(Line)));
         end
     end
     
-    if SplittingCheck(WS,find(WS.Space.Status,1))
-    Config = GetConfiguration(WS);
-    Node = ConfigStruct2Node(Config);
-    else
-        Node = [];
-    end
+    
 end
+% if SplittingCheck(WS,find(WS.Space.Status,1),true)
+    Config = GetConfiguration(WS);
+    Node = ConfigStruct2Node(Node,Config);
+
+   
+% else
+%     Node = [];
+% end
+end
+
+function OK = CheckLineConnected(WS,Lines)
+
+TopLineModuelInd = find(WS.Space.Status(Lines(1),:));
+baseLineModuelInd = find(WS.Space.Status(Lines(2),:));
+
+TopLineModuelInd(WS.Space.Type(Lines(1),TopLineModuelInd)==-1) = [];
+baseLineModuelInd(WS.Space.Type(Lines(2),baseLineModuelInd)==1) = [];
+
+OK = any(ismember(TopLineModuelInd,baseLineModuelInd));
 
 end
 

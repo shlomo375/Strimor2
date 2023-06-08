@@ -4,15 +4,32 @@ AllModuleInd = find(WS.Space.Status,tree.N);
 
 Case = sum(GroupsEdges.*[2,1]);
 if Case == 3
-    AlphaInRightGroup = length(GroupInd{2}{GroupsPairLoc}) >= length(GroupInd{2}{GroupsPairLoc+1});
-    if AlphaInRightGroup
-        Case = 1;
-        if abs(GroupIndexes{2}{GroupsPairLoc+2}(1) - GroupIndexes{2}{GroupsPairLoc+1}(end)) < 3
+    if GroupsPairLoc == 1
+        Case = 2;
+    else
+        AlphaInRightGroup = length(GroupInd{2}{GroupsPairLoc}) >= length(GroupInd{2}{GroupsPairLoc+1});
+        if AlphaInRightGroup
+            Case = 1;
+            if length(GroupIndexes{2}) > 2
+                if abs(GroupIndexes{2}{GroupsPairLoc+2}(1) - GroupIndexes{2}{GroupsPairLoc+1}(end)) < 3
+                    Case = 2;
+                    if abs(GroupIndexes{2}{GroupsPairLoc}(1) - GroupIndexes{2}{GroupsPairLoc-1}(end)) < 3
+                        OK = false;
+                        return
+                    end   
+                end
+            end
+        else
             Case = 2;
-            if abs(GroupIndexes{2}{GroupsPairLoc}(1) - GroupIndexes{2}{GroupsPairLoc-1}(end)) < 3
-                OK = false;
-                return
-            end   
+            if length(GroupIndexes{2}) > 2
+                if abs(GroupIndexes{2}{GroupsPairLoc-1}(end) - GroupIndexes{2}{GroupsPairLo1}(1)) < 3
+                    Case = 1;
+                    if abs(GroupIndexes{2}{GroupsPairLoc+1}(1) - GroupIndexes{2}{GroupsPairLoc}(end)) < 3
+                        OK = false;
+                        return
+                    end   
+                end
+            end
         end
     end
 end
@@ -26,8 +43,9 @@ switch Case
         ForwardHorizenStep = (GroupIndexes{2}{GroupsPairLoc+1}(end) - GroupIndexes{2}{GroupsPairLoc}(end) + 1)/2;
         BackwardHorizenStep = -sign(ForwardHorizenStep).*length(GroupIndexes{2}{GroupsPairLoc+1})/2;
 %         [~, BranchInd] = ScanningAgents(WS, ScannedAgent, GroupInd{2}{GroupsPairLoc +1}(1), []);
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, InnerBeta);
+        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, InnerBeta,true);
 %         BranchIndInMovingHalf = ismember(MovingHalfInd,BranchInd);
+        InnerBetaLocInBranch = (BranchInd == InnerBeta);
 
         Axis = [2 ,     1     ,       2,      1     ,       2];
         Step = [1,ForwardHorizenStep, 1,BackwardHorizenStep,-1];
@@ -35,11 +53,15 @@ switch Case
         AboveModule = true;
         IncludeOrigin = true;
         MovingHalfInd = FindModuleReletiveToMotionAxis(WS.R3,GroupInd{2}{GroupsPairLoc}(end),AllModuleInd,AboveModule,IncludeOrigin);
+        try
         InnerBeta = GroupInd{2}{GroupsPairLoc+1}(1);
+        catch Ubb
+            Ubb
+        end
         ForwardHorizenStep = -(GroupIndexes{2}{GroupsPairLoc+1}(1) - GroupIndexes{2}{GroupsPairLoc}(1) + 1)/2;
         BackwardHorizenStep = -sign(ForwardHorizenStep).*length(GroupIndexes{2}{GroupsPairLoc})/2;
 %         [~, BranchInd] = ScanningAgents(WS, ScannedAgent, GroupInd{2}{GroupsPairLoc +1}(1), []);
-        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, InnerBeta);
+        [~, BranchInd] = ScanningAgentsFast(WS, ScannedAgent, InnerBeta,true);
         InnerBetaLocInBranch = (BranchInd == InnerBeta);
         Axis = [3 ,     1     ,       3,      1     ,       3];
         Step = [-1,ForwardHorizenStep, -1,BackwardHorizenStep,1];
@@ -48,7 +70,7 @@ switch Case
         return
 end
 % figure(1)
-% PlotWorkSpace(WS,[],[]);
+% PlotWorkSpace(WS,[]);
 %%
 %%   a) Lowering the half containing a group with an alpha module at the end
     
@@ -59,7 +81,7 @@ if ~ OK
     return
 end
 % figure(2)
-% PlotWorkSpace(NewWS,[],[]);
+% PlotWorkSpace(NewWS,[]);
 %%   b) Moving the second group along the X axis towards the first group
 [OK, NewWS, Newtree, NewParentInd, BranchInd] =...
         ManeuverStepProcess(NewWS,Newtree,NewParentInd,BranchInd, Axis(2), Step(2));
@@ -68,7 +90,7 @@ if ~ OK
     return
 end
 % figure(3)
-% PlotWorkSpace(NewWS,[],[]);
+% PlotWorkSpace(NewWS,[]);
 %%   c) Downloading the front beta module in the second group
 
 [OK, NewWS, Newtree, NewParentInd, BranchInd(InnerBetaLocInBranch)] =...
@@ -78,7 +100,7 @@ if ~ OK
     return
 end
 % figure(4)
-% PlotWorkSpace(NewWS,[],[]);
+% PlotWorkSpace(NewWS,[]);
 
 InnerBeta = BranchInd(InnerBetaLocInBranch);
 BranchInd(InnerBetaLocInBranch) = [];
@@ -91,7 +113,7 @@ if ~ OK
     return
 end
 % figure(5)
-% PlotWorkSpace(NewWS,[],[]);
+% PlotWorkSpace(NewWS,[]);
 %%   e) Raising the lowered half back
 
 [OK, NewWS, Newtree, NewParentInd] =...
@@ -101,7 +123,7 @@ if ~ OK
     return
 end
 % figure(6)
-% PlotWorkSpace(NewWS,[],[]);
+% PlotWorkSpace(NewWS,[]);
 %%
 
 WS = NewWS;

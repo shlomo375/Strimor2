@@ -11,7 +11,7 @@ if ~contains(Folder,"OneTree")
 
 
     TargetDs = fileDatastore(EndFolder,"IncludeSubfolders",false,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
-    if isnan(Isomotphism)
+    if isempty(Isomotphism) || isnan(Isomotphism)
         [Connect, ConnectedNode] = CompareMixsedTree2TreeFiles(StartTree,TargetDs);
     else
         [Connect, ConnectedNode] = CompareMixsedTree2TreeFilesIsomorphism(StartTree,TargetDs,Isomotphism);
@@ -25,10 +25,10 @@ else
     TwoTree = false;
 end
 if Connect
-    if isnan(Isomotphism)
-        [NumberOfCOnfig, PathLength] = ExtructTreeData(Folder,ConnectedNode(ConnectedNode_idx,:),TwoTree);
+    if isempty(Isomotphism) || isnan(Isomotphism)
+        [NumberOfCOnfig, PathLength,Path,time] = ExtructTreeData(Folder,ConnectedNode(1,:),TwoTree);
     else
-        [NumberOfCOnfig, PathLength] = ExtructTreeDataIsomorphism(Folder,ConnectedNode,Isomotphism);
+        [NumberOfCOnfig, PathLength,Path,time] = ExtructTreeDataIsomorphism(Folder,ConnectedNode,Isomotphism);
     end
         
         save(Folder+"\success.mat","time","Path","PathLength","NumberOfCOnfig");

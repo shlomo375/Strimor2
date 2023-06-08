@@ -1,0 +1,74 @@
+function [WS,tree, ParentInd] = SpreadAndReduce(WS,tree, ParentInd)
+    
+[GroupsSizes,~, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+[Row, Col] = find(GroupsSizes);
+
+GroupSubLocation = sortrows([Row,Col],1,"descend");
+
+
+
+for row = numel(GroupsSizes,1):-1:2
+    
+    if SpreadingDir == 1
+        ColNum = 1:length(GroupInd{line});
+    else
+        ColNum = length(GroupInd{line}):-1:1;
+    end
+    
+    for col = ColNum
+        
+
+
+    end
+end
+
+end
+
+
+
+function [WS,tree, ParentInd, GroupInd] = SpreadAndReduce_SingleGroup(WS,tree, ParentInd,GroupsIndexes,GroupSubLoc, SpreadingDir)
+
+OneModuleInd = GroupsIndexes{GroupSubLoc(1)}{GroupSubLoc(2)}(1);
+[MoveingModules, Max_Step, ReduceModuleInd, ReduceAxis] = Get_BranchModuleInd(WS,GroupsIndexes,OneModuleInd,GroupSubLoc(1),"BRANCH_AND_MAX_STEP",Dir=SpreadingDir);
+
+if isempty(ReduceModuleInd) && ~Max_Step
+    return
+end
+
+Step = Max_Step;
+OK = false;
+while Step && ~OK
+
+    Axis = 1;
+    [OK, TempWS, Temptree, TempParentInd, TempMoveingModules] =...
+    ManeuverStepProcess(WS,tree,ParentInd,MoveingModules, Axis, Step);
+    
+    if ~OK
+        Step = (abs(Step) - 1)*sign(Step);
+        continue
+    end
+    
+    NewReduceModuleInd = UpdateLinearIndex(WS.SpaceSize,ReduceModuleInd,1,Step-Max_Step);
+    RelevantModuleInd = NewReduceModuleInd(ismember(NewReduceModuleInd,ReduceModuleInd));
+    if ~isempty(RelevantModuleInd)
+        [OK, TempWS, Temptree, TempParentInd, TempMoveingModules] =...
+        ManeuverStepProcess(TempWS,Temptree,TempParentInd,RelevantModuleInd, ReduceAxis, (ReduceAxis==2)-2*(ReduceAxis==3));
+        
+        if ~OK
+            Step = (abs(Step) - 1)*sign(Step);
+            continue
+        end
+    end
+
+end
+
+if OK
+    WS = TempWS;
+    tree = Temptree;
+    ParentInd = TempParentInd;
+end
+[~,~, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+
+
+% PlotWorkSpace(WS,[],[]);
+end

@@ -1,7 +1,9 @@
-function [WS,Tree, ParentInd] =  DualModuleOnly(WS, Tree, ParentInd)
+function [WS,tree, ParentInd] =  DualModuleOnly(WS, tree, ParentInd)
 
-GroupSizes = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
-if size(GroupSizes,2) > 1 || size(GroupSizes,1) > 2  || sign(GroupSizes(2,1)) ~= sign(GroupSizes(1,1))
+[GroupsSizes,GroupIndexes, GroupInd] = ConfigGroupSizes(WS.Space.Status,WS.Space.Type,WS.R1);
+
+% GroupSizes = tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
+if size(GroupsSizes,2) > 1 || size(GroupsSizes,1) > 2  || sign(GroupsSizes(2,1)) ~= sign(GroupsSizes(1,1)) || abs(GroupsSizes(2,1))~=2
     return
 end
 
@@ -10,108 +12,120 @@ end
 % Algorithm for changing the order of a group with only 2 modules, a unit in a row when the base row has identical modules at the edges.
 % The numbering of the modules is carried out from the end of the base line and inwards, modules 1-5,
 % In the upper pair: module close to the corner - 6. Close to the middle - 7.
-% 
-% 1) Moving the upper pair towards the alpha module one step before the end.
-% 2) Upload modules 1,2 one step up
-% 3) Moving modules 1,2,6,7 one step inward.
-% 4) Moving modules 1,3,4,5 one step down
-% 5) Moving module 2 one step down
-% 6) Moving module 1,2,3,4,5 one step up
-% 7) Moving module 1,2,3,4 step up
-% 8) Moving module 7 step up
-% 9) Moving module 1,2,3,4,7 one step down.
+if ~FirstIsAlpha(GroupsSizes(1))
+    AllModuleInd = [GroupInd{1}{1}(1:5); GroupInd{2}{1}];
 
-if GroupPairNum == 1
-% All modules are arranged in the following order:
-% 1-4) The four modules of the bottom row, from the edge inward
-% 5) Front module in the top row
-% 6) Rear module in the top row
-    AllModuleInd = [GroupInd{1}{1}(1:4); GroupInd{2}{1}(1); GroupInd{2}{2}(1)];
+    FirstStep = floor((GroupIndexes{1}{1}(1) - GroupIndexes{2}{1}(1)+1)/2);
 
-    FirstStep = -(((GroupIndexes{2}{1}(1)-GroupIndexes{1}{1}(1))/2)-1);
-    SecondStep = -(((GroupIndexes{2}{2}(1)-GroupIndexes{2}{1}(1))/2)-1);
-
-    Steps = [FirstStep,SecondStep,1,2,-1];
-    Axis = [1,1,2,3,2];
-
-
-    
-
+    Steps = [FirstStep, -1, 1, 1, 1, -1, 1, 1, -1];
+    Axis =  [1, 2, 1, 3, 2, 3, 2, 3, 2 ];
 else
-% All modules are arranged in the following order:
-% 1-4) The four modules of the bottom row, from the edge inward
-% 5) Front module in the top row
-% 6) Rear module in the top row
-    AllModuleInd = [flip(GroupInd{1}{1}(end-3:end)); GroupInd{2}{end}(1); GroupInd{2}{end-1}(1)];
+    AllModuleInd = [flip(GroupInd{1}{1}(end-4:end)); flip(GroupInd{2}{1})];
 
-    FirstStep = (((GroupIndexes{1}{1}(end)-GroupIndexes{2}{end}(1))/2)-1);
-    SecondStep = (((GroupIndexes{2}{end}(1)-GroupIndexes{2}{end-1}(1))/2)-1);
-
-    Steps = [FirstStep,SecondStep,-1,-2,1];
-    Axis = [1,1,3,2,3];
-
+    FirstStep = floor((GroupIndexes{1}{1}(end) - GroupIndexes{2}{1}(end)-1)/2);
+    
+    Steps = [FirstStep, 1, -1, -1, -1, 1, -1, -1, 1];
+    Axis =  [1, 3, 1, 2, 3, 2, 3, 2, 3 ];
 end
-% figure(1)
-% PlotWorkSpace(WS,[],[]);
 
-% Algorithm for merging 2 alpha modules, the modules are numbered from the
-% outer edge of the bottom row inward, the two modules in the top row are
-% described as front and back modules.
+%% 1) Moving the upper pair towards the alpha module one step before the end.
 
-%%
-% 1) Moving a front and rear module in the upper row to the front edge of the lower
-% row.
-[OK, NewWS, Newtree, NewParentInd, AllModuleInd([5,6])] =...
-    ManeuverStepProcess(WS,tree,ParentInd,AllModuleInd([5,6]), Axis(1), Steps(1));
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([6,7])] =...
+    ManeuverStepProcess(WS,tree,ParentInd,AllModuleInd([6,7]), Axis(1), Steps(1));
 
     if ~ OK
         return
     end
 
 % figure(1)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 2) Moving the rear module in the top row in the same direction until it
-% attaches to the front module.
+% PlotWorkSpace(NewWS,[]);
+%% 2) Upload modules 1,2 one step up
+
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2])] =...
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2]), Axis(2), Steps(2));
+
+    if ~ OK
+        return
+    end
+% figure(2)
+% PlotWorkSpace(NewWS,[]);
+
+%% 3) Moving modules 1,2,6,7 one step inward.
+
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,6,7])] =...
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,6,7]), Axis(3), Steps(3));
+
+    if ~ OK
+        return
+    end
+% figure(3)
+% PlotWorkSpace(NewWS,[]);
+
+%% 4) Moving modules 1,2,3,6 one step up 
+
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3,6])] =...
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3,6]), Axis(4), Steps(4));
+
+    if ~ OK
+        return
+    end
+% figure(4)
+% PlotWorkSpace(NewWS,[]);
+
+%% 5) Moving module 6 one step down
+
 [OK, NewWS, Newtree, NewParentInd, AllModuleInd(6)] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd(6), Axis(2), Steps(2));
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd(6), Axis(5), Steps(5));
 
     if ~ OK
         return
     end
-% figure(1)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 3) Download front module and modules 1,2,3,4 one line down
-[OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3,4,5])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3,4,5]), Axis(3), Steps(3));
+% figure(5)
+% PlotWorkSpace(NewWS,[]);
+
+%% 6) Moving module 1,2,3 one step down
+
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3])] =...
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3]), Axis(6), Steps(6));
 
     if ~ OK
         return
     end
-% figure(1)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 4) Move module 1 two lines up.
+% figure(6)
+% PlotWorkSpace(NewWS,[]);
+%% 7) Moving module 1,2,3,4 step down
+
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([1,2,3,4])] =...
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([1,2,3,4]), Axis(7), Steps(7));
+
+    if ~ OK
+        return
+    end
+% figure(7)
+% PlotWorkSpace(NewWS,[]);
+
+%% 8) Moving module 1 step up
+
 [OK, NewWS, Newtree, NewParentInd, AllModuleInd(1)] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd(1), Axis(4), Steps(4));
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd(1), Axis(8), Steps(8));
 
     if ~ OK
         return
     end
-% figure(1)
-% PlotWorkSpace(NewWS,[],[]);
-%%
-% 5) Raising the front module and 2,3,4 one row up.
-[OK, NewWS, Newtree, NewParentInd, AllModuleInd([2,3,4,5])] =...
-    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([2,3,4,5]), Axis(5), Steps(5));
+% figure(8)
+% PlotWorkSpace(NewWS,[]);
+
+%% 9) Moving module 2,3,4 one step up.
+
+[OK, NewWS, Newtree, NewParentInd, AllModuleInd([2,3,4])] =...
+    ManeuverStepProcess(NewWS, Newtree, NewParentInd,AllModuleInd([2,3,4]), Axis(9), Steps(9));
 
     if ~ OK
         return
     end
+% figure(9)
+% PlotWorkSpace(NewWS,[]);
 
-% figure(1)
-% PlotWorkSpace(NewWS,[],[]);
 
 WS = NewWS;
 tree = Newtree;

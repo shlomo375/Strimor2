@@ -23,8 +23,16 @@ if ~isempty(p)
 %     p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color, p);
     
 else
-    cla
-    p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color,"LineWidth",1);
+    if ~isempty(ColorIndex)
+        if ColorIndex(1) == 11
+            p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color,"LineWidth",1,"FaceAlpha",0.3,"EdgeAlpha",0.6);
+        else
+    
+            p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color,"LineWidth",1);
+        end
+    else
+        p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color,"LineWidth",1);
+    end
     if ~isempty(MoveNumText)
         MoveNumText.handel = text(MoveNumText.x,MoveNumText.y,num2str(MoveNumText.value),'FontSize',22,'FontWeight','bold','HorizontalAlignment','center');
 

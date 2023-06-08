@@ -1,9 +1,5 @@
-
 SoftwareLocation = pwd;
-AddDirToPath;
-cd(SoftwareLocation);
-
-% addpath(genpath(SoftwareLocation));
+AddDirToPath();
 % clear
 % Path = TargetConfig;
 % load('CompletePath.mat', 'Path');
@@ -15,13 +11,18 @@ N = 15;
 Size = [N, 2*N];
 BasicWS = WorkSpace(Size,"RRT*");
 figure(2)
+
 % PlotWorkSpace(BasicWS,[]);
 while true
-[Config,Movement] = Node2ConfigStruct(Path(end,:));
+    for ii = 1:size(Path,1)
+        figure(ii)
+[Config,Movement] = Node2ConfigStruct(Path(ii,:));
 Config.Status = logical(Config.Status);
 [WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config,2);
 Agent = find(WS.Space.Status);
 PlotWorkSpace(WS,[],Agent,1);
+
+    end
 % PlotWorkSpace(WS,[]);
 
 Parts =  AllSlidingParts(WS);

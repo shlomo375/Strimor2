@@ -2,9 +2,9 @@ clear;
 close all;
 % clear Taskmaster
 %% Creat Tree Dir for pair of config, one from start, one from target.
-ModuleRange = [16:40]; % number of modules in the tree
-TreeType = ["OptimalTree"]%,"uniform_IM2Axis__3","uniform_IM1Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
-TreeIndexes = 1:200;
+ModuleRange = [12]; % number of modules in the tree
+TreeType = ["uniform_3","uniform_1","normal_1"]%,"uniform_IM2Axis__3","uniform_IM1Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
+TreeIndexes = 1:5;
 %%
 
 
@@ -13,81 +13,83 @@ AddDirToPath;
 cd(SoftwareLocation);
 
 % OriginalOrBeckUp = "Results"%"Results"%"BeckupResults","BlankTree"
-for OriginalOrBeckUp = ["Results"]%,"BeckupResults","BlankTree"]%,"BlankTree"] %"Results",,"BlankTree"
+for OriginalOrBeckUp = ["BlankTree","Results","BeckupResults"]%,"BlankTree"] %"Results",,"BlankTree"
 % SuccessDir = fullfile(extractBefore(TreeFolder,digitsPattern+"N\"),"AllTreeResulte");
 mkdir(fullfile(SoftwareLocation,"RRTtree",OriginalOrBeckUp,"AllTreeResulte"));
 
 
-for NumberOfModule= ModuleRange
+for ii= ModuleRange
     for DirName = TreeType%"normal_1","normal_3"];%"TwoTree","uniform_1","uniform_3","OneTree"
-        TreeFolderName = fullfile(SoftwareLocation,"RRTtree",OriginalOrBeckUp,DirName,NumberOfModule+"N");
-        PairFile = fullfile("configuration","OptimalConfigPairs","N"+NumberOfModule+".mat");
-        mkdir(TreeFolderName);
+
+        PairFile = fullfile("configuration","ConfigPairs","N"+ii+".mat");
+        mkdir(fullfile(SoftwareLocation,"RRTtree",OriginalOrBeckUp,ii+"N",DirName));
         load(PairFile,'ConfigPairs');
     
         TimeFromStart = datetime;
     
 %         TreeName = fullfile(SoftwareLocation,"RRTtree","Results",ii+"N",DirName,"tree_"+string(jj));
         for kk= TreeIndexes
-            TreeName = fullfile(TreeFolderName,"tree_"+string(kk));
+            TreeName = fullfile(SoftwareLocation,"RRTtree",OriginalOrBeckUp,ii+"N",DirName,"tree_"+string(kk));
             %%
+% % % % % %             if exist(TreeName,'dir')
+% % % % % %                 rmdir(TreeName,'s');
+% % % % % %                 continue
+% % % % % %             else
+% % % % % %                 continue
+% % % % % %             end
+%%
 try
             mkdir(TreeName);
-            
-            if ~contains(DirName,"OneTree") && ~matches(DirName,"MultyTree")
-                TreeDir = fullfile(TreeName,"Start")
-                mkdir(TreeDir);
-            end
-            files = dir(TreeDir);
+            files = dir(TreeName);
             if sum([files.isdir])<=2
-              
-                Config = ConfigPairs{kk}{1};
-                StartConfig = ConfigStruct2Node(Config);
-                tree = TreeClass(TreeDir, NumberOfModule, 10500, StartConfig);
-                SaveTree(tree);
+                TreeDir = TreeName
+                if ~contains(DirName,"OneTree") && ~matches(DirName,"MultyTree")
+                    TreeDir = fullfile(TreeName,"Start");
+                    mkdir(TreeDir);
+                end
+                
+                config = ConfigPairs{kk}{1};
+%                 StartConfig = table(duration(0,0,0),1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                StartConfig = ConfigStruct2Node(config);
+                tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
+                StartConfig = tree.Data(1,:);
+                SaveTree2Files(tree);
                 save(fullfile(TreeDir,"Start.mat"),"StartConfig");
                 
-                %%
-%                 ConfigPairs{kk}=[ConfigPairs{kk},ConfigPairs{kk+1}]
-                %%
-                for StartNum = 2:numel(ConfigPairs{kk})
-                    Config = ConfigPairs{kk}{StartNum};
-                    TargetConfig(StartNum-1,:) = ConfigStruct2Node(Config);
-                end
-                    save(fullfile(TreeDir,"Target.mat"),"TargetConfig");
-                    clear("TargetConfig");
-                
+                config = ConfigPairs{kk}{2};
+%                 StartConfig = table(duration(0,0,0),-1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                StartConfig = ConfigStruct2Node(config);
+                tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
+                TargetConfig = tree.Data(1,:);
+                save(fullfile(TreeDir,"Target.mat"),"TargetConfig");
+        
                 if ~contains(DirName,"OneTree") && ~matches(DirName,"MultyTree")
-                    for StartNum = 2:numel(ConfigPairs{kk})
-                        TreeDir = fullfile(TreeName,"Target"+"_"+(StartNum-1));
-                        mkdir(TreeDir);
-                        
-                        Config = ConfigPairs{kk}{StartNum};
-                        StartConfig = ConfigStruct2Node(Config);
-                        tree = TreeClass(TreeDir, NumberOfModule, 10500, StartConfig);
-                        SaveTree(tree);
-                        save(fullfile(TreeDir,"Start.mat"),"StartConfig");
+                    TreeDir = fullfile(TreeName,"Target");
+                    mkdir(TreeDir);
                     
-                    
-                        Config = ConfigPairs{kk}{1};
-                        TargetConfig = ConfigStruct2Node(Config);
-                        save(fullfile(TreeDir,"Target.mat"),"TargetConfig");
-                        clear("TargetConfig");
-                    end
+                    config = ConfigPairs{kk}{2};
+%                     StartConfig = table(duration(0,0,0),1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                    StartConfig = ConfigStruct2Node(config);
+                    tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
+                    StartConfig = tree.Data(1,:);
+                    SaveTree2Files(tree);
+                    save(fullfile(TreeDir,"Start.mat"),"StartConfig");
+                
+    
+                    config = ConfigPairs{kk}{1};
+%                     StartConfig = table(duration(0,0,0),-1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                    StartConfig = ConfigStruct2Node(config);
+                    tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
+                    TargetConfig = tree.Data(1,:);
+                    save(fullfile(TreeDir,"Target.mat"),"TargetConfig");
                 end
                 
-         
             end
-catch ME11
-    ME11
 end
-
         end
-
     end
 end
-
 end
-% copyfile(fullfile(SoftwareLocation,"RRTtree","Results"),fullfile(SoftwareLocation,"RRTtree","BeckupResults"));
+copyfile(fullfile(SoftwareLocation,"RRTtree","BeckupResults","18N"),fullfile(SoftwareLocation,"RRTtree","Results","18N"));
 
 
