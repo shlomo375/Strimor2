@@ -148,6 +148,7 @@ while size(Task_Queue,1) > 0
     CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
     if CorrectionSteps >= Tree.N/6
         [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);
+        KillSwitch = tic;
     end
     catch memanuvers
         memanuvers
