@@ -46,7 +46,7 @@ WS.DoSplittingCheck = false;
 ParentInd = 1;
 
 Start_WS.Center_Of_Area = centerOfArea(Start_WS);
-MaxTotalTime = N;
+MaxTotalTime = N*1.5;
 TotalTime = tic;
 while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:))
     Line = find(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:),1,"last");
@@ -75,7 +75,7 @@ end
 
 end
 
-function [WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Ploting,KillSwitch,TotalTime,MaxTotalTime)
+function [WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Ploting,TotalTime,MaxTotalTime,KillSwitch)
 
 arguments
     WS
@@ -86,9 +86,10 @@ arguments
     Line = [];
     Downwards = [];
     Ploting = false;
-    KillSwitch = inf;
+    
     TotalTime = 0;
     MaxTotalTime = 0;
+    KillSwitch = inf;
 end
 
 
