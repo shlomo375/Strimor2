@@ -2,7 +2,7 @@
 clear
 close all
 AddDirToPath
-
+delete(gcp('nocreate'))
 TestFile = dir("SimpleShapeAlg\Experiments");
 SolutionFolder = fullfile(pwd,"SimpleShapeAlg\Solutions");
 
@@ -26,6 +26,7 @@ SortedTestFile = TestFile(loc);
 f(1:FevalArray) = parallel.FevalFuture;
 LastTask = 1;
 F_idx = 1;
+num_worker=8;
 for ii = 1:numel(SortedTestFile)
     
     % if str2double(cell2mat(extractBetween(SortedTestFile(ii).name,"N_","_"))) == 100
@@ -41,15 +42,24 @@ for ii = 1:numel(SortedTestFile)
     end
     
     for idx = 1:size(Exp,2)
-        SolutionFileName = join(["N_",string(N),"_Batch_",string(F_idx),".mat"],"");
-        if matches({SolutionFile.name},SolutionFileName)
-            F_idx = F_idx + 1
-            continue
-        end
+        
+        % if  F_idx<37
+        %     F_idx = F_idx + 1
+        %     continue
+        % end
         % f(F_idx) = parfeval(@temp,0,["5","g"]);
-        f(F_idx) = parfeval(@SolveBatchSimpleProblem,0,Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
-        % [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
+      f(F_idx) = parfeval(@SolveBatchSimpleProblem,0,Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
+          % [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
         F_idx = F_idx + 1
+
+                fprintf("worker on queue,N %d, idx %d, Task %d, date %s\n",N,idx,F_idx,datetime)
+
+        while any(matches({f.State},"queued"))
+        pause(60)
+        files = dir(SolutionFolder);
+        fprintf("Problem solved: %d\n",numel(files)-2)
+        end
+        
     end
     % end
 end

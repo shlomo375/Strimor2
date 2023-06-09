@@ -3,8 +3,13 @@ Num_Problem_In_Batch = size(Exp,1);
 Solution = cell(Num_Problem_In_Batch,1);
 ErrorProblem = cell(1,1);
 ii = 1;
+
+SolutionFiles = dir(SolutionFolder);
+
 for jj = 1:Num_Problem_In_Batch
-    try
+    if any(matches({SolutionFiles.name},join(["N_",string(N),"_Batch_",string(Batch_idx),"p",string(jj),".mat"],"")))
+        continue
+    end
     stratTime = tic;
     StartNode = Exp{jj}{1};
     TargetNode = Exp{jj}{2};
@@ -13,21 +18,21 @@ for jj = 1:Num_Problem_In_Batch
     [Tree, error,msg] = SimpleShapeAlgorithm(BasicWS, N, StartNode, TargetNode,Ploting);
 
     if error 
-        Solution(jj) = {msg};
-        ErrorProblem(ii) =  {{StartNode,TargetNode}};
+        Solution = {msg};
+        ErrorProblem(ii) = {{StartNode,TargetNode}};
         ii = ii + 1;
         disp(msg)
         fprintf("batch: %d, problem idx: %d , error!!!!!!!!\n", Batch_idx,jj);
     else
-        Solution(jj) = {Tree.Data(1:Tree.LastIndex, :)};
+        Solution = {Tree.Data(1:Tree.LastIndex, :)};
         % problemSolve = problemSolve+1;
         fprintf("batch: %d, problem idx: %d , time: %.1f\n", Batch_idx,jj,toc(stratTime));
+    
+
     end
-    catch e
-        e
-    end
+        save(fullfile(SolutionFolder,join(["N_",string(N),"_Batch_",string(Batch_idx),"p",string(jj),".mat"],"")),"Solution","ErrorProblem");
+
 end
 
-save(fullfile(SolutionFolder,join(["N_",string(N),"_Batch_",string(Batch_idx),".mat"],"")),"Solution","ErrorProblem");
 
 end

@@ -46,14 +46,15 @@ WS.DoSplittingCheck = false;
 ParentInd = 1;
 
 Start_WS.Center_Of_Area = centerOfArea(Start_WS);
-
+MaxTotalTime = N;
+TotalTime = tic;
 while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:))
     Line = find(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.IsomorphismMatrices1{1}(:,:),1,"last");
     % if Line ==3
     %     d=5;
     % end
     while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1) ~= TargetNode.IsomorphismMatrices1{1}(Line,:)) 
-        [Start_WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting);
+        [Start_WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting,TotalTime,MaxTotalTime);
         if LineCreated
             break
         end
@@ -74,7 +75,7 @@ end
 
 end
 
-function [WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Ploting,KillSwitch)
+function [WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(WS,Tree, ParentInd,TargetConfig,ConfigShift,Line,Downwards,Ploting,KillSwitch,TotalTime,MaxTotalTime)
 
 arguments
     WS
@@ -86,6 +87,8 @@ arguments
     Downwards = [];
     Ploting = false;
     KillSwitch = inf;
+    TotalTime = 0;
+    MaxTotalTime = 0;
 end
 
 
@@ -96,9 +99,9 @@ LastTreeInd = Tree.LastIndex;
     StartConfig_GroupMatrix = Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1);
     TargetConfig_GroupMatrix = TargetConfig.IsomorphismMatrices1{1}(:,:,1);
     try
-    if ParentInd >= 282
-            d=5;
-    end    
+    % if ParentInd >= 282
+    %         d=5;
+    % end    
     Task_Queue = Module_Task_Allocation(StartConfig_GroupMatrix, TargetConfig_GroupMatrix,Downwards, Line,WS=WS,ConfigShift=ConfigShift);
     catch me
         me
@@ -122,6 +125,12 @@ while size(Task_Queue,1) > 0
     else
         LastTreeInd = Tree.LastIndex;
         KillSwitch = tic;
+    end
+    if toc(TotalTime)>MaxTotalTime
+        Error = true;
+            msg = "TotalTimeOut";
+             
+            return
     end
     if ParentInd >= 284
             d=5;
