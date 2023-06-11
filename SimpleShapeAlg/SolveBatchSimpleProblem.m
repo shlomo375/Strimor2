@@ -15,7 +15,7 @@ for jj = 1:Num_Problem_In_Batch
     TargetNode = Exp{jj}{2};
     
     % if StartNode.ConfigRow < TargetNode.ConfigRow
-    [Tree, error,msg] = SimpleShapeAlgorithm(BasicWS, N, StartNode, TargetNode,Ploting);
+    [Tree, error,msg] = SimpleShapeAlgorithm( N,BasicWS, StartNode, TargetNode,Ploting);
 
     if error 
         Solution = {msg};

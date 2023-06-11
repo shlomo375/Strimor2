@@ -1,4 +1,4 @@
-function [WS, tree, ParentInd, OK] = Sequence_of_Maneuvers(WS,tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShifts,P)
+function [WS, tree, ParentInd, OK,AllModuleInd] = Sequence_of_Maneuvers(WS,tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShifts,P)
 
 arguments
     WS
@@ -23,14 +23,15 @@ end
 NewWS = WS;
 Newtree = tree;
 NewParentInd = ParentInd;
+NewAllModuleInd = AllModuleInd;
 
 for Maneuver_ind = 1:length(Axis)
 %     if Maneuver_ind==6
 %         d=5
 %     end
-    [OK, NewWS, Newtree, NewParentInd, AllModuleInd(Moving_Log(Maneuver_ind,:)),Error] =...
+    [OK, NewWS, Newtree, NewParentInd, NewAllModuleInd(Moving_Log(Maneuver_ind,:)),Error] =...
                 ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
-                    AllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
+                    NewAllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
     
 
 
@@ -79,5 +80,6 @@ end
 WS = NewWS;
 tree = Newtree;
 ParentInd = NewParentInd;
+AllModuleInd = NewAllModuleInd;
 
 end

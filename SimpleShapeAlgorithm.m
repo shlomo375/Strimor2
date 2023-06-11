@@ -7,14 +7,25 @@
 % %% init
 % load;
 
-function [Tree,Error,msg] = SimpleShapeAlgorithm(BasicWS,N,StartNode,TargetNode,Ploting)
+function [Tree,Error,msg] = SimpleShapeAlgorithm(N,BasicWS,StartNode,TargetNode,Ploting)
+
+arguments
+    N
+    BasicWS
+    StartNode
+    TargetNode
+    Ploting
+end
 % dbstop in NotTested at 12
 % dbstop if error
 % close all
 % dbstop if caught error
-% N = sum(logical(StartNode{1,"ConfigMat"}{:}),'all');
-% Size = [N, 2*N];
-% BasicWS = WorkSpace(Size,"RRT*");
+if isempty(BasicWS)
+    AddDirToPath()
+    N = sum(logical(StartNode{1,"ConfigMat"}{:}),'all');
+    Size = [N, 2*N];
+    BasicWS = WorkSpace(2*Size,"RRT*");
+end
 Error = false;
 % Ploting = 1;
 try
@@ -61,6 +72,15 @@ while any(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(:,:,1) ~= TargetNode.Is
         if Error
             return
         end
+        NewCA = centerOfArea(Start_WS);
+        CorrectionSteps = fix((Start_WS.Center_Of_Area - NewCA)/4);
+        if CorrectionSteps >= Tree.N/6
+            ConfigStruct = Node2ConfigStruct(Tree.Data(Tree.LastIndex,:));
+            Start_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
+            Start_WS.Center_Of_Area = centerOfArea(Start_WS);
+        end
+
+        
     end
 end
 % if ParentInd == 377
@@ -154,12 +174,12 @@ while size(Task_Queue,1) > 0
             LineCreated = true;
     end
 
-    NewCA = centerOfArea(WS);
-    CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
-    if CorrectionSteps >= Tree.N/6
-        [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,CorrectionSteps,Ploting);
-        KillSwitch = tic;
-    end
+    % NewCA = centerOfArea(WS);
+    % CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
+    % if CorrectionSteps >= Tree.N/6
+    %     [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,2*CorrectionSteps,Ploting);
+    %     KillSwitch = tic;
+    % end
     catch memanuvers
         memanuvers
         Error = true;
