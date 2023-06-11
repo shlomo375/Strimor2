@@ -23,6 +23,7 @@ for idx = 1:numel(Files)
     if ~istable(Solution{1})
         data{idx,"N"} = -1;
         Problems{idx} = ErrorProblem{end};
+        delete(fullfile(Files(idx).folder,Files(idx).name));
        continue 
     end
     Path = Solution{1};
