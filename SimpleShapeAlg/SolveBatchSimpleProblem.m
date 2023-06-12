@@ -19,7 +19,7 @@ for jj = 1:Num_Problem_In_Batch
 
     if error 
         Solution = {msg};
-        ErrorProblem(ii) = {{StartNode,TargetNode}};
+        ErrorProblem = {{StartNode,TargetNode}};
         ii = ii + 1;
         disp(msg)
         fprintf("batch: %d, problem idx: %d , error!!!!!!!!\n", Batch_idx,jj);
