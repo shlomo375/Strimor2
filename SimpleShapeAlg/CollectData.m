@@ -44,24 +44,45 @@ for idx = 1:numel(Files)
     data{idx,uniqueGroups(2:end)} = aggregatedData(2:end)';
 
 end
+
+%%
+data(data.N==1,:) = [];
+data.DL = data.DL+1;
 save("SimpleShapeAlg\AllSolutions.mat","data");
 
 %%
-data.N(data.N==-1) = 1;
-data.DL = data.DL+1;
 
 Path_N = accumarray([data.N,data.DL],data{:,"Path_N"}-data{:,"MoveTo"},[],@mean);
 N = accumarray([data.N,data.DL],data.N,[],@mean);
 DL = accumarray([data.N,data.DL],data.DL,[],@mean);
-Resulte = cat(3,N,DL,Path_N);
-Resulte(all(~Resulte(:,:,1),2),:,:) = [];
-Resulte(Resulte(:,1,1)==1,:,:) = [];
-x = Resulte(:,:,1);
-y = Resulte(:,:,2);
-z = Resulte(:,:,3);
+Path_N_STD = accumarray([data.N,data.DL],data{:,"Path_N"}-data{:,"MoveTo"},[],@std);
+Path_N(all(~N,2),:) = [];
+DL(all(~N,2),:) = [];
+Path_N_STD(all(~N,2),:) = [];
+N(all(~N,2),:) = [];
+N = max(N,[],2);
+DL = max(DL,[],1);
+DL = DL-1;
+N_Req = [100,300,500];
+Color = [0,0.45,.74;  .85,.33,.1; .49,.18,.56]%.93,.69,.13;
+for ii = 1:numel(N)
+    
+    if any(N(ii) == N_Req)
+        p = Path_N(ii,Path_N(ii,:)~=0);
+        s = Path_N_STD(ii,Path_N(ii,:)~=0);
+        l = DL(1,Path_N(ii,:)~=0);
 
-save("SimpleShapeAlg\AllSolutions.mat","data","Resulte");
-surf(x,y,z);
+        plot(l,p,'Color',Color(N(ii) == N_Req,:));
+        hold on
+        lower_bound = p - 2*s;
+        upper_bound = p + 2*s;
+        fill([l'; flip(l)'], [upper_bound'; flip(lower_bound)'],Color(N(ii) == N_Req,:), 'FaceAlpha', 0.2,'EdgeColor','none');
+    end
+        
+end
+
+% save("SimpleShapeAlg\AllSolutions.mat","data","Resulte");
+% surf(x,y,z);
 
 
 
