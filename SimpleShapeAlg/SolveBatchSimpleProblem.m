@@ -1,4 +1,4 @@
-function [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp,BasicWS,N,Batch_idx,Ploting,SolutionFolder)
+function [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp,BasicWS,N,Batch_idx,Ploting,SolutionFolder,Group_Approx)
 Num_Problem_In_Batch = size(Exp,1);
 Solution = cell(Num_Problem_In_Batch,1);
 ErrorProblem = cell(1,1);
@@ -7,7 +7,14 @@ ii = 1;
 SolutionFiles = dir(SolutionFolder);
 
 for jj = 1:Num_Problem_In_Batch
-    if any(matches({SolutionFiles.name},join(["N_",string(N),"_Batch_",string(Batch_idx),"p",string(jj),".mat"],"")))
+    
+    if Group_Approx
+        SolutionName = join(["N_",string(N),"_Batch_",string(Batch_idx),"p",string(jj),"Approx.mat"],"");
+    else
+        SolutionName = join(["N_",string(N),"_Batch_",string(Batch_idx),"p",string(jj),".mat"],"");
+    end
+
+    if any(matches({SolutionFiles.name},SolutionName))
         continue
     end
     stratTime = tic;
@@ -15,7 +22,7 @@ for jj = 1:Num_Problem_In_Batch
     TargetNode = Exp{jj}{2};
     
     % if StartNode.ConfigRow < TargetNode.ConfigRow
-    [Tree, error,msg] = SimpleShapeAlgorithm( N,BasicWS, StartNode, TargetNode,Ploting);
+    [Tree, error,msg] = SimpleShapeAlgorithm( N,BasicWS, StartNode, TargetNode,Ploting,"GroupSize_Approx",Group_Approx);
 
     if error 
         Solution = {msg};
@@ -30,7 +37,7 @@ for jj = 1:Num_Problem_In_Batch
     
 
     end
-        save(fullfile(SolutionFolder,join(["N_",string(N),"_Batch_",string(Batch_idx),"p",string(jj),".mat"],"")),"Solution","ErrorProblem");
+    save(fullfile(SolutionFolder,SolutionName),"Solution","ErrorProblem");
 
 end
 

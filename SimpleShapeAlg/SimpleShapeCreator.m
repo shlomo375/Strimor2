@@ -4,7 +4,7 @@
 % N = 100;
 % TEMP = cell(7,1);
 
-function [Nodes] = SimpleShapeCreator(N,ProblemNum)
+function [Nodes] = SimpleShapeCreator(N,ProblemNum,Group_Approx)
   
     BasicWS = WorkSpace([N,N*2],"RRT*");
 

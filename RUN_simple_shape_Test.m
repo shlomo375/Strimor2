@@ -12,6 +12,8 @@ Num_Problem_In_Batch = 100;
 Ploting = 0;
 FevalArray = 100;
 
+Group_Approx = 1;
+
 SolutionFile = dir("SimpleShapeAlg\Solutions");
 SolutionFile([SolutionFile.isdir]) = [];
 
@@ -48,8 +50,8 @@ for ii = 1:numel(SortedTestFile)
         %     continue
         % end
         % f(F_idx) = parfeval(@temp,0,["5","g"]);
-      f(F_idx) = parfeval(@SolveBatchSimpleProblem,0,Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
-          % [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder);
+      % f(F_idx) = parfeval(@SolveBatchSimpleProblem,0,Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder,Group_Approx);
+          [Solution,ErrorProblem] = SolveBatchSimpleProblem(Exp(:,idx),BasicWS,N,F_idx,Ploting,SolutionFolder,Group_Approx);
         F_idx = F_idx + 1
 
                 fprintf("worker on queue,N %d, idx %d, Task %d, date %s\n",N,idx,F_idx,datetime)

@@ -12,8 +12,9 @@ arguments
     Addition.DisableSwitch = false;
     Addition.Task = [];
     Addition.totalDownwards = Downwards;
+    Addition.GroupSize_Approx = false;
 end
-[AbsDiff, AlphaDiff, BetaDiff, Switch] = GetGroupConfigDiff(StartConfig,TargetConfig);
+[AbsDiff, AlphaDiff, BetaDiff, Switch] = GetGroupConfigDiff(StartConfig,TargetConfig,Addition.GroupSize_Approx);
 
 if numel(Addition.BetaDiff_Override) == 1 || numel(Addition.AlphaDiff_Override) == 1
     Temp = zeros(size(StartConfig));
@@ -93,12 +94,12 @@ ReturnFlag = false;
             ReturnFlag = true;
         
     % One module
-        elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) >= 0
+        elseif AlphaDiff(Line) <= -1 && BetaDiff(Line) >= 0 && ~Addition.GroupSize_Approx
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",Line,"Downwards",Downwards,"Type",1,"DestenationLine_Alpha",Line-1,"Side",Addition.Side);
             % ReturnFlag = true;
             return
             
-        elseif BetaDiff(Line) <= -1  && AlphaDiff(Line) >= 0 || (BetaDiff(Line) <= -1  && AlphaDiff(Line) == -1 && abs(AbsDiff(Line)) == abs(StartConfig(Line)))
+        elseif  ~Addition.GroupSize_Approx && BetaDiff(Line) <= -1  && AlphaDiff(Line) >= 0 || (BetaDiff(Line) <= -1  && AlphaDiff(Line) == -1 && abs(AbsDiff(Line)) == abs(StartConfig(Line)))
             Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Beta",Line,"Downwards",Downwards,"Type",-1,"DestenationLine_Beta",Line-1,"Side",Addition.Side);
             % ReturnFlag = true;
             return
@@ -140,7 +141,7 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                 
                 return
         % One module
-            elseif (AlphaDiff(Line) >= 1 && BetaDiff(Line) <= 0) || (AlphaDiff(Line) <= 0 && BetaDiff(Line) >= 1)%xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1) || 
+            elseif ((AlphaDiff(Line) >= 1 && BetaDiff(Line) <= 0) || (AlphaDiff(Line) <= 0 && BetaDiff(Line) >= 1)) && ~Addition.GroupSize_Approx%xor(AlphaDiff(Line) == 1,BetaDiff(Line) == 1) || 
 %                 [GroupsSizes,GroupIndexes,GroupsInds] = GetConfigGroupSizes(Addition.WS, Addition.ConfigShift,Downwards);
 %                 Edges1 = Get_GroupEdges(GroupsSizes,GroupIndexes,GroupsInds);
                 RegularStartConfig = StartConfig;
