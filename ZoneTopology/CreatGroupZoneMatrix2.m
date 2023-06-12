@@ -1,7 +1,25 @@
-function GroupZoneMatrix = CreatGroupZoneMatrix2(GroupMatrix,ConfigType,ConfigMat,GroupIndexes)
+function GroupZoneMatrixOriginal = CreatGroupZoneMatrix2(GroupMatrixOriginal,ConfigMatOriginal,ConfigTypeOriginal,GroupIndexesOriginal)
+
+%%
+SaveRows = any(GroupMatrixOriginal,2);
+GroupMatrix = GroupMatrixOriginal(SaveRows,:);
+ConfigMat = ConfigMatOriginal(SaveRows,:);
+ConfigType = ConfigTypeOriginal(SaveRows,:);
+GroupIndexes = GroupIndexesOriginal(SaveRows);
+%%
 
 GroupZoneMatrix = zeros([size(GroupMatrix),2]);
-
+%% zero padding
+Type = ConfigType(find(ConfigMat,1));
+ConfigMat = [ConfigMat,zeros(size(ConfigMat,1),max(abs(GroupMatrix),[],"all")-1)];    
+ConfigType = GetFullType(ConfigMat,Type);
+% Eddition = repmat([ConfigType(:,end-1),ConfigType(:,end)],1,floor(max(abs(GroupMatrix),[],"all")/2));
+% if mod(max(abs(GroupMatrix),[],"all"),2)
+%     ConfigType = [ConfigType,Eddition];
+% else
+%     ConfigType = [ConfigType,Eddition(:,1:end-1)];    
+% end
+%%
 ConfigMat(ConfigMat~=0) = 1;
 HoleMat = ~ConfigMat;
 HoleMat = HoleMat.*ConfigType;
@@ -11,6 +29,8 @@ BetaCol =  [0;0;1];
 [MaxLine,MaxCol] = size(GroupMatrix);
 for Line = 1:MaxLine
     for Col = 1:MaxCol
+        TopZone = false;
+        ButtomZone = false;
         if GroupMatrix(Line,Col)~=0
             
             if GroupMatrix(Line,Col)>0
@@ -23,24 +43,33 @@ for Line = 1:MaxLine
             end
             
             if Line ~= MaxLine
+                if GroupMatrix(Line,Col) == 1
+                    TopZone = true;
+                end
                 HoleVec = ConvMatrix(3,:);
-                if ~HoleVec(1)
+                if ~HoleVec(1) && HoleMat(Line+1,1) ~= 1
                     HoleVec(1) = [];
                 end
                 TopHoleValue = conv(HoleMat(Line+1,:),flip(HoleVec),'valid');
                 TopZoneLoc = find(TopHoleValue == sum(abs(HoleVec)));
+%                 TopZoneLoc(TopZoneLoc==1) = [];
             else
-                TopZoneLoc = [];
+                TopZoneLoc = 1:2:size(ConfigMat,2);
             end
+
             if Line ~= 1
+                if GroupMatrix(Line,Col) == -1
+                    ButtomZone = true;
+                end
                 HoleVec = ConvMatrix(1,:);
-                if ~HoleVec(1)
+                if ~HoleVec(1) && HoleMat(Line-1,1) ~= -1
                     HoleVec(1) = [];
                 end
                 ButtomHoleValue = conv(HoleMat(Line-1,:),flip(HoleVec),'valid');
                 ButtomZoneLoc = find(ButtomHoleValue == sum(abs(HoleVec)));
+%                 ButtomZoneLoc(ButtomZoneLoc==1) = [];
             else
-                ButtomZoneLoc = [];
+                ButtomZoneLoc = 1:2:size(ConfigMat,2);
             end
 %             switch Line
 %                 case 1
@@ -58,10 +87,21 @@ for Line = 1:MaxLine
             % less then the gap index, it means that it has reached the
             % area to the left of the gap
             GroupIndex = GroupIndexes{Line}{Col}';
-
-            GroupZoneMatrix(Line,Col,1) = GetZoneOfGroup(TopZoneLoc,GroupIndex);
-            GroupZoneMatrix(Line,Col,2) = GetZoneOfGroup(ButtomZoneLoc,GroupIndex);
+            try
+                if ~TopZone
+                    GroupZoneMatrix(Line,Col,1) = GetZoneOfGroup(TopZoneLoc,GroupIndex);
+                else
+                    GroupZoneMatrix(Line,Col,1) = inf;
+                end
+                if ~ButtomZone
+                    GroupZoneMatrix(Line,Col,2) = GetZoneOfGroup(ButtomZoneLoc,GroupIndex);
+                else
+                    GroupZoneMatrix(Line,Col,2) = inf;
+                end
             
+            catch ee
+                ee
+            end
 
         else
             break
@@ -69,5 +109,11 @@ for Line = 1:MaxLine
     end
     
 end
-% GroupZoneMatrix   
+
+
+%%
+GroupZoneMatrixOriginal = zeros([size(GroupMatrixOriginal),2]);
+GroupZoneMatrixOriginal(SaveRows,:,:) = GroupZoneMatrix;
+%%
+
 end

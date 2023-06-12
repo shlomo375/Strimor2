@@ -2,9 +2,9 @@ clear;
 close all;
 % clear Taskmaster
 %% Creat Tree Dir for pair of config, one from start, one from target.
-ModuleRange = [10:12]; % number of modules in the tree
-TreeType = ["OneTree_IM3Axis"]%,"uniform_IM2Axis__3","uniform_IM1Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
-TreeIndexes = 1;
+ModuleRange = [12]; % number of modules in the tree
+TreeType = ["uniform_3","uniform_1","normal_1"]%,"uniform_IM2Axis__3","uniform_IM1Axis__3"]%,"uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"uniform_LineCostSam__3"]; %mast to be unique names
+TreeIndexes = 1:5;
 %%
 
 
@@ -49,14 +49,16 @@ try
                 end
                 
                 config = ConfigPairs{kk}{1};
-                StartConfig = table(duration(0,0,0),1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+%                 StartConfig = table(duration(0,0,0),1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                StartConfig = ConfigStruct2Node(config);
                 tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
                 StartConfig = tree.Data(1,:);
                 SaveTree2Files(tree);
                 save(fullfile(TreeDir,"Start.mat"),"StartConfig");
                 
                 config = ConfigPairs{kk}{2};
-                StartConfig = table(duration(0,0,0),-1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+%                 StartConfig = table(duration(0,0,0),-1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                StartConfig = ConfigStruct2Node(config);
                 tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
                 TargetConfig = tree.Data(1,:);
                 save(fullfile(TreeDir,"Target.mat"),"TargetConfig");
@@ -66,7 +68,8 @@ try
                     mkdir(TreeDir);
                     
                     config = ConfigPairs{kk}{2};
-                    StartConfig = table(duration(0,0,0),1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+%                     StartConfig = table(duration(0,0,0),1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                    StartConfig = ConfigStruct2Node(config);
                     tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
                     StartConfig = tree.Data(1,:);
                     SaveTree2Files(tree);
@@ -74,7 +77,8 @@ try
                 
     
                     config = ConfigPairs{kk}{1};
-                    StartConfig = table(duration(0,0,0),-1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+%                     StartConfig = table(duration(0,0,0),-1,0,config.Type,0,0,0,0,config.Row,config.Col,0,0,1,0,string(config.Str),"",{config.Status},{[]},{[]});
+                    StartConfig = ConfigStruct2Node(config);
                     tree = TreeClass(TreeDir, kk, 1e5, StartConfig);
                     TargetConfig = tree.Data(1,:);
                     save(fullfile(TreeDir,"Target.mat"),"TargetConfig");
@@ -86,6 +90,6 @@ end
     end
 end
 end
-% copyfile(fullfile(SoftwareLocation,"RRTtree","Results"),fullfile(SoftwareLocation,"RRTtree","BeckupResults"));
+copyfile(fullfile(SoftwareLocation,"RRTtree","BeckupResults","18N"),fullfile(SoftwareLocation,"RRTtree","Results","18N"));
 
 

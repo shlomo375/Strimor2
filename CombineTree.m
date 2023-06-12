@@ -44,23 +44,23 @@ for kk = 3:numel(ff)
         end
         ds = fileDatastore(W(kk),"IncludeSubfolders",false,"ReadFcn",@LoadTableFromMAT,'PreviewFcn',@LoadTableFromMATPreview,'UniformRead',true);
         ds.Files = ds.Files(contains(ds.Files,"size"));
-        try
+%         try
             Tall = tall(ds);
             s = gather(size(Tall));
             fprintf("tree size: "+string(s(1)));
             rmdir(D(kk)+"\"+files(ii).name,"s");
 
             BeckupFolder = insertAfter(D(kk),"N\","Beckup\");
-            try
+%             try
                 rmdir(BeckupFolder,"s");
-            catch
-            end
+%             catch
+%             end
             fprintf("coping file...\n");
             copyfile(D(kk),BeckupFolder)
-        catch e
-            disp(e)
-            pause
-        end
+%         catch e
+%             disp(e)
+%             pause
+%         end
         
         
     

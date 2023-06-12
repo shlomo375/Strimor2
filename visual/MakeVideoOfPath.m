@@ -1,4 +1,6 @@
-function MakeVideoOfPath(Path, N, FPS, PathName,stills)
+function frames = MakeVideoOfPath(Path, N, FPS, PathName,stills,Background)
+tic
+close all
 MovingAgentIndex = 10;
 Size = [N, 2*N];
 BasicWS = WorkSpace(Size,"RRT*");
@@ -17,7 +19,7 @@ for ii = 1:NumberOfMove
 %     figure(ii)
 %     PlotWorkSpace(WS,1);
 %     Agent = find(WS.Space.Status)';
-    PlotWorkSpace(WS,[],MovingAgent,2);
+%     PlotWorkSpace(WS,[],MovingAgent,2);
 %     MovingAgent = ismember(Agent, Path(ii+1).Movment.Agent);
     
     
@@ -41,9 +43,12 @@ for ii = 1:NumberOfMove
     CenterLoc = permute([x,y],[1 3 2]);
     CenterLoc = CenterLoc + zeros(size(CenterLoc,1),FPS*abs(step),2);
     
-    FramePerStep = linspace(0,1,FPS*abs(step));
+    FramePerStep = linspace(0,1,FPS*mean(abs(step)));
+%     FramePerStep = linspace(0,1,FPS*abs(step));
+
     
-    ds = [dx;dy].*FramePerStep.*ones(1,1,sum(MovingAgentLoc));
+%     ds = [dx;dy].*FramePerStep.*ones(1,1,sum(MovingAgentLoc));
+    ds = permute([dx;dy],[1,3,2]).*FramePerStep;
 
     try
     CenterLoc(MovingAgentLoc,:,:) = CenterLoc(MovingAgentLoc,:,:) + permute(ds,[3 2 1]);
@@ -54,83 +59,149 @@ for ii = 1:NumberOfMove
     Color = ones(size(CenterLoc,1),1);
     Color(MovingAgentLoc,:) = MovingAgentIndex .* ones(sum(MovingAgentLoc),1);
     
-    MoveNumber = [MoveNumber, ii.*ones(1,numel(FramePerStep))];
+    MoveNumber = [MoveNumber, (NumberOfMove-ii).*ones(1,numel(FramePerStep))];
+%     MoveNumber = [MoveNumber, (ii+1).*ones(1,numel(FramePerStep))];
     AgentType = WS.Space.Type(Agent);
     Loc = [Loc , CenterLoc];
     C = [C, Color.*ones(1,size(CenterLoc,2))];
     Type = [Type, AgentType.*ones(1,size(CenterLoc,2))];
 end
-MoveNumber = MoveNumber-1;
+% MoveNumber = MoveNumber-1;
 C(:,1) = deal(1);
 C(:,end) = deal(1);
-ShapeCenter = (max(Loc)+min(Loc))/2;
-ShapeCenter(:,:,1) = 0;
-Loc = Loc - ShapeCenter;
-%frames = 
+
+%% keep central mass
+% ShapeCenter = (max(Loc)+min(Loc))/2;
+% ShapeCenter(:,:,1) = 0;
+% Loc = Loc - ShapeCenter;
+Loc(:,1:1+FPS-1,:) = Loc(:,1:1+FPS-1,:) - repmat(((max(Loc(:,1,:))+min(Loc(:,1,:)))/2),[size(Loc,1),FPS]);
+for jj = 1+FPS:FPS:size(Loc,2)
+    Loc(:,jj:jj+FPS-1,:) = Loc(:,jj:jj+FPS-1,:) - repmat(((max(Loc(:,jj,:))+min(Loc(:,jj,:)))/2) - ((max(Loc(:,jj-1,:))+min(Loc(:,jj-1,:)))/2),[size(Loc,1),FPS]);
+end
+
+StartShapeCenter = (max(Loc(:,1,:))+min(Loc(:,1,:)))/2;
+EndShapeCenter = (max(Loc(:,end,:))+min(Loc(:,end,:)))/2;
+
+Displacment = EndShapeCenter-StartShapeCenter;
+d_CM = Displacment.*linspace(0,1,size(Loc,2));
+Loc = Loc - d_CM;
+%%
 
 video = VideoWriter(PathName);
 video.Quality = 100;
-video.FrameRate = 30;
+video.FrameRate = 60;
 
-
-figure(100)%
+figure(100)
+% figure("Name","video","Position",[1	49	1536	740.800000000000])%
 cla;
-xlimit = [min(Loc(:,:,1),[],'all')-5-sqrt(3)/2, max(Loc(:,:,1),[],'all')+5+sqrt(3)/2];
-ylimit = [min(Loc(:,:,2),[],'all')-5-sqrt(3)/2, max(Loc(:,:,2),[],'all')+5+sqrt(3)/2];
-axis([xlimit,ylimit])
-MoveNumText.x = xlimit(1)+4;
-MoveNumText.y = ylimit(2)-3;
+xlimit = [min(Loc(:,:,1),[],'all')-7-sqrt(3)/2, max(Loc(:,:,1),[],'all')+7+sqrt(3)/2];
+ylimit = [min(Loc(:,:,2),[],'all')-7-sqrt(3)/2, max(Loc(:,:,2),[],'all')+7+sqrt(3)/2];
+% axis([xlimit,ylimit])
+plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)],".r");
+axis equal
+MoveNumText.x = xlimit(1)+6;
+MoveNumText.y = ylimit(2)-5;
 MoveNumText.value = MoveNumber(1);
 MoveNumText.handel = [];
 
-[p,~,MoveNumText] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1),[],[],[],MoveNumText);
 
-if nargin > 4
-    saveas(p,stills+"1"+".png");
+TargetLoc = Loc(:,end,:)  +d_CM;
+% [p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1),[],[],[],MoveNumText);
+[p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1),[],[],[],[]);
+if exist("Background","var")
+    [p.T] = PlotTriangle(permute(TargetLoc(:,end,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],[],[],[]);
 end
-ImgIdx = 1;
-exportgraphics(gca,string(ImgIdx)+".jpg","Resolution",300)
-ImgIdx = ImgIdx +1;
-% I = imread("Plot.jpg");
+
+if exist("stills","var")
+    if ~isempty(stills)
+        saveas(p,stills+"1"+".png");
+    end
+end
+
+drawnow
+pause(2);
+
+% exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
+
+% I = imread("Plot.png");
 % frames = zeros([size(I),size(Loc,2)+2*video.FrameRate]);
-% frames(:,:,:,1:video.FrameRate) = repmat(imread("Plot.jpg"),[1,1,1,video.FrameRate]);
+% frames(:,:,:,1:video.FrameRate) = repmat(imread("ArticleMovie\Plot.png"),[1,1,1,video.FrameRate]);
 % frames(1:video.FrameRate) = deal(getframe);
 % for kk = 1:10
 %     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
 % end
-for j = 2:size(Loc,2)
+FigureHandels = cell(1,size(Loc,2));
+Lastjj = 1;
+close all
+% frames= uint8()
+for jj = 1:size(Loc,2)
+    FigureHandels{jj} = figure(jj);
+    hold on
+    fprintf("progress: "+string(jj)+"/"+string(size(Loc,2))+"time: "+string(toc)+"\n");
 %     xlim([min(Loc(:,:,1),[],'all')-1-sqrt(3)/2, max(Loc(:,:,1),[],'all')+1+sqrt(3)/2]);
 %     ylim([min(Loc(:,:,2),[],'all')-1-sqrt(3)/2, max(Loc(:,:,2),[],'all')+1+sqrt(3)/2]);
-    MoveNumText.value = MoveNumber(j);
-    [p,~,MoveNumText] = PlotTriangle(permute(Loc(:,j,:),[1 3 2]), Type(:,j), C(:,j),[],p,[],MoveNumText);
-%     drawnow
+    MoveNumText.value = MoveNumber(jj);
+%     [p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,j,:),[1 3 2]), Type(:,j), C(:,j),[],p.S,[],MoveNumText);
+%     if exist("Background","var")
+%         [p.T] = PlotTriangle(permute(TargetLoc(:,end-j+1,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],p.T,[],[]);
+%     end
+plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)],".r");
+%     [p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,jj,:),[1 3 2]), Type(:,jj), C(:,jj),[],[],[],MoveNumText);
+[p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,jj,:),[1 3 2]), Type(:,jj), C(:,jj),[],[],[],[]);    
+if exist("Background","var")
+        [p.T] = PlotTriangle(permute(TargetLoc(:,end-jj+1,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],[],[],[]);
+end
+    %     drawnow
 %     frames(j+video.FrameRate-1) = getframe;
-    exportgraphics(gca,string(ImgIdx)+".jpg","Resolution",300)
-    ImgIdx = ImgIdx +1;
-%     frames(:,:,:,j+video.FrameRate-1) = imread("Plot.jpg");
-%     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
-%     pause(0.1)
-if j==12
-    d=5
-end
-    if nargin > 4
-        saveas(p,stills+string(j)+".png");
-        
-    end
-end
-exportgraphics(gca,string(ImgIdx)+".jpg","Resolution",300)
-    ImgIdx = ImgIdx +1;
+axis equal
 
-% frames(:,:,:,end+1:end+video.FrameRate) = repmat(imread("Plot.jpg"),[1,1,1,video.FrameRate]);
 
-% frames(end:end+video.FrameRate) = deal(getframe);
-% for kk = 1:10
-%     exportgraphics(gca,"Media\"+extractBefore(PathName,".")+".gif","Append",true);
+    exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
+
+    frames(:,:,:,jj) = imread("ArticleMovie\Plot.png");
+
+% SaveEvery = 100;
+% if ~mod(jj,SaveEvery) || jj==size(Loc,2)
+%     drawnow
+%     CellFrames = cell(1,size(Loc,2));
+%     End = Lastjj+SaveEvery-1;
+%     if End>size(Loc,2)
+%         End = size(Loc,2);
+%     end
+% 
+%     parfor kk = Lastjj:End
+%     
+%         exportgraphics(FigureHandels{kk},"ArticleMovie\Plot"+string(kk)+".png","Resolution",600)
+%         CellFrames{kk} = imread("ArticleMovie\Plot"+string(kk)+".png");
+%         
+%         disp(kk)
+%     end
+%     Lastjj = jj+1;
+%     close all
 % end
 
+%     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
+%     pause(0.1)
+ 
+    if exist("stills","var")
+        if ~isempty(stills)
+            saveas(p,stills+string(jj)+".png");
+        end
+    end
+end
+drawnow
+pause(2)
+
+
+% exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
+
+
+% frames(:,:,:,end+1:end+video.FrameRate) = repmat(imread("ArticleMovie\Plot.png"),[1,1,1,video.FrameRate]);
+% frames = cat(4,CellFrames{:});
+frames = flip(frames,4);
 open(video);
 writeVideo(video,frames);
 close(video);
-
+close all
 end
 

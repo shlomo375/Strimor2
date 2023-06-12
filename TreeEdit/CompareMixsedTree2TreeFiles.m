@@ -14,7 +14,7 @@ for ii = 1:size(FilesSize,1)
         continue
     end
     FileData = readall(Files);
-    StrLoc = Data.ConfigRow == FilesSize(ii,1) & Data.ConfigCol == FilesSize(ii,2);
+   StrLoc = Data.ConfigRow == FilesSize(ii,1) & Data.ConfigCol == FilesSize(ii,2);
     [FileConfigLoc, DataConfigLoc] = ismember(FileData.ConfigStr,Data.ConfigStr(StrLoc));
     FilesConnectedNode = FileData(FileConfigLoc,:);
     TreeConnectedNode = Data(StrLoc,:);

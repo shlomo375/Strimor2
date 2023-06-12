@@ -3,9 +3,9 @@ clear;
 % close all;
   
 %% Creat Tree Dir for pair of config, one from start, one from target.
-ModuleRange = [10:23]; % number of modules in the tree
-TreeType = ["OneTree_IM3Axis","uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"]%,"normal_1","uniform_1","uniform_3"]; %mast to be unique names  "normal_1","uniform_1","uniform_3"
-TreeRange = 1:200;
+ModuleRange = [23]; % number of modules in the tree
+TreeType = ["uniform_IM3AxisZoneInf__3"]%"uniform_3",,"normal_1","uniform_1","uniform_3"]; %mast to be unique names  "normal_1","uniform_1","uniform_3"
+TreeRange = 1;
 %%
 
 
@@ -25,8 +25,8 @@ Info.RowNumData.parameter = 1;
 TreeFolder=[];
 AllResultFolder = fullfile(SoftwareLocation,"AllTreeResulte");
 
- delete(gcp('nocreate'));    
- p =  parpool(maxNumCompThreads);
+%  delete(gcp('nocreate'));    
+%  p =  parpool(maxNumCompThreads);
 
 TreesFolder = fullfile("RRTtree","Results");
 tbl = table();

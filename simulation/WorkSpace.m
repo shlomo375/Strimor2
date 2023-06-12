@@ -1,11 +1,14 @@
 classdef WorkSpace
-    properties (SetAccess = private)
+    properties (SetAccess = public)
         SpaceSize %{mustBeVector,mustBeNumeric,mustBePositive}
         Space
         R1
         R2
         R3
         Algoritem
+        MovmentColorIdx = 4
+        DoSplittingCheck = false
+        Center_Of_Area
         
     end
     
@@ -29,11 +32,15 @@ classdef WorkSpace
                         colors(i,:) = [1 .55 .55];%red
                     case 2 %selected
                         colors(i,:) = [0.4 1 0.4];%green
-                    case 10 %error
-                        colors(i,:) = [232, 7, 37]/255;%blue%[214,12,50]/255;%
                     case 3 %center of mass
                         colors(i,:) = [1 .75 .81];%pink
-
+                    case 4 %Movment
+                        colors(i,:) = [1 .55 .55];%red    
+                    case 10 %error
+                        colors(i,:) = [232, 7, 37]/255;%blue%[214,12,50]/255;%
+    
+                    case 11
+                        colors(i,:) = [0.5 0.5 0.5];
                 end
             end
         end
@@ -54,13 +61,17 @@ classdef WorkSpace
     
     methods
         
-        function WS = WorkSpace(Size,algoritem,Lite)
-            index = num2cell(1:prod(Size));
+        function WS = WorkSpace(Size,algoritem,~,FullType)
             WS.Space = WorkSpace.SpaceStructure(Size);
 %             [WS.Space.index] = index{:};
             WS.SpaceSize = Size;
             WS.Algoritem = algoritem;
-            WS = SetSpaceType(WS);
+            if nargin < 4
+                WS = SetSpaceType(WS);
+            else
+                WS.Space.Type = FullType;
+                WS = AxisRotationMatrixNew(WS);
+            end
 %             PlotWorkSpace(WS);
             if nargin < 3
                 WS = AxisRotationMatrixNew(WS);
@@ -78,6 +89,15 @@ classdef WorkSpace
             temp(2:2:end) = -1;
             WS.Space.Type = WS.Space.Type.*temp;
 
+        end
+        
+        function CA = centerOfArea(WS)
+
+            [~,RightCol] = find(WS.Space.Status,1,'last');
+            [~,LeftCol] = find(WS.Space.Status,1,'first');
+            
+            CA = LeftCol+fix((RightCol-LeftCol)/2);
+        
         end
 
         function WS = AxisRotationMatrixNew(WS)
@@ -99,34 +119,67 @@ classdef WorkSpace
             R = [];
             n2 = 2.5:2:((2*NewRow)+1);
             [i,j] = meshgrid(1:Col,1:Row);
-            for k = 1:length(n2)
+
+
+            ind = cell(length(n2),1);
+            parfor k = 1:length(n2)
+                fprintf("axis 2: %d/%d\n",k,length(n2));
                 [ro,co] = find(abs(j-line(i,-1,n2(k)))<=.5);
                 loc = flip(sortrows([ro,co],[2 1],{'descend' 'ascend'}),1);
-                ind = sub2ind(Size,loc(:,1),loc(:,2));
-                if isempty(ind)
-                    break
-                end
-                if k>1
-                    target = sub2ind(Size,loc(end,1),loc(end,2)-1);
-                    shift = 1;
-                    if find(ind==target)
-                        target = sub2ind(Size,loc(end,1),loc(end,2)-2);
-                        shift = 2;
-                    end
-    
-%                     [row,col] = find(R==target);
-
-                    R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
-                    [row,col] = find(R==target);
-                    R(row+1,col+shift-length(ind):col+(shift==2)) = ind';
-                    
-                    
-                else
-                    R = [R, zeros(NewRow,length(ind))];
-                    R(k,:) = ind';
-                end
+                ind{k} = sub2ind(Size,loc(:,1),loc(:,2));
+                % if isempty(ind{k})
+                %     break
+                % end
             end
-            R(:,sum(R)==0) = []; 
+            
+            R = zeros(NewRow,sum(Size));
+            Left = ceil(Size(1)/2);
+            if ~mod(Size(1),2)
+                R(Left,Left-Left+1:Left-Left+numel(ind{Left})) = ind{Left}';
+                Left = Left+1;
+                
+            end
+            for Line = Left:numel(ind)
+                R(Line,Line-Left+1:Line-Left+numel(ind{Line})) = ind{Line}';
+            end
+            
+            Right = find(R(Left,:),1,"last");
+            for Line = Left-1:-1:1
+                R(Line,Right-(Left-Line)+1-numel(ind{Line}):Right-(Left-Line)) = ind{Line}';
+            end
+            R(:,sum(R)==0) = [];
+            % R1=R;
+            
+%             R = [];
+%             for k = 1:length(n2)
+%                 fprintf("axis 2: %d/%d\n",k,length(n2));
+%                 [ro,co] = find(abs(j-line(i,-1,n2(k)))<=.5);
+%                 loc = flip(sortrows([ro,co],[2 1],{'descend' 'ascend'}),1);
+%                 ind = sub2ind(Size,loc(:,1),loc(:,2));
+%                 if isempty(ind)
+%                     break
+%                 end
+%                 if k>1
+%                     target = sub2ind(Size,loc(end,1),loc(end,2)-1);
+%                     shift = 1;
+%                     if find(ind==target)
+%                         target = sub2ind(Size,loc(end,1),loc(end,2)-2);
+%                         shift = 2;
+%                     end
+% 
+% %                     [row,col] = find(R==target);
+% 
+%                     R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
+%                     [row,col] = find(R==target);
+%                     R(row+1,col+shift-length(ind):col+(shift==2)) = ind';
+% 
+% 
+%                 else
+%                     R = [R, zeros(NewRow,length(ind))];
+%                     R(k,:) = ind';
+%                 end
+%             end
+%             R(:,sum(R)==0) = []; 
             WS.R2 = R;
             
             
@@ -137,35 +190,75 @@ classdef WorkSpace
                 n3 = n3(1:NewRow);
             end
             [i,j] = meshgrid(1:Col,1:Row);
-            for k = 1:length(n3)
+
+
+            ind = cell(length(n3),1);
+            parfor k = 1:length(n3)
+                fprintf("axis 3: %d/%d\n",k,length(n3));
                 [ro,co] = find(abs(i-line(j,1,n3(k)))<=.5);
                 loc = sortrows([ro,co],1,'ascend');
-                ind = sub2ind(Size,loc(:,1),loc(:,2));
-            
-                if isempty(ind)
-                    break
-                end
-                if k>1
-                    target = sub2ind(Size,loc(1,1),loc(1,2)+1);
-                    shift = 1;
-                    if find(ind==target)
-                        target = sub2ind(Size,loc(1,1),loc(1,2)+2);
-                        shift = 2;
-                    end
-    
-%                     [row,col] = find(R==target);
-
-                    R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
-                    [row,col] = find(R==target);
-                    R(row+1,col-(shift==2):col-(shift==2)+length(ind)-1) = ind';
-                    
-                    
-                else
-                    R = [R, zeros(NewRow,length(ind))];
-                    R(k,:) = ind';
-                end
+                ind{k} = sub2ind(Size,loc(:,1),loc(:,2));
+                % if isempty(ind{k})
+                %     break
+                % end
             end
-            R(:,sum(R)==0) = []; 
+            
+            R = zeros(NewRow,sum(Size));
+            Left = floor(Size(2)/2);
+            % if mod(Size(1),2)
+            %     R(Left,Left-Left+1:Left-Left+numel(ind{Left})) = ind{Left}';
+            %     Left = Left+1;  
+            % end
+
+            for Line = Left:-1:1
+                R(Line,Left-Line+1:Left-Line+numel(ind{Line})) = ind{Line}';
+            end
+            
+            if mod(Size(1),2)
+                
+                Left = Left+1;
+                R(Left,Left-Left+1:Left-Left+numel(ind{Left})) = ind{Left}';
+            end
+            Right = find(R(Left,:),1,"last");
+            for Line = Left:numel(ind)
+                R(Line,Right-(Line-Left)+1-numel(ind{Line}):Right-(Line-Left)) = ind{Line}';
+            end
+            
+            
+            
+            R(:,sum(R)==0) = [];
+%             R1=R;
+%             R = [];
+%             for k = 1:length(n3)
+%                 fprintf("axis 3: %d/%d\n",k,length(n3));
+%                 [ro,co] = find(abs(i-line(j,1,n3(k)))<=.5);
+%                 loc = sortrows([ro,co],1,'ascend');
+%                 ind = sub2ind(Size,loc(:,1),loc(:,2));
+% 
+%                 if isempty(ind)
+%                     break
+%                 end
+%                 if k>1
+%                     target = sub2ind(Size,loc(1,1),loc(1,2)+1);
+%                     shift = 1;
+%                     if find(ind==target)
+%                         target = sub2ind(Size,loc(1,1),loc(1,2)+2);
+%                         shift = 2;
+%                     end
+% 
+% %                     [row,col] = find(R==target);
+% 
+%                     R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
+%                     [row,col] = find(R==target);
+%                     R(row+1,col-(shift==2):col-(shift==2)+length(ind)-1) = ind';
+% 
+% 
+%                 else
+%                     R = [R, zeros(NewRow,length(ind))];
+%                     R(k,:) = ind';
+%                 end
+%             end
+            % R(:,sum(R)==0) = []; 
             WS.R3 = R;
         end
 
@@ -269,40 +362,103 @@ classdef WorkSpace
             end
         end
         
-        function PlotWorkSpace(WS,text,Agent,c,MoveNumber)
-            
-            
-            map = WS.Space;
-            Loc = true(size(map.Status));
-            if nargin>2
-%                 map = WS.Space(Agent);
-                Loc = false(size(map.Status));
-                Loc(Agent) = true;
-                Loc = Loc';
-            end
+%         function PlotWorkSpace(WS,text,Agent,c,MoveNumber)
+%             
+%             
+%             map = WS.Space;
+%             Loc = true(size(map.Status));
+%             if nargin>2
+% %                 map = WS.Space(Agent);
+%                 Loc = false(size(map.Status));
+%                 Loc(Agent) = true;
+%                 Loc = Loc';
+%             end
+% 
+%             Status = map.Status;
+%             if nargin>2
+%                     Status(Agent) = deal(c);
+%             end
+%             Status = Status';
+%             
+%             Type = map.Type';
+%             Index = map.index';
+%            
+% %             [yShift,xShift] = ind2sub(size(WS.Space.Status),Index);
+%             [yShift,xShift] = meshgrid(1:size(WS.Space.Status,1),1:size(WS.Space.Status,2));
+%             if nargin>4
+%                 MoveNumText.x = min(xShift,[],"all")-3;
+%                 MoveNumText.y = max(yShift,[],"all")+3;
+%                 MoveNumText.value = MoveNumber(1);
+%                 MoveNumText.handel = [];
+%             else
+%                 MoveNumText = [];
+%             end
+%             
+%             if ~isempty(text)
+%                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc')),[],[],MoveNumText);
+%             else
+%                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc),[],[],[],MoveNumText);
+%             end
+%            axis equal;
+% %             xlim([])
+%         end
 
-            Status = map.Status;
-            if nargin>2
-                    Status(Agent) = deal(c);
-            end
-            Status = Status';
+        function PlotWorkSpace(WS,GeneralPlot,PlotAgent,NumberPlot)
             
+            arguments
+                WS (1,1) {mustBeA(WS,"WorkSpace")}
+%                 FigureHandle (1,1) = figure("Name","WorkSpacePloted");
+                GeneralPlot.Plot_CellInd (1,1) {mustBeNumericOrLogical} = false;
+                GeneralPlot.Plot_FullWorkSpace (1,1) {mustBeNumericOrLogical} = false;
+                GeneralPlot.Plot_AllModule (1,1) {mustBeNumericOrLogical} = false;
+%                 PlotAgent.PlotOnlySpacificAgent (1,1) {mustBeNumericOrLogical} = false;
+                PlotAgent.Set_SpecificAgentInd (:,1) {mustBeInteger,mustBePositive,mustBeVector}
+                PlotAgent.Set_SpecificColors (:,3) {mustBeInteger} = 10;
+                NumberPlot.PlotMoveNumber (1,1) {mustBeNumericOrLogical} = false;
+                NumberPlot.MoveNumber (1,1) {mustBePositive,mustBeInteger} = 1;
+                NumberPlot.NumberLocation (1,2) {mustBePositive} = [3,3];
+            end
+            map = WS.Space;
+            
+            Status = map.Status;
+            if GeneralPlot.Plot_FullWorkSpace
+                Loc = true(size(map.Status));
+            else
+                [Row,Col] = find(map.Status);
+                RowRange = [min(Row)-3,max(Row)+1];
+                ColRange = [min(Col)-6,max(Col)+4];
+                Loc = true(size(map.Status));
+                Loc(1:RowRange(1)-1,:) = false;
+                Loc(RowRange(2)+1:end,:) = false;
+                Loc(:,1:ColRange(1)-1) = false;
+                Loc(:,ColRange(2)+1:end) = false;
+            end
+            if isfield(PlotAgent,"Set_SpecificAgentInd")
+%                 map = WS.Space(Agent);
+%                 Loc = false(size(map.Status));
+%                 Loc(PlotAgent.AgentInd) = true;
+%                 Loc = Loc';
+                Status(PlotAgent.AgentInd) = deal(Set_SpecificColors);
+            end
+            Loc = Loc';
+            
+            Status = Status';
             Type = map.Type';
             Index = map.index';
            
-%             [yShift,xShift] = ind2sub(size(WS.Space.Status),Index);
             [yShift,xShift] = meshgrid(1:size(WS.Space.Status,1),1:size(WS.Space.Status,2));
-            if nargin>4
-                MoveNumText.x = min(xShift,[],"all")-3;
-                MoveNumText.y = max(yShift,[],"all")+3;
-                MoveNumText.value = MoveNumber(1);
+            
+            if NumberPlot.PlotMoveNumber
+                MoveNumText.x = min(xShift,[],"all")-NumberPlot.NumberLocation(1);
+                MoveNumText.y = max(yShift,[],"all")+NumberPlot.NumberLocation(2);
+                MoveNumText.value = NumberPlot.MoveNumber(1);
                 MoveNumText.handel = [];
             else
                 MoveNumText = [];
             end
             
-            if ~isempty(text)
-                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc')),[],[],MoveNumText);
+            if GeneralPlot.Plot_CellInd
+                PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc)),[],[],MoveNumText);
             else
                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc),[],[],[],MoveNumText);
             end
@@ -342,7 +498,7 @@ classdef WorkSpace
 
         function CM = CenterOfMass(WS)
             
-            l = find([WS.Space.Status] == 1);
+            l = find(WS.Space.Status);
             [y,x] = ind2sub(WS.SpaceSize,l);
             CM = [mean(y) mean(x)];
 %             ind = sub2ind(WS.SpaceSize,CM(1),CM(2));
@@ -367,6 +523,13 @@ classdef WorkSpace
             Alert = "movment is OK";
             CollidingAgent = [];
             MoveAgent2Ind = [];
+
+            if ~all(WS.Space.Status(Movment.Agent))
+                OK = false;
+                return
+            end
+
+
             Loc = Movment.Agent;
             Type = WS.Space.Type(Loc);
             BaseDown = Loc(Type==1);
@@ -480,7 +643,11 @@ classdef WorkSpace
             catch e
                 e
             end
+            try
             PartnerAgent = [PartnerAgentUpIndLoc; PartnerAgentDownIndLoc];
+            catch qwe
+                qwe
+            end
             try
             PartnerAgentInSpace = R(PartnerAgent);
             zeroLoc = (PartnerAgentInSpace == 0);
@@ -540,60 +707,44 @@ classdef WorkSpace
             end  
         end 
 
-        function approve = ScanningAgentsFast(WS, ScannedAgent)
-            approve = true;
-%             Agent = find(~ScannedAgent);
-%             Agent = Agent(randperm(length(Agent),1));
-            
-%             ScannedAgent(Agent) = 1;
-            group = {[]};
-%             r = {WS.R1, WS.R2, WS.R3};
-            while any(~ScannedAgent)
-                Agent = find(~ScannedAgent);
-                Agent = Agent(randperm(length(Agent),1));
+        
+        function [ScannedAgent, ModulesList,Idx] = ScanningAgentsFast(WS, ScannedAgent, Agent, FirstItr, ModulesList,AgentType, Idx)
+            if nargin<5
+                ModulesList = zeros(sum(logical(WS.Space.Status),"all"),1);
+                AgentType = WS.Space.Type(Agent);
+                Idx = 1;
+            end
+            ScannedAgent(Agent) = true;
+            ModulesList(Idx) = Agent;
+            Idx = Idx +1;
 
-
-                Neighbors = [];
-                for r = {WS.R1, WS.R2, WS.R3}
-                    R = cell2mat(r);
-                    [row,~] = find(ismember(R,Agent),1);
-                    NextLoc = R(sub2ind(size(R),row*ones(1,size(R,2)),1:size(R,2)));
-                    NextLoc(NextLoc==0) = []; 
-                    Populated = ~[WS.Space(NextLoc).Status];
-                    
-                    first = Populated(1:find(NextLoc==Agent));
-                    last = Populated(size(first,2)+1:end);
-                    Neighbors = [Neighbors, NextLoc(find(first,1,"last")+1:size(first,2))];
-                    Neighbors = [Neighbors, NextLoc(size(first,2)+(1:find(last,1,"first")-1))];
-                    
-                end
-                ScannedAgent(Neighbors) = 1;
-                AddToGroup = false;
-                for i=1:size(group,2)
-                    
-                    g = cell2mat(group(i));
-                    if isempty(g)
-                        group = {Neighbors};
-                        AddToGroup = true; 
-                        break
-                    end
-                    
-                    if ~isempty(ismember(g,Neighbors))
-                        group(i) = {unique([g,Neighbors])};
-                        AddToGroup = true; 
-                        break
-                    end
-                end
-                if ~AddToGroup
-                    group(end+1) = {Neighbors};
+            NextAgent = Agent + WS.SpaceSize(1);
+            if NextAgent >= 1 && NextAgent <= numel(WS.Space.Status)
+                if ~ScannedAgent(NextAgent)
+                    [ScannedAgent, ModulesList,Idx] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, [], ModulesList,-AgentType, Idx);
                 end
             end
-                if size(group,2)>1
-                    approve = false;
+            
+            NextAgent = Agent - WS.SpaceSize(1);
+            if NextAgent >= 1 && NextAgent <= numel(WS.Space.Status)
+                if ~ScannedAgent(NextAgent)
+                    [ScannedAgent, ModulesList,Idx] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, [], ModulesList,-AgentType, Idx);
                 end
-                
-        end
-        
+            end
+            
+            NextAgent = Agent - AgentType;
+            if abs(mod(NextAgent,WS.SpaceSize(1))-mod(Agent,WS.SpaceSize(1)))<=1
+                if ~ScannedAgent(NextAgent)
+                        [ScannedAgent, ModulesList,Idx] = ScanningAgentsFast(WS, ScannedAgent, NextAgent, [], ModulesList,-AgentType, Idx);
+                end
+            end
+
+            if ~isempty(FirstItr)
+                ModulesList(~ModulesList) = [];
+            end
+        end 
+
+
         function [Approve, Alert] = SplittingCheckSlow(WS)
             Approve = true;            
             space = logical(reshape([WS.Space.Status],size(WS.R1)));
@@ -691,9 +842,17 @@ classdef WorkSpace
 %             end
         
 
-        function [Approve, Alert] = SplittingCheck(WS,Loc)
+        function [Approve, Alert] = SplittingCheck(WS,Loc,DoSplittingCheck)
+            arguments
+                WS
+                Loc
+                DoSplittingCheck = false;
+            end
             Alert = "not spliting";
             Approve = true;
+            if ~WS.DoSplittingCheck && ~DoSplittingCheck
+                return
+            end
             ScannedAgent = ~WS.Space.Status(:);
             ScannedAgent = ScanningAgents(WS, ScannedAgent, Loc(1));
 %             Approve = ScanningAgentsFast(WS, ScannedAgent);
@@ -707,9 +866,12 @@ classdef WorkSpace
         function WS = ChangeAgentLoc(WS,Ind,OldInd)
             status = 1;
             if nargin==3
+                if ~all(WS.Space.Status(OldInd))
+                    error("the ind to move arn't a module location");
+                end
                 WS.Space.Status(OldInd) = deal(0);
                 if WS.Algoritem == "RRT*"
-                    status = 2;
+                    status = WS.MovmentColorIdx;
                 end
                 
             end

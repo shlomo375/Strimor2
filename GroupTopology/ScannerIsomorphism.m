@@ -1,4 +1,4 @@
-function [OK, Path, ConfigLevel] = ScannerIsomorphism(Ds,Config,mode,Axis)
+function [OK, Path, ConfigLevel] = ScannerIsomorphism(Ds,Config,mode)
 
 OK = 1;
 %% Find config in tree

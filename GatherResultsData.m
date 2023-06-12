@@ -10,8 +10,8 @@ ds = fileDatastore(Folder,"IncludeSubfolders",false,"ReadFcn",@load,'UniformRead
 fprintf("readall");
 data = readall(ds,"UseParallel", true);%,"UseParallel", true
 Data = struct2table(data);
-save("AllDataRAW.mat","Data");
-load("AllDataRAW.mat","Data");
+% save("AllDataRAW.mat","Data");
+% load("AllDataRAW.mat","Data");
 deleteRow = [0,0];
 deleteTree = [0,0];
 TreeLoc = [];
@@ -46,7 +46,7 @@ Data = [Data,table(string(extractBetween(Data.ResultFileName,"Results-","-tree",
 % % Data = [Data, table(Data.TreeType,'VariableNames',"type")];
 
 
-% save("AllData.mat","Data");
+save("AllData.mat","Data");
 % load("AllData.mat","Data");
 
 Names = unique(Data.TreeName);
@@ -54,7 +54,7 @@ VariableType = {'double','double','double','string','double'};
 MeanData = table('Size',[numel(Names), 5],'VariableType',VariableType,'VariableNames',["NumberOfCOnfig","PathLength","N","name","NamberOfTrees"])
 stdData = MeanData;
 for ii = 1:numel(Names)
-    NameLoc=matches(Data.TreeName,Names(ii));% & double(extractBetween(Data.ResultFileName,"tree_",".mat"))<=50;
+    NameLoc=matches(Data.TreeName,Names(ii)) & double(extractBetween(Data.ResultFileName,"tree_",".mat"))<=60;
     MeanData(ii,:) = table(mean(Data{NameLoc,"NumberOfCOnfig"}),...
                               mean(cell2mat(Data{NameLoc,"PathLength"})),...
                               double(string(extractBefore(Names(ii),"N"))),...
@@ -69,7 +69,7 @@ for ii = 1:numel(Names)
 
 end
 
-
+load("MeanStd.mat","MeanData","stdData")
 
 %     ResultPloter(MeanData, "PathLength",unique(MeanData.name))
 
@@ -91,13 +91,14 @@ end
 % % figure('Name','std')
 % % ResultPloter(stdData, "PathLength",["uniform_1","uniform_3","normal_1"])
 
-figure('Name','Mean')
-ResultPloter(MeanData, "NumberOfCOnfig",["uniform_3","uniform_IM3AxisZone__3","uniform_IM3AxisZoneInf__3"])
+% figure('Name','Mean')
+ResultPloter(MeanData,stdData, "NumberOfCOnfig",["uniform_3","uniform_IM3AxisZoneInf__3"])
 
-figure('Name','Mean')
-ResultPloter(MeanData, "PathLength",["uniform_3","uniform_IM3AxisZone__3","uniform_IM3AxisZoneInf__3"])
+% figure('Name','Mean')
+ResultPloter(MeanData,stdData, "PathLength",["uniform_3","uniform_IM3AxisZoneInf__3"])
 % figure('Name','std')
-% ResultPloter(stdData, "PathLength",["uniform_1","uniform_3","normal_1"])
+ResultPloter(MeanData,stdData, "PathLength",["uniform_1","uniform_3","normal_1"])
+ResultPloter(MeanData,stdData, "NumberOfCOnfig",["uniform_1","uniform_3","normal_1"])
 
 % figure('Name','Mean')
 % ResultPloter(MeanData, "NumberOfCOnfig",["uniform_3","uniform_IM1Axis__3","uniform_IM2Axis__3","uniform_IM3Axis__3"])

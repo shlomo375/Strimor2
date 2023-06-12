@@ -16,6 +16,11 @@ if OK
 %% without cost taget
         CostToTarget = 1;
 %%
+WS1=WS;
+WS1.Space.Status = zeros(WS.SpaceSize);
+WS1=SetConfigurationOnSpace(WS1,Configuration);
+figure(2)
+PlotWorkSpace(WS1,[])
 try
         [tree,~,ConfigIndex] = UpdateTree(tree, Parent, Configuration, Movment, Level, Cost,CostToTarget);
 catch ME_UpdateTree

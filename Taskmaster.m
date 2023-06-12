@@ -1,7 +1,4 @@
-function WorkerList = Taskmaster(WorkerList,Folders, info)
-Name = extractBetween(Folders,"N\","\tree","Boundaries","exclusive");
-% Name = extractBetween(Folders,"Results\","\","Boundaries","exclusive");
-
+function WorkerList = Taskmaster(Folders)
 
 
 for ii = 1:numel(WorkerList)
@@ -27,8 +24,8 @@ for ii = 1:numel(WorkerList)
             if isnan(info.RowNumData.parameter)
                 info.RowNumData.parameter = double(extractAfter(Name(ii),"_"));
             end
-            WorkerList(ii) = parfeval(@Expend2Tree,5,FolderName, info);
-%             Expend2Tree(FolderName, info)
+%             WorkerList(ii) = parfeval(@Expend2Tree,5,FolderName, info);
+            Expend2Tree(FolderName, info)
     end
 end
 WorkerList(matches({WorkerList.State},'unavailable')) = [];
