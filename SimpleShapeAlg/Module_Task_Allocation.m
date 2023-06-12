@@ -227,7 +227,11 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
                     DestenationLine = Line;
                     Downwards = ~Downwards;
                 end
+                try
                 Task = CreatTaskAllocationTable([],"ActionType","TransitionModules","Current_Line_Alpha",StartLine,"Current_Line_Beta",StartLine,"Downwards",Downwards,"Type",0,"DestenationLine",DestenationLine,"Side",Addition.Side);
+                catch eer
+                    eer
+                end
                 return
             end
 

@@ -17,7 +17,10 @@ Switch = StartGroupConfig == - TargetGroupConfig & StartGroupConfig;
 if Approx
     % AlphaDiff(abs(AlphaDiff)==1) = 0;
     % BetaDiff(abs(BetaDiff)==1) = 0;
-    AbsDiff(abs(AbsDiff)==1) = 0;
+    if abs(AbsDiff(Approx))==1
+        AbsDiff(Approx) = 0;
+    end
+    % AbsDiff(abs(AbsDiff)==1) = 0;
 end
 end
 

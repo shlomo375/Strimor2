@@ -60,12 +60,12 @@ ParentInd = 1;
 Start_WS.Center_Of_Area = centerOfArea(Start_WS);
 MaxTotalTime = N*1.5;
 TotalTime = tic;
-while any((abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}) - abs(TargetNode.IsomorphismMatrices1{1})) > A.GroupSize_Approx)
-    Line = find((abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}) - abs(TargetNode.IsomorphismMatrices1{1})) > A.GroupSize_Approx,1,"last");
+while any(abs(abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}) - abs(TargetNode.IsomorphismMatrices1{1})) > A.GroupSize_Approx)
+    Line = find(abs(abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}) - abs(TargetNode.IsomorphismMatrices1{1})) > A.GroupSize_Approx,1,"last");
     % if Line ==3
     %     d=5;
     % end
-    while (abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1)) - abs(TargetNode.IsomorphismMatrices1{1}(Line,:))) > A.GroupSize_Approx 
+    while abs(abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}(Line,:,1)) - abs(TargetNode.IsomorphismMatrices1{1}(Line,:))) > A.GroupSize_Approx 
         [Start_WS,Tree, ParentInd,ConfigShift,LineCreated,Error,msg] = Module_to_Destination(Start_WS,Tree, ParentInd,TargetNode,ConfigShift,Line,Downwards,Ploting,TotalTime,MaxTotalTime,"GroupSize_Approx",A.GroupSize_Approx);
         if LineCreated
             break
