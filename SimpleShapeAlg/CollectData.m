@@ -51,7 +51,7 @@ data.DL = data.DL+1;
 save("SimpleShapeAlg\AllSolutions.mat","data");
 
 %%
-
+load("SimpleShapeAlg\AllSolutions.mat","data");
 Path_N = accumarray([data.N,data.DL],data{:,"Path_N"}-data{:,"MoveTo"},[],@mean);
 N = accumarray([data.N,data.DL],data.N,[],@mean);
 DL = accumarray([data.N,data.DL],data.DL,[],@mean);
