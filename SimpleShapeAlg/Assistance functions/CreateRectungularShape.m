@@ -1,4 +1,4 @@
-function CreateRectungularShape(BasicWS,N,High)
+function [WS,Node,Config] = CreateRectungularShape(BasicWS,N,High)
 
 if isempty(BasicWS)
     BasicWS = WorkSpace([N,N*2],"RRT*");
@@ -21,6 +21,10 @@ Config.Type = 1;
 
 WS = SetConfigurationOnSpace(BasicWS,Config);
 WS = FixEqualeTypeNumberModule(WS,'same');
+
+Config = GetConfiguration(WS);
+Node = CreateNode(1);
+Node = ConfigStruct2Node(Node,Config);
 
 
 end
