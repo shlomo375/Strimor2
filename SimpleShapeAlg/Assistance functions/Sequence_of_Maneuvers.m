@@ -72,7 +72,7 @@ for Maneuver_ind = 1:length(Axis)
             pause(P.Plot)
         end
         cla
-        PlotWorkSpace(NewWS,"Plot_CellInd",false);
+        PlotWorkSpace(NewWS,"Plot_CellInd",false,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",NewWS.ObstacleInd);%
         NewWS.Space.Status(NewWS.Space.Status==NewWS.MovmentColorIdx) = 1; 
     end
 end

@@ -77,10 +77,13 @@ end
 catch eeee
     throw(eeee)
 end
+try
 [WS, Tree, ParentInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",Plot);
-
+catch me2
+    me2
+end
 Tree = AddManuversInfo(Tree,Decision,numel(Step));
-% try
+
 Task = Update_CurrentLine_Of_ModuleReduced(Task,Decision);
 if Task.Current_Line_Alpha <0 || Task.Current_Line_Beta<0
     d=5
@@ -93,9 +96,7 @@ if Task.Finish
 else
     Task_Queue(end,:) = Task;
 end
-% catch me2
-%     me2
-% end
+
 
 end
 

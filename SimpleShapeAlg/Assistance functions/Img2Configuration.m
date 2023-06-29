@@ -1,6 +1,6 @@
 %% img to configuration
 % AddDirToPath
-function [WS,Node,Config] = Img2Configuration(ImgAddress,Resize)
+function [WS,Node,Config,BasicWS] = Img2Configuration(ImgAddress,Resize)
 % img = imread("Shapes\S.png");
 img = imread(ImgAddress);
 imgGray = imresize(rgb2gray(img),Resize);

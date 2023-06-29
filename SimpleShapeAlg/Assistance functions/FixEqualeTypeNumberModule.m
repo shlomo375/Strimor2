@@ -12,7 +12,7 @@ GroupsSizes(GroupsSizes<0) = -1;
 
 diffType = sum(GroupsSizes);
 
-if diffType>0
+if diffType~=0
     deleteEdge = find(GroupsSizes==sign(diffType),abs(diffType));
     for row = deleteEdge
         WS.Space.Status(GroupInd{row}{1}(1)) = 0;

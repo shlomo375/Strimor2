@@ -89,7 +89,11 @@ k = 1;
 Axis = repmat(Axis,1,size(Moving_Log,1));
 WS.DoSplittingCheck = true;
 StepsSign =sign(Steps);
-Step = repmat(Steps,1,size(Moving_Log,1));
+if abs(Steps) > 1
+    Step = repmat(sign(Steps)*1,1,size(Moving_Log,1));
+else
+    Step = repmat(ceil(Steps/2),1,size(Moving_Log,1));
+end
 while sign(Steps) == StepsSign
     % [WS, Tree, ParentInd,OK,AllModuleInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",true,"GoBackStep",false);
     % if OK
@@ -114,7 +118,7 @@ while sign(Steps) == StepsSign
         break
     end
 
-    
+    WS.DoSplittingCheck = false;
     [WS, Tree, ParentInd,OK,AllModuleInd] = Sequence_of_Maneuvers(WS,Tree,ParentInd,AllModuleInd,Moving_Log,Axis,Step,ConfigShift(:,1),"Plot",false,"GoBackStep",false);
     if (abs(Steps) - abs(Step(1)))<0
         Step = repmat(Steps,1,size(Moving_Log,1));

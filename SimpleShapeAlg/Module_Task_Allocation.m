@@ -216,13 +216,13 @@ if AlphaDiff(Line) > 0 || BetaDiff(Line) > 0
             elseif AlphaDiff(Line) >= 1 && BetaDiff(Line) >= 1
                 DestenationLine = size(StartConfig,1)-(Line-1);
                 
-                StartLine = find(AbsDiff(1:Line-1)<0,1,"last");
+                StartLine = find(AbsDiff(1:Line-1)<0 & [false(find(StartConfig,1)-1,1);true;abs(StartConfig(find(StartConfig,1)+1:Line-1))>=8],1,"last");
                 % StartLine = find(abs(StartConfig(Line+1:end))>=4,1,"last");
                 StartLine = size(StartConfig,1)+1 - StartLine; % When you need to bring 2 to fill a missing row, take from the closest row below it which has 4 modules or more.
                 if isempty(StartLine)
-                    if ~Downwards
-                        StartConfig = flip(StartConfig);
-                    end
+                    % if ~Downwards
+                    %     StartConfig = flip(StartConfig);
+                    % end
                     StartLine = find(AbsDiff<0,1,"first");
                     DestenationLine = Line;
                     Downwards = ~Downwards;

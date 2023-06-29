@@ -9,6 +9,7 @@ classdef WorkSpace
         MovmentColorIdx = 4
         DoSplittingCheck = false
         Center_Of_Area
+        ObstacleInd
         
     end
     
@@ -411,9 +412,10 @@ classdef WorkSpace
                 GeneralPlot.Plot_CellInd (1,1) {mustBeNumericOrLogical} = false;
                 GeneralPlot.Plot_FullWorkSpace (1,1) {mustBeNumericOrLogical} = false;
                 GeneralPlot.Plot_AllModule (1,1) {mustBeNumericOrLogical} = false;
+                GeneralPlot.Plot_FullWorkSpace_NoLattice = false;
 %                 PlotAgent.PlotOnlySpacificAgent (1,1) {mustBeNumericOrLogical} = false;
                 PlotAgent.Set_SpecificAgentInd (:,1) {mustBeInteger,mustBePositive,mustBeVector}
-                PlotAgent.Set_SpecificColors (:,3) {mustBeInteger} = 10;
+                PlotAgent.Set_SpecificColors (:,1) {mustBeInteger} = 10;
                 NumberPlot.PlotMoveNumber (1,1) {mustBeNumericOrLogical} = false;
                 NumberPlot.MoveNumber (1,1) {mustBePositive,mustBeInteger} = 1;
                 NumberPlot.NumberLocation (1,2) {mustBePositive} = [3,3];
@@ -421,25 +423,38 @@ classdef WorkSpace
             map = WS.Space;
             
             Status = map.Status;
-            if GeneralPlot.Plot_FullWorkSpace
-                Loc = true(size(map.Status));
-            else
-                [Row,Col] = find(map.Status);
-                RowRange = [min(Row)-3,max(Row)+1];
-                ColRange = [min(Col)-6,max(Col)+4];
-                Loc = true(size(map.Status));
-                Loc(1:RowRange(1)-1,:) = false;
-                Loc(RowRange(2)+1:end,:) = false;
-                Loc(:,1:ColRange(1)-1) = false;
-                Loc(:,ColRange(2)+1:end) = false;
-            end
+
             if isfield(PlotAgent,"Set_SpecificAgentInd")
+                if numel(PlotAgent.Set_SpecificAgentInd) == 1 && PlotAgent.Set_SpecificAgentInd == 1
+                    PlotAgent.Set_SpecificAgentInd = find(WS.Space.Status);
+                    PlotAgent.Set_SpecificColors = WS.Space.Status(PlotAgent.Set_SpecificAgentInd);
+                end
+
 %                 map = WS.Space(Agent);
 %                 Loc = false(size(map.Status));
 %                 Loc(PlotAgent.AgentInd) = true;
 %                 Loc = Loc';
-                Status(PlotAgent.AgentInd) = deal(Set_SpecificColors);
+                Status(PlotAgent.Set_SpecificAgentInd) = deal(PlotAgent.Set_SpecificColors);
             end
+            if GeneralPlot.Plot_FullWorkSpace
+                Loc = true(size(Status));
+            elseif ~GeneralPlot.Plot_FullWorkSpace_NoLattice
+                [Row,Col] = find(Status);
+                RowRange = [min(Row)-3,max(Row)+1];
+                ColRange = [min(Col)-6,max(Col)+4];
+                Loc = true(size(Status));
+                Loc(1:RowRange(1)-1,:) = false;
+                Loc(RowRange(2)+1:end,:) = false;
+                Loc(:,1:ColRange(1)-1) = false;
+                Loc(:,ColRange(2)+1:end) = false;
+            else
+                % [Row,Col] = find(map.Status);
+                % RowRange = [min(Row),max(Row)];
+                % ColRange = [min(Col),max(Col)];
+                Loc = false(size(Status));
+                Loc(Status~=0) = true;
+            end
+            
             Loc = Loc';
             
             Status = Status';
@@ -462,13 +477,16 @@ classdef WorkSpace
             else
                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc),[],[],[],MoveNumText);
             end
-           axis equal;
-%             xlim([])
+            axis equal;
+            % xlim([min(xShift,[],"all"),max(xShift,[],"all")]);
+            % ylim([min(yShift,[],"all"),max(yShift,[],"all")]);
+
         end
         
         function [WS, AgentLoc] = GetAgentFromUser(WS,Status)
 %             PlotWorkSpace(WS,1);
             exit = 1;
+            
             AgentLoc = [];
             hold on
             while exit
