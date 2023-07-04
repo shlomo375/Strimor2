@@ -10,6 +10,7 @@ classdef WorkSpace
         DoSplittingCheck = false
         Center_Of_Area
         ObstacleInd
+        TrackAgent = true
         
     end
     
@@ -51,6 +52,7 @@ classdef WorkSpace
             s.Type = [];
             s.index = zeros(Size);
             s.index(:) = 1:numel(s.index);
+            s.AgentID = zeros(Size);
 %             s = repmat(struct("Status",0,"Type",[],"index",0),Size);
         end
         
@@ -149,38 +151,6 @@ classdef WorkSpace
                 R(Line,Right-(Left-Line)+1-numel(ind{Line}):Right-(Left-Line)) = ind{Line}';
             end
             R(:,sum(R)==0) = [];
-            % R1=R;
-            
-%             R = [];
-%             for k = 1:length(n2)
-%                 fprintf("axis 2: %d/%d\n",k,length(n2));
-%                 [ro,co] = find(abs(j-line(i,-1,n2(k)))<=.5);
-%                 loc = flip(sortrows([ro,co],[2 1],{'descend' 'ascend'}),1);
-%                 ind = sub2ind(Size,loc(:,1),loc(:,2));
-%                 if isempty(ind)
-%                     break
-%                 end
-%                 if k>1
-%                     target = sub2ind(Size,loc(end,1),loc(end,2)-1);
-%                     shift = 1;
-%                     if find(ind==target)
-%                         target = sub2ind(Size,loc(end,1),loc(end,2)-2);
-%                         shift = 2;
-%                     end
-% 
-% %                     [row,col] = find(R==target);
-% 
-%                     R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
-%                     [row,col] = find(R==target);
-%                     R(row+1,col+shift-length(ind):col+(shift==2)) = ind';
-% 
-% 
-%                 else
-%                     R = [R, zeros(NewRow,length(ind))];
-%                     R(k,:) = ind';
-%                 end
-%             end
-%             R(:,sum(R)==0) = []; 
             WS.R2 = R;
             
             
@@ -228,38 +198,7 @@ classdef WorkSpace
             
             
             R(:,sum(R)==0) = [];
-%             R1=R;
-%             R = [];
-%             for k = 1:length(n3)
-%                 fprintf("axis 3: %d/%d\n",k,length(n3));
-%                 [ro,co] = find(abs(i-line(j,1,n3(k)))<=.5);
-%                 loc = sortrows([ro,co],1,'ascend');
-%                 ind = sub2ind(Size,loc(:,1),loc(:,2));
-% 
-%                 if isempty(ind)
-%                     break
-%                 end
-%                 if k>1
-%                     target = sub2ind(Size,loc(1,1),loc(1,2)+1);
-%                     shift = 1;
-%                     if find(ind==target)
-%                         target = sub2ind(Size,loc(1,1),loc(1,2)+2);
-%                         shift = 2;
-%                     end
-% 
-% %                     [row,col] = find(R==target);
-% 
-%                     R = [zeros(NewRow,length(ind)), R, zeros(NewRow,(k>1))];
-%                     [row,col] = find(R==target);
-%                     R(row+1,col-(shift==2):col-(shift==2)+length(ind)-1) = ind';
-% 
-% 
-%                 else
-%                     R = [R, zeros(NewRow,length(ind))];
-%                     R(k,:) = ind';
-%                 end
-%             end
-            % R(:,sum(R)==0) = []; 
+
             WS.R3 = R;
         end
 
@@ -363,46 +302,6 @@ classdef WorkSpace
             end
         end
         
-%         function PlotWorkSpace(WS,text,Agent,c,MoveNumber)
-%             
-%             
-%             map = WS.Space;
-%             Loc = true(size(map.Status));
-%             if nargin>2
-% %                 map = WS.Space(Agent);
-%                 Loc = false(size(map.Status));
-%                 Loc(Agent) = true;
-%                 Loc = Loc';
-%             end
-% 
-%             Status = map.Status;
-%             if nargin>2
-%                     Status(Agent) = deal(c);
-%             end
-%             Status = Status';
-%             
-%             Type = map.Type';
-%             Index = map.index';
-%            
-% %             [yShift,xShift] = ind2sub(size(WS.Space.Status),Index);
-%             [yShift,xShift] = meshgrid(1:size(WS.Space.Status,1),1:size(WS.Space.Status,2));
-%             if nargin>4
-%                 MoveNumText.x = min(xShift,[],"all")-3;
-%                 MoveNumText.y = max(yShift,[],"all")+3;
-%                 MoveNumText.value = MoveNumber(1);
-%                 MoveNumText.handel = [];
-%             else
-%                 MoveNumText = [];
-%             end
-%             
-%             if ~isempty(text)
-%                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc), num2str(Index(Loc')),[],[],MoveNumText);
-%             else
-%                 PlotTriangle([xShift(Loc),yShift(Loc)], Type(Loc), Status(Loc),[],[],[],MoveNumText);
-%             end
-%            axis equal;
-% %             xlim([])
-%         end
 
         function PlotWorkSpace(WS,GeneralPlot,PlotAgent,NumberPlot)
             
@@ -895,11 +794,17 @@ classdef WorkSpace
             end
             
             
-                WS.Space.Status(Ind) = deal(status);
-            
-            %A(length(OldInd)) = Agent;% = WorkSpace.SpaceStructure([1,length(Ind)]);
-%             [WS.Space(OldInd).Agent] = mat2cell(A,2);
-%             [WS.Space(Ind).Agent] = Temp.Agent;
+            WS.Space.Status(Ind) = deal(status);
+            if WS.TrackAgent
+                if nargin == 3
+                    AgentID = WS.Space.AgentID(OldInd);
+                    WS.Space.AgentID(OldInd) = 0;
+                    WS.Space.AgentID(Ind) = AgentID;
+                elseif nnz(WS.Space.AgentID)==0
+                    WS.Space.AgentID(Ind) = 1:nnz(WS.Space.Status);
+                end
+            end
+
             
         end
 
@@ -938,13 +843,7 @@ classdef WorkSpace
                     NewInd = sub2ind(Size,Nrow,Ncol);
                 end
             end
-            
-%             Temp = WS.Space(ind);
-%             A = WorkSpace.SpaceStructure([1,length(ind)]);
-%             B = {Temp.Type};
-%             [A.Type] = B{:};
-%             WS.Space(ind) = A;
-%             [WS.Space(NewInd)] = Temp;
+           
 
             WS = ChangeAgentLoc(WS,NewInd,ind);
 
@@ -957,6 +856,10 @@ classdef WorkSpace
             row = any(Configuration.Status,2);
             Configuration.Status = Configuration.Status(row,col);
             
+            if WS.TrackAgent
+                Configuration.AgentID = WS.Space.AgentID(row,col);
+            end
+
             Configuration.CompleteType = WS.Space.Type(row,col);
             Configuration.Type = WS.Space.Type(TypeLoc);
 %             Configuration.FullType = WS.Space.Type(row,col);
@@ -981,11 +884,7 @@ classdef WorkSpace
 %             Row = StartRow:StartRow+Size(1)-1;
             Row = row + ShiftRow;
             Col = col + ShiftCol;
-%             try
-%                 WS.Space(Row(1),Col(1)).Type
-%             catch e
-%                 d=5;
-%             end
+
             if WS.Space.Type(Row(1),Col(1)) ~= Config.Type
                 edge = [min(Row)>1, max(Row)<WS.SpaceSize(1), min(Col)>1, max(Col)<WS.SpaceSize(2)];
                 i = find(edge,1);

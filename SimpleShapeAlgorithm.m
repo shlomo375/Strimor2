@@ -29,7 +29,7 @@ if isempty(BasicWS)
     BasicWS = WorkSpace(2*Size,"RRT*");
 end
 Error = false;
-Ploting = 1;
+% Ploting = 1;
 try
 ConfigStruct_A = Node2ConfigStruct(StartNode);
 Start_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct_A);
@@ -59,15 +59,15 @@ WS.DoSplittingCheck = false;
 ParentInd = 1;
 
 Start_WS.Center_Of_Area = centerOfArea(Start_WS);
-Temp_WS = Start_WS;
-for row = [200:205,295:300]
-    Temp_WS.Space.Status(row,:) = 777;
-end
-Temp_WS.Space.Status(200:300,1:5) = 777;
-Temp_WS.Space.Status(200:300,end-4:end) = 777;
-figure
-Start_WS.ObstacleInd = find(Temp_WS.Space.Status==777);
-PlotWorkSpace(Temp_WS,"Plot_CellInd",false,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Start_WS.ObstacleInd);
+% Temp_WS = Start_WS;
+% for row = [200:205,295:300]
+%     Temp_WS.Space.Status(row,:) = 777;
+% end
+% Temp_WS.Space.Status(200:300,1:5) = 777;
+% Temp_WS.Space.Status(200:300,end-4:end) = 777;
+% figure
+% Start_WS.ObstacleInd = find(Temp_WS.Space.Status==777);
+% PlotWorkSpace(Temp_WS,"Plot_CellInd",false,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Start_WS.ObstacleInd);
 
 MaxTotalTime = N*1.5;
 TotalTime = tic;
@@ -194,7 +194,7 @@ while size(Task_Queue,1) > 0
     if ~A.ConfigCopyPaste
         NewCA = centerOfArea(WS);
         CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
-        if CorrectionSteps >= Tree.N/40 && (ParentInd - A.LastTry) > 10*Tree.N/40
+        if CorrectionSteps >= 5 && (ParentInd - A.LastTry) > 10*5
             [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,2*CorrectionSteps,Ploting);
             KillSwitch = tic;
             A.LastTry = ParentInd;

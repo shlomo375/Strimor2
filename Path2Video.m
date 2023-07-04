@@ -1,32 +1,73 @@
-function frames = MakeVideoOfPath(Path, FPS, PathName,stills,Background)
-tic
-close all
-N = nnz(Path.ConfigMat{1});
-MovingAgentIndex = 10;
-Size = [N, 2*N];
-BasicWS = WorkSpace(Size,"RRT*");
-MoveNumber = [];
-Loc = [];
-C = [];
-Type = [];
-Path = flip(Path,1);
-NumberOfMove = size(Path,1);
+function Path2Video(Path, FPS, PathName,stills)
+Batch = 0;
+N = nnz(Path.ConfigMat{1}(:,:,1));
 
-MoveNumber = zeros(1,NumberOfMove*2*FPS);
-Loc = zeros(N,NumberOfMove*2*FPS,2);
-C = zeros(N,NumberOfMove*2*FPS); 
-Type = zeros(N,NumberOfMove*2*FPS);
-k=1;
-t= tic
+Size = [N, 2*N];
+
+%% add agant ID for the first config
+BasicWS = WorkSpace(Size,"RRT*");
+Config = Node2ConfigStruct(Path(1,:));
+[WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config);
+
+if size(Path.ConfigMat{1},3)==1
+    Config = GetConfiguration(WS);
+    Path.ConfigMat{1} = cat(3,Config.Status,Config.AgentID);
+end
+
+%% arrange all config path 
+% into one matrix described the location of each module at after full step.
+% also, create vector of step size
+Locations = zeros(N,size(Path,1),2);
+for idx = 1:size(Path,1)
+    % get AgentID and Location
+    [Loc(:,2),Loc(:,1),ID] = find(Path.ConfigMat{idx}(:,:,2));
+    [~,Sorted_Loc] = sort(ID);
+    Locations(:,idx,:) = permute(Loc(Sorted_Loc,:),[1,3,2]);
+end
+ 
+TotalSteps = 2 + sum(abs(Path.Step));
+
+Frames = zeros(N,TotalSteps*FPS,3);
+AgentType = WS.Space.Type(WS.Space.Status>0);
+FramePerStep = linspace(0,1,FPS);
+LastFrame = 1;
+for Location_Idx = 2:(size(Locations,2))
+    % ds = linspace(0,1,abs(Path.Step(Step_Idx))*FPS);
+    fprintf("Steps: %d\n",Location_Idx);
+    MovingAgent_logical = any(Locations(:,Location_Idx-1,:) ~= Locations(:,Location_Idx,:),3);
+    
+    step = -Path.Step(Location_Idx);
+    dir = Path.Dir(Location_Idx);
+    switch dir
+        case 1
+            dx = 2 * step;
+            dy = 0;
+        case 2
+            dx = step;
+            dy = -step;
+        case 3
+            dx = step;
+            dy = step;
+    end
+    for stepIdx = 0:abs(step)-1
+        ds = permute(permute([dx;dy],[1,3,2]).*FramePerStep,[3,2,1]);
+        FrameRange = LastFrame:(LastFrame-1+FPS);
+        Frames(:,FrameRange,1:2) = repmat((Locations(:,Location_Idx,:)),1,numel(FramePerStep),1);
+        Frames(MovingAgent_logical,FrameRange,1:2) = Locations(MovingAgent_logical,Location_Idx,:) + ds;
+        Frames(MovingAgent_logical,FrameRange,3) = 1;
+        LastFrame = LastFrame + FPS;
+    end
+
+end
+
+
+
+
+
 for ii = 1:NumberOfMove
     Config.Status = Path.ConfigMat{ii};
     Config.Type = Path.Type(ii);
-    [WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config);
-%     figure(ii)
-%     PlotWorkSpace(WS,1);
-%     Agent = find(WS.Space.Status)';
-%     PlotWorkSpace(WS,[],MovingAgent,2);
-%     MovingAgent = ismember(Agent, Path(ii+1).Movment.Agent);
+    [WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config,10);
 
     step = -Path.Step(ii);
     dir = Path.Dir(ii);
@@ -165,14 +206,14 @@ plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)],".r");
 if exist("Background","var")
         [p.T] = PlotTriangle(permute(TargetLoc(:,end-jj+1,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],[],[],[]);
 end
-    %     drawnow
+        drawnow
 %     frames(j+video.FrameRate-1) = getframe;
 axis equal
 
 
-    exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
+    % exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
 
-    frames(:,:,:,jj) = imread("ArticleMovie\Plot.png");
+    % frames(:,:,:,jj) = imread("ArticleMovie\Plot.png");
 
 % SaveEvery = 100;
 % if ~mod(jj,SaveEvery) || jj==size(Loc,2)
@@ -197,11 +238,11 @@ axis equal
 %     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
 %     pause(0.1)
  
-    if exist("stills","var")
-        if ~isempty(stills)
-            saveas(p,stills+string(jj)+".png");
-        end
-    end
+    % if exist("stills","var")
+    %     if ~isempty(stills)
+    %         saveas(p,stills+string(jj)+".png");
+    %     end
+    % end
 end
 drawnow
 pause(2)
@@ -217,5 +258,5 @@ open(video);
 writeVideo(video,frames);
 close(video);
 close all
-end
 
+end

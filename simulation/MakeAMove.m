@@ -25,4 +25,5 @@ function [OK, Configuration, Movment, WS1, CollidingAgent,Alert] = MakeAMove(WS,
     else
         WS1=WS;
     end
+    WS1.Space.Status(WS1.Space.Status>1) = 1;
 end

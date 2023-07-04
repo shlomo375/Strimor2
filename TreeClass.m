@@ -472,22 +472,7 @@ classdef TreeClass
             end
             
             flag = [];
-            
-            % ConfigIndex = FindConfig(tree, Config.Str, Config.Row, Config.Col);
-            % 
-            % if isempty(ConfigIndex)
-            %     ConfigIndex = 0;
-            % end
-            % if (~ConfigIndex)
-            % 
-            %     tree.LastIndex = tree.LastIndex + 1;
-            %     ConfigIndex = tree.LastIndex;
-            % else
-            % 
-            %     if ~CompereNode(tree, ConfigIndex, Level, Cost)
-            %         return
-            %     end
-            % end
+          
 
             ParentRow = tree.Data.ConfigRow(Parent);
             ParentCol = tree.Data.ConfigCol(Parent);
@@ -514,7 +499,7 @@ classdef TreeClass
                 tree.Data(ConfigIndex,:) = table(string(NodeTime),ConfigIndex,Parent,...
                     Config.Type,Level,Cost,Movment.dir,Movment.step,Config.Row,...
                     Config.Col,ParentRow,ParentCol,1,CostToTarget,string(Config.Str),...
-                    ParentStr,{Config.Status},{ParentMat}, ...
+                    ParentStr,{cat(3,Config.Status,Config.AgentID)},{ParentMat}, ...
                     IsomorphismMetrices(1),IsomorphismMetrices(2),IsomorphismMetrices(3)...
                     ,IsomorphismStr(1),IsomorphismStr(2),IsomorphismStr(3)...
                     ,IsomorpSizes(1,1),IsomorpSizes(1,2),IsomorpSizes(2,1)...

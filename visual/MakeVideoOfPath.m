@@ -1,28 +1,25 @@
-function frames = MakeVideoOfPath(Path, N, FPS, PathName,stills,Background)
+function frames = MakeVideoOfPath(Path, FPS, PathName,stills,Background)
 tic
 close all
+N = nnz(Path.ConfigMat{1});
 MovingAgentIndex = 10;
 Size = [N, 2*N];
 BasicWS = WorkSpace(Size,"RRT*");
-MoveNumber = [];
-Loc = [];
-C = [];
-Type = [];
-% Path = flip(Path,1);
+
+Path = flip(Path,1);
 NumberOfMove = size(Path,1);
 
-
+MoveNumber = zeros(1,NumberOfMove*2*FPS);
+Loc = zeros(N,NumberOfMove*2*FPS,2);
+C = zeros(N,NumberOfMove*2*FPS); 
+Type = zeros(N,NumberOfMove*2*FPS);
+k=1;
+t= tic
 for ii = 1:NumberOfMove
     Config.Status = Path.ConfigMat{ii};
     Config.Type = Path.Type(ii);
-    [WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config);
-%     figure(ii)
-%     PlotWorkSpace(WS,1);
-%     Agent = find(WS.Space.Status)';
-%     PlotWorkSpace(WS,[],MovingAgent,2);
-%     MovingAgent = ismember(Agent, Path(ii+1).Movment.Agent);
-    
-    
+    [WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config,10);
+
     step = -Path.Step(ii);
     dir = Path.Dir(ii);
     switch dir
@@ -59,13 +56,22 @@ for ii = 1:NumberOfMove
     Color = ones(size(CenterLoc,1),1);
     Color(MovingAgentLoc,:) = MovingAgentIndex .* ones(sum(MovingAgentLoc),1);
     
-    MoveNumber = [MoveNumber, (NumberOfMove-ii).*ones(1,numel(FramePerStep))];
+    MoveNumber(k:k-1+numel(FramePerStep)) = (NumberOfMove-ii).*ones(1,numel(FramePerStep));
 %     MoveNumber = [MoveNumber, (ii+1).*ones(1,numel(FramePerStep))];
     AgentType = WS.Space.Type(Agent);
-    Loc = [Loc , CenterLoc];
-    C = [C, Color.*ones(1,size(CenterLoc,2))];
-    Type = [Type, AgentType.*ones(1,size(CenterLoc,2))];
+    Loc(:,k:k-1+numel(FramePerStep),:) = CenterLoc;
+    C(:,k:k-1+numel(FramePerStep)) = Color.*ones(1,size(CenterLoc,2));
+    Type(:,k:k-1+numel(FramePerStep)) = AgentType.*ones(1,size(CenterLoc,2));
+    k = k + numel(FramePerStep);
+    fprintf("Step: %d/%d, time: %s",ii,NumberOfMove,toc(t))
+    toc
 end
+Delete_Col = all(~C,1);
+C(:,Delete_Col) = [];
+Loc(:,Delete_Col,:) = [];
+Type(:,Delete_Col,:) = [];
+save("SimpleShapeAlg\Shapes\LocFile.mat");
+%%
 % MoveNumber = MoveNumber-1;
 C(:,1) = deal(1);
 C(:,end) = deal(1);
@@ -84,7 +90,7 @@ EndShapeCenter = (max(Loc(:,end,:))+min(Loc(:,end,:)))/2;
 
 Displacment = EndShapeCenter-StartShapeCenter;
 d_CM = Displacment.*linspace(0,1,size(Loc,2));
-Loc = Loc - d_CM;
+% Loc = Loc - d_CM;
 %%
 
 video = VideoWriter(PathName);
@@ -151,14 +157,14 @@ plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)],".r");
 if exist("Background","var")
         [p.T] = PlotTriangle(permute(TargetLoc(:,end-jj+1,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],[],[],[]);
 end
-    %     drawnow
+        drawnow
 %     frames(j+video.FrameRate-1) = getframe;
 axis equal
 
 
-    exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
+    % exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
 
-    frames(:,:,:,jj) = imread("ArticleMovie\Plot.png");
+    % frames(:,:,:,jj) = imread("ArticleMovie\Plot.png");
 
 % SaveEvery = 100;
 % if ~mod(jj,SaveEvery) || jj==size(Loc,2)
@@ -183,11 +189,11 @@ axis equal
 %     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
 %     pause(0.1)
  
-    if exist("stills","var")
-        if ~isempty(stills)
-            saveas(p,stills+string(jj)+".png");
-        end
-    end
+    % if exist("stills","var")
+    %     if ~isempty(stills)
+    %         saveas(p,stills+string(jj)+".png");
+    %     end
+    % end
 end
 drawnow
 pause(2)
