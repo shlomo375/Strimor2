@@ -1,4 +1,15 @@
-function [p, t,MoveNumText] = PlotTriangle(CenterLoc, Type, ColorIndex, Text, p, t,MoveNumText)
+function [p, t,MoveNumText] = PlotTriangle(CenterLoc, Type, ColorIndex, Text, p, t,MoveNumText,Alpha)
+arguments
+    CenterLoc
+    Type
+    ColorIndex
+    Text
+    p
+    t
+    MoveNumText
+    Alpha = [];
+end
+
 TriangleCoordinate = zeros(3,size(CenterLoc,1),2);
 
 down = (Type==1);
@@ -23,9 +34,16 @@ if ~isempty(p)
 %     p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color, p);
     
 else
-    LineWidth = 1; % 0.01
-    FaceAlpha = 0.3; % 0.8
-    EdgeAlpha = 0.6; %1
+    % LineWidth = 1; % 0.01
+    % FaceAlpha = 0.3; % 0.8
+    % EdgeAlpha = 0.6; %1
+    
+    LineWidth =  0.01;
+    FaceAlpha = 0.8;
+    EdgeAlpha = 1; 
+    if ~isempty(Alpha)
+        FaceAlpha = Alpha;
+    end
     if ~isempty(ColorIndex)
         if ColorIndex(1) == 11
             p = patch(TriangleCoordinate(:,:,1),TriangleCoordinate(:,:,2),Color,"LineWidth",LineWidth,"FaceAlpha",FaceAlpha,"EdgeAlpha",EdgeAlpha);

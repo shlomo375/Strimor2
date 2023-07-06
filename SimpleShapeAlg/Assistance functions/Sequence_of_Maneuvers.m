@@ -13,13 +13,7 @@ arguments
     P.GoBackStep (1,1) = true;
     
 end
-try
-    % if P.GoBackStep
-    %     [Step,Axis,Moving_Log] = AddGoBackSteps(Step,Axis,Moving_Log);
-    % end
-catch ff
-    d=4;
-end
+N = nnz(WS.Space.Status);
 NewWS = WS;
 Newtree = tree;
 NewParentInd = ParentInd;
@@ -29,10 +23,29 @@ for Maneuver_ind = 1:length(Axis)
 %     if Maneuver_ind==6
 %         d=5
 %     end
-    [OK, NewWS, Newtree, NewParentInd, NewAllModuleInd(Moving_Log(Maneuver_ind,:)),Error] =...
-                ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
-                    NewAllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
-    
+    if numel(NewAllModuleInd(Moving_Log(Maneuver_ind,:))) < floor(N/2)
+        [OK, NewWS, Newtree, NewParentInd, NewAllModuleInd(Moving_Log(Maneuver_ind,:)),Error] =...
+                    ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
+                        NewAllModuleInd(Moving_Log(Maneuver_ind,:)), Axis(Maneuver_ind), Step(Maneuver_ind));
+    else
+        try
+        AllModule = find(NewWS.Space.Status,N);
+        OuterInList = NewAllModuleInd(~Moving_Log(Maneuver_ind,:));
+        SecondHalf_ModuleInd = [OuterInList;setdiff(AllModule,NewAllModuleInd)];
+
+        [OK, NewWS, Newtree, NewParentInd, SecondHalf_ModuleInd,Error] =...
+                    ManeuverStepProcess(NewWS, Newtree, NewParentInd, ...
+                        SecondHalf_ModuleInd, Axis(Maneuver_ind), -Step(Maneuver_ind));
+        if ~isempty(OuterInList)
+            NewAllModuleInd(~Moving_Log(Maneuver_ind,:)) = SecondHalf_ModuleInd(1:numel(OuterInList));
+        end
+        if ~OK
+            d=5
+        end
+        catch ewe
+            ewe
+        end
+    end
 
 
     if ~ OK

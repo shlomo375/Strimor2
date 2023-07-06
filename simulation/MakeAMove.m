@@ -8,8 +8,8 @@ function [OK, Configuration, Movment, WS1, CollidingAgent,Alert] = MakeAMove(WS,
     %     disp(Alert);
     % end
     if OK
-
-        WS1 = ChangeAgentLoc(WS,MoveAgent2Ind,Movment.Agent);
+        NewInd = UpdateLinearIndex(WS.SpaceSize,Movment.Agent,Movment.dir,Movment.step);
+        WS1 = ChangeAgentLoc(WS,NewInd',Movment.Agent);
 
         try
         [OK, Alert] = SplittingCheck(WS1,MoveAgent2Ind(1));

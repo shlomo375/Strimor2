@@ -59,15 +59,6 @@ WS.DoSplittingCheck = false;
 ParentInd = 1;
 
 Start_WS.Center_Of_Area = centerOfArea(Start_WS);
-% Temp_WS = Start_WS;
-% for row = [200:205,295:300]
-%     Temp_WS.Space.Status(row,:) = 777;
-% end
-% Temp_WS.Space.Status(200:300,1:5) = 777;
-% Temp_WS.Space.Status(200:300,end-4:end) = 777;
-% figure
-% Start_WS.ObstacleInd = find(Temp_WS.Space.Status==777);
-% PlotWorkSpace(Temp_WS,"Plot_CellInd",false,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Start_WS.ObstacleInd);
 
 MaxTotalTime = N*1.5;
 TotalTime = tic;
@@ -85,24 +76,38 @@ while any(abs(abs(Tree.Data{ParentInd,"IsomorphismMatrices1"}{1}) - abs(TargetNo
         if Error
             return
         end
-        if A.ConfigCopyPaste
-            NewCA = centerOfArea(Start_WS);
-            CorrectionSteps = fix((Start_WS.Center_Of_Area - NewCA)/4);
-            if CorrectionSteps >= Tree.N/6
-                ConfigStruct = Node2ConfigStruct(Tree.Data(Tree.LastIndex,:));
-                Start_WS = SetConfigurationOnSpace(BasicWS,ConfigStruct);
-                Start_WS.Center_Of_Area = centerOfArea(Start_WS);
+            if ~A.ConfigCopyPaste
+                NewCA = centerOfArea(Start_WS);
+        
+                CorrectionSteps = fix((Start_WS.Center_Of_Area - NewCA)/4);
+                if CorrectionSteps > 20
+                    D=5
+                end
+                if abs(CorrectionSteps) >= 5 && (ParentInd - A.LastTry) > 3
+                    [Start_WS,Tree, ParentInd,ConfigShift] = MoveTo(Start_WS, Tree, ParentInd, ConfigShift,1,2*CorrectionSteps,Ploting);
+                    KillSwitch = tic;
+                    A.LastTry = ParentInd;
+                end
             end
-        end
 
         fprintf("Move: %d\n",ParentInd);
     end
 end
-% if ParentInd == 377
-%     d=4;
-% end
 
 [Start_WS,Tree, ParentInd,ConfigShift] = MatchingStage(Start_WS,Target_WS,Tree, ParentInd,ConfigShift,Ploting);
+    if ~A.ConfigCopyPaste
+        NewCA = centerOfArea(Start_WS);
+
+        CorrectionSteps = fix((Start_WS.Center_Of_Area - NewCA)/4);
+        if CorrectionSteps > 20
+            D=5
+        end
+        if abs(CorrectionSteps) >= 5 
+            [Start_WS,Tree, ParentInd,ConfigShift] = MoveTo(Start_WS, Tree, ParentInd, ConfigShift,1,2*CorrectionSteps,Ploting);
+            KillSwitch = tic;
+            A.LastTry = ParentInd;
+        end
+    end
 catch e
     Error = true;
     msg = e
@@ -155,7 +160,7 @@ KillSwitch = tic;
 while size(Task_Queue,1) > 0
     if LastTreeInd == Tree.LastIndex 
         if toc(KillSwitch) > 10 && ~Ploting
-            Error = true;
+            % Error = true;
             msg = "TimeOut";
              
             % return
@@ -166,18 +171,12 @@ while size(Task_Queue,1) > 0
         KillSwitch = tic;
     end
     if toc(TotalTime)>MaxTotalTime && ~Ploting
-        Error = true;
+        % Error = true;
             msg = "TotalTimeOut";
              
             % return
     end
-    if ParentInd >= 4594
-            d=5;
-    end    
-  
-    % if ~Task_Queue{end,"Downwards"}
-    %     d=5
-    % end
+   
     try
     switch Task_Queue(end,:).ActionType
     
@@ -193,8 +192,10 @@ while size(Task_Queue,1) > 0
     end
     if ~A.ConfigCopyPaste
         NewCA = centerOfArea(WS);
+
         CorrectionSteps = fix((WS.Center_Of_Area - NewCA)/4);
-        if CorrectionSteps >= 5 && (ParentInd - A.LastTry) > 10*5
+
+        if abs(CorrectionSteps) >= 5 && (ParentInd - A.LastTry) > 3
             [WS,Tree, ParentInd,ConfigShift] = MoveTo(WS, Tree, ParentInd, ConfigShift,1,2*CorrectionSteps,Ploting);
             KillSwitch = tic;
             A.LastTry = ParentInd;

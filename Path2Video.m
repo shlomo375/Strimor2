@@ -1,5 +1,6 @@
-function Path2Video(Path, FPS, PathName,stills)
-Batch = 0;
+function Path2Video(Path, FPS, PathName,BasicWS)
+% mkdir(PathName);
+
 N = nnz(Path.ConfigMat{1}(:,:,1));
 
 Size = [N, 2*N];
@@ -7,7 +8,7 @@ Size = [N, 2*N];
 %% add agant ID for the first config
 BasicWS = WorkSpace(Size,"RRT*");
 Config = Node2ConfigStruct(Path(1,:));
-[WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config);
+WS = SetConfigurationOnSpace(BasicWS,Config);
 
 if size(Path.ConfigMat{1},3)==1
     Config = GetConfiguration(WS);
@@ -17,243 +18,136 @@ end
 %% arrange all config path 
 % into one matrix described the location of each module at after full step.
 % also, create vector of step size
-Locations = zeros(N,size(Path,1),2);
-for idx = 1:size(Path,1)
-    % get AgentID and Location
-    [Loc(:,2),Loc(:,1),ID] = find(Path.ConfigMat{idx}(:,:,2));
+Locations = zeros(N,1,2);
+
+
+[Loc(:,2),Loc(:,1),ID] = find(Path.ConfigMat{1}(:,:,2));
     [~,Sorted_Loc] = sort(ID);
-    Locations(:,idx,:) = permute(Loc(Sorted_Loc,:),[1,3,2]);
-end
- 
+Locations(:,1,:) = permute(Loc(Sorted_Loc,:),[1,3,2]);
+
 TotalSteps = 2 + sum(abs(Path.Step));
 
 Frames = zeros(N,TotalSteps*FPS,3);
+Frames(:,1,1:2) = Locations(:,1,:);
+Frames(:,:,3) = 1;
+for idx = 1:size(Path,1)
+    % get AgentID and Location
+    % MovingAgent_ind = find(Path.ConfigMat{idx}(:,:,1)>1);
+    IDs = Path.ConfigMat{idx}(:,:,2);
+    % Frames(IDs(Path.ConfigMat{idx}(:,:,1)>1),idx,3) = 10;
+end
+ 
+
+% Frames(:,:,3) = 1;
+
 AgentType = WS.Space.Type(WS.Space.Status>0);
 FramePerStep = linspace(0,1,FPS);
-LastFrame = 1;
-for Location_Idx = 2:(size(Locations,2))
+LastFrame = 2;
+for Location_Idx = 2:(size(Path,1))
+    MovingAgent_logical = false(N,1);
     % ds = linspace(0,1,abs(Path.Step(Step_Idx))*FPS);
     fprintf("Steps: %d\n",Location_Idx);
-    MovingAgent_logical = any(Locations(:,Location_Idx-1,:) ~= Locations(:,Location_Idx,:),3);
-    
-    step = -Path.Step(Location_Idx);
+    % MovingAgent_logical = any(Locations(:,Location_Idx-1,:) ~= Locations(:,Location_Idx,:),3);
+    IDs = Path.ConfigMat{Location_Idx}(:,:,2);
+    MovingAgent = IDs(Path.ConfigMat{Location_Idx}(:,:,1)>1);
+    if ~isempty(MovingAgent)
+        MovingAgent_logical(MovingAgent) = true;
+    end
+    step = Path.Step(Location_Idx);
     dir = Path.Dir(Location_Idx);
+
     switch dir
         case 1
-            dx = 2 * step;
+            dx = 2 * sign(step);
             dy = 0;
         case 2
-            dx = step;
-            dy = -step;
+            dx = sign(step);
+            dy = -sign(step);
         case 3
-            dx = step;
-            dy = step;
+            dx = sign(step);
+            dy = sign(step);
     end
     for stepIdx = 0:abs(step)-1
         ds = permute(permute([dx;dy],[1,3,2]).*FramePerStep,[3,2,1]);
         FrameRange = LastFrame:(LastFrame-1+FPS);
-        Frames(:,FrameRange,1:2) = repmat((Locations(:,Location_Idx,:)),1,numel(FramePerStep),1);
-        Frames(MovingAgent_logical,FrameRange,1:2) = Locations(MovingAgent_logical,Location_Idx,:) + ds;
-        Frames(MovingAgent_logical,FrameRange,3) = 1;
+        Frames(:,FrameRange,1:2) = repmat((Frames(:,LastFrame-1,1:2)),1,numel(FramePerStep),1);
+        Frames(MovingAgent_logical,FrameRange,1:2) = Frames(MovingAgent_logical,LastFrame-1,1:2) + ds;
+        Frames(MovingAgent_logical,FrameRange,3) = 10;
         LastFrame = LastFrame + FPS;
     end
 
 end
 
-
-
-
-
-for ii = 1:NumberOfMove
-    Config.Status = Path.ConfigMat{ii};
-    Config.Type = Path.Type(ii);
-    [WS,MovingAgent] = SetConfigurationOnSpace(BasicWS,Config,10);
-
-    step = -Path.Step(ii);
-    dir = Path.Dir(ii);
-    switch dir
-        case 1
-            dx = 2 * step;
-            dy = 0;
-        case 2
-            dx = step;
-            dy = -step;
-        case 3
-            dx = step;
-            dy = step;
-    end
-
-    [y,x] = find(Config.Status);
-    Agent = find(WS.Space.Status);
-    MovingAgentLoc = ismember(Agent,MovingAgent);
-    CenterLoc = permute([x,y],[1 3 2]);
-    CenterLoc = CenterLoc + zeros(size(CenterLoc,1),FPS*abs(step),2);
-    
-    FramePerStep = linspace(0,1,FPS*mean(abs(step)));
-%     FramePerStep = linspace(0,1,FPS*abs(step));
-
-    
-%     ds = [dx;dy].*FramePerStep.*ones(1,1,sum(MovingAgentLoc));
-    ds = permute([dx;dy],[1,3,2]).*FramePerStep;
-
-    try
-    CenterLoc(MovingAgentLoc,:,:) = CenterLoc(MovingAgentLoc,:,:) + permute(ds,[3 2 1]);
-    catch e
-        e
-    end
-    
-    Color = ones(size(CenterLoc,1),1);
-    Color(MovingAgentLoc,:) = MovingAgentIndex .* ones(sum(MovingAgentLoc),1);
-    
-    MoveNumber(k:k-1+numel(FramePerStep)) = (NumberOfMove-ii).*ones(1,numel(FramePerStep));
-%     MoveNumber = [MoveNumber, (ii+1).*ones(1,numel(FramePerStep))];
-    AgentType = WS.Space.Type(Agent);
-    Loc(:,k:k-1+numel(FramePerStep),:) = CenterLoc;
-    C(:,k:k-1+numel(FramePerStep)) = Color.*ones(1,size(CenterLoc,2));
-    Type(:,k:k-1+numel(FramePerStep)) = AgentType.*ones(1,size(CenterLoc,2));
-    k = k + numel(FramePerStep);
-    fprintf("Step: %d/%d, time: %s",ii,NumberOfMove,toc(t))
-    toc
-end
-Delete_Col = all(~C,1);
-C(:,Delete_Col) = [];
-Loc(:,Delete_Col,:) = [];
-Type(:,Delete_Col,:) = [];
-save("SimpleShapeAlg\Shapes\LocFile.mat");
+Delete_Col = all(~Frames(:,:,1),1);
+Frames(:,Delete_Col,:) = [];
+% save("SimpleShapeAlg\Shapes\FramesFile.mat");
 %%
-% MoveNumber = MoveNumber-1;
-C(:,1) = deal(1);
-C(:,end) = deal(1);
+ClipMaxFrame = 2000;
 
-%% keep central mass
-% ShapeCenter = (max(Loc)+min(Loc))/2;
-% ShapeCenter(:,:,1) = 0;
-% Loc = Loc - ShapeCenter;
-Loc(:,1:1+FPS-1,:) = Loc(:,1:1+FPS-1,:) - repmat(((max(Loc(:,1,:))+min(Loc(:,1,:)))/2),[size(Loc,1),FPS]);
-for jj = 1+FPS:FPS:size(Loc,2)
-    Loc(:,jj:jj+FPS-1,:) = Loc(:,jj:jj+FPS-1,:) - repmat(((max(Loc(:,jj,:))+min(Loc(:,jj,:)))/2) - ((max(Loc(:,jj-1,:))+min(Loc(:,jj-1,:)))/2),[size(Loc,1),FPS]);
-end
-
-StartShapeCenter = (max(Loc(:,1,:))+min(Loc(:,1,:)))/2;
-EndShapeCenter = (max(Loc(:,end,:))+min(Loc(:,end,:)))/2;
-
-Displacment = EndShapeCenter-StartShapeCenter;
-d_CM = Displacment.*linspace(0,1,size(Loc,2));
-% Loc = Loc - d_CM;
-%%
-
-video = VideoWriter(PathName);
+video = VideoWriter(join([PathName,"_1.mp4"],""));
 video.Quality = 100;
 video.FrameRate = 60;
 
-figure(100)
-% figure("Name","video","Position",[1	49	1536	740.800000000000])%
-cla;
-xlimit = [min(Loc(:,:,1),[],'all')-7-sqrt(3)/2, max(Loc(:,:,1),[],'all')+7+sqrt(3)/2];
-ylimit = [min(Loc(:,:,2),[],'all')-7-sqrt(3)/2, max(Loc(:,:,2),[],'all')+7+sqrt(3)/2];
+
+xlimit = [min(Frames(:,:,1),[],'all')-1-sqrt(3)/2, max(Frames(:,:,1),[],'all')+1+sqrt(3)/2];
+ylimit = [min(Frames(:,:,2),[],'all')-1-sqrt(3)/2, max(Frames(:,:,2),[],'all')+1+sqrt(3)/2];
 % axis([xlimit,ylimit])
 plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)],".r");
 axis equal
-MoveNumText.x = xlimit(1)+6;
-MoveNumText.y = ylimit(2)-5;
-MoveNumText.value = MoveNumber(1);
-MoveNumText.handel = [];
 
-
-TargetLoc = Loc(:,end,:)  +d_CM;
-% [p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1),[],[],[],MoveNumText);
-[p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,1,:),[1 3 2]), Type(:,1), C(:,1),[],[],[],[]);
-if exist("Background","var")
-    [p.T] = PlotTriangle(permute(TargetLoc(:,end,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],[],[],[]);
-end
-
-if exist("stills","var")
-    if ~isempty(stills)
-        saveas(p,stills+"1"+".png");
-    end
-end
-
-drawnow
-pause(2);
-
-% exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
-
-% I = imread("Plot.png");
-% frames = zeros([size(I),size(Loc,2)+2*video.FrameRate]);
-% frames(:,:,:,1:video.FrameRate) = repmat(imread("ArticleMovie\Plot.png"),[1,1,1,video.FrameRate]);
-% frames(1:video.FrameRate) = deal(getframe);
-% for kk = 1:10
-%     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
-% end
-FigureHandels = cell(1,size(Loc,2));
-Lastjj = 1;
+TargetLoc = Frames(:,end,:);
+clear WS Path BasicWS
 close all
 % frames= uint8()
-for jj = 1:size(Loc,2)
-    FigureHandels{jj} = figure(jj);
-    hold on
-    fprintf("progress: "+string(jj)+"/"+string(size(Loc,2))+"time: "+string(toc)+"\n");
-%     xlim([min(Loc(:,:,1),[],'all')-1-sqrt(3)/2, max(Loc(:,:,1),[],'all')+1+sqrt(3)/2]);
-%     ylim([min(Loc(:,:,2),[],'all')-1-sqrt(3)/2, max(Loc(:,:,2),[],'all')+1+sqrt(3)/2]);
-    MoveNumText.value = MoveNumber(jj);
-%     [p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,j,:),[1 3 2]), Type(:,j), C(:,j),[],p.S,[],MoveNumText);
-%     if exist("Background","var")
-%         [p.T] = PlotTriangle(permute(TargetLoc(:,end-j+1,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],p.T,[],[]);
-%     end
-plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)],".r");
-%     [p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,jj,:),[1 3 2]), Type(:,jj), C(:,jj),[],[],[],MoveNumText);
-[p.S,~,MoveNumText] = PlotTriangle(permute(Loc(:,jj,:),[1 3 2]), Type(:,jj), C(:,jj),[],[],[],[]);    
-if exist("Background","var")
-        [p.T] = PlotTriangle(permute(TargetLoc(:,end-jj+1,:),[1 3 2]), Type(:,end), 11*ones(N,1),[],[],[],[]);
-end
-        drawnow
-%     frames(j+video.FrameRate-1) = getframe;
+f=figure(666);
+f.WindowState = 'maximized';
+pause(1);
+hold on
+
+p.T = PlotTriangle(permute(TargetLoc(:,end,1:2),[1 3 2]), AgentType, ones(N,1)*11,[],[],[],[],0.2);
+p.S = PlotTriangle(permute(Frames(:,1,1:2),[1 3 2]), AgentType, Frames(:,1,3),[],[],[],[]);   
+plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)]*sqrt(3),".r");
 axis equal
+drawnow
+
+exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",300)
+
+frames(:,:,:,1) = imread("ArticleMovie\Plot.png");
+frames = repmat(frames,1,1,1,ClipMaxFrame);
+
+for jj = 2:size(Frames,2)
+    figure(666)
+    % cla
+    fprintf("progress: "+string(jj)+"/"+string(size(Frames,2))+"time: "+string(toc)+"\n");
 
 
-    % exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
+p.S = PlotTriangle(permute(Frames(:,jj,1:2),[1 3 2]), AgentType, Frames(:,jj,3),[],p.S,[],[]);    
+plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)]*sqrt(3),".r");
+axis equal
+drawnow
+exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",300)
 
-    % frames(:,:,:,jj) = imread("ArticleMovie\Plot.png");
+frames(:,:,:,jj) = imresize(imread("ArticleMovie\Plot.png"),[size(frames,[1,2])]);
 
-% SaveEvery = 100;
-% if ~mod(jj,SaveEvery) || jj==size(Loc,2)
-%     drawnow
-%     CellFrames = cell(1,size(Loc,2));
-%     End = Lastjj+SaveEvery-1;
-%     if End>size(Loc,2)
-%         End = size(Loc,2);
-%     end
-% 
-%     parfor kk = Lastjj:End
-%     
-%         exportgraphics(FigureHandels{kk},"ArticleMovie\Plot"+string(kk)+".png","Resolution",600)
-%         CellFrames{kk} = imread("ArticleMovie\Plot"+string(kk)+".png");
-%         
-%         disp(kk)
-%     end
-%     Lastjj = jj+1;
-%     close all
-% end
+if ~mod(jj,ClipMaxFrame) || jj == size(Frames,2)
+    open(video);
+    writeVideo(video,frames);
+    close(video);
 
-%     exportgraphics(gca,extractBefore(PathName,".")+".gif","Append",true);
-%     pause(0.1)
- 
-    % if exist("stills","var")
-    %     if ~isempty(stills)
-    %         saveas(p,stills+string(jj)+".png");
-    %     end
-    % end
+    video = VideoWriter(join([PathName,"_",string(jj/ClipMaxFrame+1),".mp4"],""));
+    video.Quality = 100;
+    video.FrameRate = 60;
+end
+
 end
 drawnow
-pause(2)
+pause(0.5)
 
-
-% exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",600)
 
 
 % frames(:,:,:,end+1:end+video.FrameRate) = repmat(imread("ArticleMovie\Plot.png"),[1,1,1,video.FrameRate]);
 % frames = cat(4,CellFrames{:});
-frames = flip(frames,4);
+% frames = flip(frames,4);
 open(video);
 writeVideo(video,frames);
 close(video);
