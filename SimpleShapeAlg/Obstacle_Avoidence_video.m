@@ -28,3 +28,5 @@ N = nnz(StartNode.ConfigMat{:});
 Ploting = 0;
 [Tree,Error,msg] = SimpleShapeAlgorithm(N,BasicWS,StartNode,TargetNode,Ploting,"ConfigCopyPaste",false);
 save("SimpleShapeAlg\Shapes\S2Arrow.mat","Tree","-v7.3")
+%%
+Path2Video(Tree.Data,4,"SimpleShapeAlg\Media\ObstacleVideo\S2Arrow",BasicWS)
