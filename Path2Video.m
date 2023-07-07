@@ -83,7 +83,7 @@ Frames(:,Delete_Col,:) = [];
 % save("SimpleShapeAlg\Shapes\FramesFile.mat");
 %%
 ClipMaxFrame = 2000;
-
+Batch = 1;
 video = VideoWriter(join([PathName,"_1.mp4"],""));
 video.Quality = 100;
 video.FrameRate = 60;
@@ -127,16 +127,17 @@ axis equal
 drawnow
 exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",300)
 
-frames(:,:,:,jj) = imresize(imread("ArticleMovie\Plot.png"),[size(frames,[1,2])]);
+frames(:,:,:,jj-(Batch-1)*ClipMaxFrame) = imresize(imread("ArticleMovie\Plot.png"),[size(frames,[1,2])]);
 
 if ~mod(jj,ClipMaxFrame) || jj == size(Frames,2)
     open(video);
     writeVideo(video,frames);
     close(video);
 
-    video = VideoWriter(join([PathName,"_",string(jj/ClipMaxFrame+1),".mp4"],""));
+    video = VideoWriter(join([PathName,"_",string(Batch),".mp4"],""));
     video.Quality = 100;
     video.FrameRate = 60;
+    Batch = Batch + 1;
 end
 
 end
