@@ -1,26 +1,6 @@
-function CreateRectungularShape(BasicWS,N,High)
+N =1000
+AddDirToPath
+ BasicWS = WorkSpace([N,N*2],"RRT*");
+load("SimpleShapeAlg\Shapes\S2Arrow.mat","Tree")
 
-if isempty(BasicWS)
-    BasicWS = WorkSpace([N,N*2],"RRT*");
-end
-
-Width = ceil(N/High);
-GroupsSizes = zeros(High,1);
-GroupsSizes(1:end-1) = Width;
-GroupsSizes(end) = N-sum(GroupsSizes);
-
-GroupsSizes(1) = -GroupsSizes(1);
-for row = 2:numel(GroupsSizes)
-    GroupsSizes(row) = -sign(GroupsSizes(row-1))*GroupsSizes(row);
-end
-
-
-Config.Status = ones(numel(GroupsSizes),max(abs(GroupsSizes)));
-Config.Status(end,GroupsSizes(end)+1:end) = 0; 
-Config.Type = 1;
-
-WS = SetConfigurationOnSpace(BasicWS,Config);
-WS = FixEqualeTypeNumberModule(WS,'same');
-
-
-end
+Path2Video(Tree.Data,4,"SimpleShapeAlg\Media\ObstacleVideo\S2Arrow",BasicWS)

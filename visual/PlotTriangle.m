@@ -38,7 +38,7 @@ else
     % FaceAlpha = 0.3; % 0.8
     % EdgeAlpha = 0.6; %1
     
-    LineWidth =  0.01;
+    LineWidth =  0.1;
     FaceAlpha = 0.8;
     EdgeAlpha = 1; 
     if ~isempty(Alpha)

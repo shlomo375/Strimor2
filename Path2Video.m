@@ -82,8 +82,8 @@ Delete_Col = all(~Frames(:,:,1),1);
 Frames(:,Delete_Col,:) = [];
 % save("SimpleShapeAlg\Shapes\FramesFile.mat");
 %%
-ClipMaxFrame = 2000;
-Batch = 1;
+ClipMaxFrame = 200;
+Batch = 45;
 video = VideoWriter(join([PathName,"_1.mp4"],""));
 video.Quality = 100;
 video.FrameRate = 60;
@@ -104,7 +104,7 @@ f.WindowState = 'maximized';
 pause(1);
 hold on
 
-p.T = PlotTriangle(permute(TargetLoc(:,end,1:2),[1 3 2]), AgentType, ones(N,1)*11,[],[],[],[],0.2);
+% p.T = PlotTriangle(permute(TargetLoc(:,end,1:2),[1 3 2]), AgentType, ones(N,1)*11,[],[],[],[],0.2);
 p.S = PlotTriangle(permute(Frames(:,1,1:2),[1 3 2]), AgentType, Frames(:,1,3),[],[],[],[]);   
 plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)]*sqrt(3),".r");
 axis equal
@@ -115,29 +115,37 @@ exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",300)
 frames(:,:,:,1) = imread("ArticleMovie\Plot.png");
 frames = repmat(frames,1,1,1,ClipMaxFrame);
 
-for jj = 2:size(Frames,2)
-    figure(666)
+for jj = 21001:size(Frames,2)
+   % figure(666)
     % cla
     fprintf("progress: "+string(jj)+"/"+string(size(Frames,2))+"time: "+string(toc)+"\n");
 
-
-p.S = PlotTriangle(permute(Frames(:,jj,1:2),[1 3 2]), AgentType, Frames(:,jj,3),[],p.S,[],[]);    
+figures{mod(jj-1,ClipMaxFrame)+1} = figure(jj);
+figures{mod(jj-1,ClipMaxFrame)+1}.WindowState = 'maximized';
+hold on
+PlotTriangle(permute(Frames(:,jj,1:2),[1 3 2]), AgentType, Frames(:,jj,3),[],[],[],[]);    
 plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)]*sqrt(3),".r");
 axis equal
 drawnow
-exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",300)
+%exportgraphics(gcf,"ArticleMovie\Plot.png","Resolution",300)
 
-frames(:,:,:,jj-(Batch-1)*ClipMaxFrame) = imresize(imread("ArticleMovie\Plot.png"),[size(frames,[1,2])]);
+%frames(:,:,:,jj-(Batch-1)*ClipMaxFrame) = imresize(imread("ArticleMovie\Plot.png"),[size(frames,[1,2])]);
 
 if ~mod(jj,ClipMaxFrame) || jj == size(Frames,2)
-    open(video);
-    writeVideo(video,frames);
-    close(video);
-
-    video = VideoWriter(join([PathName,"_",string(Batch),".mp4"],""));
-    video.Quality = 100;
-    video.FrameRate = 60;
-    Batch = Batch + 1;
+    drawnow
+    parfor kk =1:ClipMaxFrame
+       exportgraphics(figures{kk},join([PathName,"_",string(jj+1-ClipMaxFrame +kk),".png"],""),"Resolution",300)
+fprintf("export: %d\n",kk);
+    end
+    close all
+   % open(video);
+    %writeVideo(video,frames);
+   % close(video);
+Batch = Batch + 1;
+    %video = VideoWriter(join([PathName,"_",string(Batch),".mp4"],""));
+%    video.Quality = 100;
+  %  video.FrameRate = 60;
+    
 end
 
 end
