@@ -30,12 +30,12 @@ TotalSteps = 2 + sum(abs(Path.Step));
 Frames = zeros(N,TotalSteps*FPS,3);
 Frames(:,1,1:2) = Locations(:,1,:);
 Frames(:,:,3) = 1;
-for idx = 1:size(Path,1)
-    % get AgentID and Location
-    % MovingAgent_ind = find(Path.ConfigMat{idx}(:,:,1)>1);
-    IDs = Path.ConfigMat{idx}(:,:,2);
-    % Frames(IDs(Path.ConfigMat{idx}(:,:,1)>1),idx,3) = 10;
-end
+% for idx = 1:size(Path,1)
+%     % get AgentID and Location
+%     % MovingAgent_ind = find(Path.ConfigMat{idx}(:,:,1)>1);
+%     IDs = Path.ConfigMat{idx}(:,:,2);
+%     % Frames(IDs(Path.ConfigMat{idx}(:,:,1)>1),idx,3) = 10;
+% end
  
 
 % Frames(:,:,3) = 1;
@@ -99,7 +99,7 @@ TargetLoc = Frames(:,end,:);
 clear WS Path BasicWS
 close all
 % frames= uint8()
-f=figure(666);
+f=figure(666,"WindowState","maximized");
 f.WindowState = 'maximized';
 pause(1);
 hold on
@@ -120,8 +120,8 @@ for jj = 21001:size(Frames,2)
     % cla
     fprintf("progress: "+string(jj)+"/"+string(size(Frames,2))+"time: "+string(toc)+"\n");
 
-figures{mod(jj-1,ClipMaxFrame)+1} = figure(jj);
-figures{mod(jj-1,ClipMaxFrame)+1}.WindowState = 'maximized';
+figures{mod(jj-1,ClipMaxFrame)+1} = figure(jj,"WindowState","maximized");
+
 hold on
 PlotTriangle(permute(Frames(:,jj,1:2),[1 3 2]), AgentType, Frames(:,jj,3),[],[],[],[]);    
 plot([xlimit';xlimit'],[ylimit(1);ylimit(1);ylimit(2);ylimit(2)]*sqrt(3),".r");

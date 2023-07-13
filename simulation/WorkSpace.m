@@ -397,12 +397,9 @@ classdef WorkSpace
                 AgentLoc(end+1) = sub2ind(WS.SpaceSize,round(y),round(x));
                 plot(round(x),round(y)*sqrt(3),"xb","MarkerSize",20); 
             end
-            for i = AgentLoc
-                if Status == 1
-                    WS.Space.Agent(i) = Agent;
-                end
-                WS.Space.Status(i) = Status;
-            end
+            
+            WS = ChangeAgentLoc(WS,AgentLoc);
+          
             cla
 %             PlotWorkSpace(WS,1);
         end
