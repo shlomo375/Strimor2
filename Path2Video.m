@@ -30,17 +30,11 @@ TotalSteps = 2 + sum(abs(Path.Step));
 Frames = zeros(N,TotalSteps*FPS,3);
 Frames(:,1,1:2) = Locations(:,1,:);
 Frames(:,:,3) = 1;
-% for idx = 1:size(Path,1)
-%     % get AgentID and Location
-%     % MovingAgent_ind = find(Path.ConfigMat{idx}(:,:,1)>1);
-%     IDs = Path.ConfigMat{idx}(:,:,2);
-%     % Frames(IDs(Path.ConfigMat{idx}(:,:,1)>1),idx,3) = 10;
-% end
- 
 
-% Frames(:,:,3) = 1;
+Types = WS.Space.Type(:,:,1);
+AgentType = Types(WS.Space.Status(:,:,1)>0);
+AgentType = AgentType(Sorted_Loc);
 
-AgentType = WS.Space.Type(WS.Space.Status>0);
 FramePerStep = linspace(0,1,FPS);
 LastFrame = 2;
 for Location_Idx = 2:(size(Path,1))

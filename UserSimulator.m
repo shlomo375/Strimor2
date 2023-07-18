@@ -7,7 +7,7 @@ clear
 % Path = flip(Path);
 close all
 Agent2move = [];
-N = 10;
+N = 16;
 Size = [N, 2*N];
 BasicWS = WorkSpace(Size,"RRT*");
 figure(2)
@@ -78,6 +78,7 @@ if OK
 
     Path = [Path;Node];
     WS.Space.Status(WS.Space.Status>1) = 1;
+    WS.Space.AgentID(logical(WS.Space.Status)) = Config.AgentID(logical(Config.AgentID));
 else
     fprintf("wrong move...")
 end

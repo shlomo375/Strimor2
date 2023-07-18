@@ -873,6 +873,7 @@ classdef WorkSpace
         end
         
         function [WS,TagAgentLoc] = SetConfigurationOnSpace(WS,Config,AddTag2Agent)
+            Config.Status = Config.Status(:,:,1);
             Size = size(Config.Status);
             [row,col] = find(Config.Status);
             ShiftCol = round((WS.SpaceSize(2)-Size(2))./2);
