@@ -1,11 +1,15 @@
 %% img to configuration
 % AddDirToPath
-function [WS,Node,Config,BasicWS,N] = Img2Configuration(ImgAddress,Resize,N_Requred)
-% img = imread("Shapes\S.png");
-img = imread(ImgAddress);
+close all
+% function [WS,Node,Config,BasicWS,N] = Img2Configuration(ImgAddress,Resize,N_Requred)
+Resize = 0.5;
+N_Requred = 2000;
+img = imread("Shapes\i.png");
+% img = imread(ImgAddress);
 last_Diff = [];
 step = 0.025;
-while 1
+ddd = 1;
+while 1 && ddd
     try
     imgGray = imresize(rgb2gray(img),Resize);
     imgBin = ~imbinarize(imgGray,"global");
@@ -41,7 +45,7 @@ while 1
         break
     end
 end
-BasicWS = WorkSpace([N,N*2],"RRT*");
+% BasicWS = WorkSpace([N,N*2],"RRT*");
 
 Config.Status = imgBin;
 Config.Type = 1;
@@ -56,5 +60,7 @@ Node = CreateNode(1);
 Node = ConfigStruct2Node(Node,Config);
 
 figure
-PlotWorkSpace(WS)
+AgentInd = find(WS.Space.Status);
+PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true)
+% exportgraphics(gcf,fullfile(),"Resolution",300)
 N = nnz(Config.Status);
