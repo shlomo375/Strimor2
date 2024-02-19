@@ -389,7 +389,7 @@ classdef WorkSpace
             AgentLoc = [];
             hold on
             while exit
-                [x,y,button] = ginput(1);
+                [x,y,button] = ginput(1,[0,0,0]);
                 y = y/sqrt(3);
                 if button == 3
                     break

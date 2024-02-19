@@ -7,7 +7,7 @@ clear
 % Path = flip(Path);
 close all
 Agent2move = [];
-N = 16;
+N = 10;
 Size = [N, 2*N];
 BasicWS = WorkSpace(Size,"RRT*");
 figure(2)
@@ -33,10 +33,11 @@ if FirstConfig
     Path = CreateNode(1);
     Path = ConfigStruct2Node(Path,Config);
     
-    Path.ConfigMat{1} = cat(3,Path.ConfigMat{1},Config.AgentID);
+    Path.ConfigMat{1} = cat(3,Path.ConfigMat{1});
 
     FirstConfig = false;
     PlotWorkSpace(WS,"Plot_FullWorkSpace",true)
+    % PlotWorkSpace(WS,"Set_SpecificAgentInd",find(WS.Space.Status))
 % else
 %     WSStart1.Space.Status(WSStart1.Space.Status~=0) = 1;
 %     PlotWorkSpace(WSStart1,"Plot_FullWorkSpace",true)
@@ -48,7 +49,7 @@ end
 
 Parts =  AllSlidingParts(WS);
 [~, Agent2move] = GetAgentFromUser(WS,1);
-
+figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
 prompt = {'Enter axis:','Enter number of steps:'};
 dlgtitle = 'Input';
 dims = [1 35];
@@ -63,8 +64,9 @@ for ii_Parts = 1:numel(Parts{dir})
         Agent2move = unique([Agent2move(:);Group(:)]);
     end
 end
-
+%%
 [OK, Config, Movment, CollidingAgent] = MakeAMove(WS,dir,step, Agent2move);
+%%
 if OK
     Node = CreateNode(1);
     Node = ConfigStruct2Node(Node,Config,Movment.dir,Movment.step);
