@@ -46,10 +46,10 @@ if FirstConfig
 %     [WS, ~] = GetAgentFromUser(WSStart1,1);
 end
 
+figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
 
 Parts =  AllSlidingParts(WS);
 [~, Agent2move] = GetAgentFromUser(WS,1);
-figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
 prompt = {'Enter axis:','Enter number of steps:'};
 dlgtitle = 'Input';
 dims = [1 35];
