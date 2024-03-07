@@ -46,14 +46,16 @@ if FirstConfig
 %     [WS, ~] = GetAgentFromUser(WSStart1,1);
 end
 
-figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
-
+figure(2)
 Parts =  AllSlidingParts(WS);
 [~, Agent2move] = GetAgentFromUser(WS,1);
+figure(123);close(123);figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
+
 prompt = {'Enter axis:','Enter number of steps:'};
 dlgtitle = 'Input';
 dims = [1 35];
 definput = {'1','1'};
+
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 dir = str2num(answer{1});
 step = str2num(answer{2});
@@ -81,6 +83,7 @@ if OK
     Path = [Path;Node];
     WS.Space.Status(WS.Space.Status>1) = 1;
     WS.Space.AgentID(logical(WS.Space.Status)) = Config.AgentID(logical(Config.AgentID));
+    figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
 else
     fprintf("wrong move...")
 end
