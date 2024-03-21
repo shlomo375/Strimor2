@@ -125,7 +125,7 @@ classdef WorkSpace
 
 
             ind = cell(length(n2),1);
-            parfor k = 1:length(n2)
+            for k = 1:length(n2)
                 fprintf("axis 2: %d/%d\n",k,length(n2));
                 [ro,co] = find(abs(j-line(i,-1,n2(k)))<=.5);
                 loc = flip(sortrows([ro,co],[2 1],{'descend' 'ascend'}),1);
@@ -164,7 +164,7 @@ classdef WorkSpace
 
 
             ind = cell(length(n3),1);
-            parfor k = 1:length(n3)
+            for k = 1:length(n3)
                 fprintf("axis 3: %d/%d\n",k,length(n3));
                 [ro,co] = find(abs(i-line(j,1,n3(k)))<=.5);
                 loc = sortrows([ro,co],1,'ascend');
@@ -214,7 +214,7 @@ classdef WorkSpace
             %convert to axis 2:
             RAxis2 = zeros(NewRow,NewCol);
             
-            %first partial rows
+            %first tial rows
             for i = 1:round(Row/2)
                 top = (n+1-2*i):-(Row-1):(n+Row-2*i*Row);
                 down = top(1:end-1)+1;
@@ -251,7 +251,7 @@ classdef WorkSpace
             %convert to axis 3: 
             RAxis3 = zeros(NewRow,NewCol);
             
-            %first partial and complete rows
+            %first tial and complete rows
             for i = 1:Row
                 top = (2*i-1)*Row:-(Row+1):0;
                 if length(top)>10
@@ -268,7 +268,7 @@ classdef WorkSpace
                 line = line(:)';
                 RAxis3(i,1:size(line,2)) = line; 
             end
-            %all the rest partial rows.
+            %all the rest tial rows.
             for i = Row+1:NewRow
                 down = n-2*(i-Row-1):-(Row+1):0;
                 down = down(1:NewCol/2-2*(i-Row-1));
@@ -424,7 +424,7 @@ classdef WorkSpace
         % Is there an agent that can be moved in relation to him. 
         % The action gets all the agents that need to move
 
-        % The linear position of the agents in a particular R matrix is obtained,
+        % The linear position of the agents in a ticular R matrix is obtained,
         % the agents are moved in the same matrix and their linear representation
         % is translated into a linear representation in the matrix R1
         function [OK, MoveAgent2Ind, CollidingAgent, Alert] = ApproveMovment(WS,Movment,slide)
@@ -535,39 +535,39 @@ classdef WorkSpace
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%                          Possible Relative Movement
-            NextPartner = @(Col)([Col,2*RightLeft*ones(size(Col))]*[ones(1,step+1);0:step]);
+            Nexttner = @(Col)([Col,2*RightLeft*ones(size(Col))]*[ones(1,step+1);0:step]);
             
             ProblemRowUp = (RowUp>=Size(1));
             ProblemRowDown = (RowDown<=1);
             RowUp(ProblemRowUp) = Size(1)-1;
             RowDown(ProblemRowDown) = 2;
             try
-            PartnerAgentUpIndLoc = sub2ind(Size,(RowUp+1).*ones(1,step+1),NextPartner(ColUp));
+            tnerAgentUpIndLoc = sub2ind(Size,(RowUp+1).*ones(1,step+1),Nexttner(ColUp));
             
-            PartnerAgentDownIndLoc = sub2ind(Size,(RowDown-1).*ones(1,step+1),NextPartner(ColDown));
+            tnerAgentDownIndLoc = sub2ind(Size,(RowDown-1).*ones(1,step+1),Nexttner(ColDown));
             
-            NotCouplingUp = ismember(R(PartnerAgentUpIndLoc(:,1)),BaseDown);
-            NotCouplingDown = ismember(R(PartnerAgentDownIndLoc(:,1)),BaseUp);
+            NotCouplingUp = ismember(R(tnerAgentUpIndLoc(:,1)),BaseDown);
+            NotCouplingDown = ismember(R(tnerAgentDownIndLoc(:,1)),BaseUp);
             catch E
                 fprintf(E.identifier);
             end
             try
-            PartnerAgentUpIndLoc(NotCouplingUp | ProblemRowUp,:) = [];
-            PartnerAgentDownIndLoc(NotCouplingDown | ProblemRowDown,:) = [];
+            tnerAgentUpIndLoc(NotCouplingUp | ProblemRowUp,:) = [];
+            tnerAgentDownIndLoc(NotCouplingDown | ProblemRowDown,:) = [];
             catch e
                 e
             end
             try
-            PartnerAgent = [PartnerAgentUpIndLoc; PartnerAgentDownIndLoc];
+            tnerAgent = [tnerAgentUpIndLoc; tnerAgentDownIndLoc];
             catch qwe
                 qwe
             end
             try
-            PartnerAgentInSpace = R(PartnerAgent);
-            zeroLoc = (PartnerAgentInSpace == 0);
-            PartnerAgentInSpace(zeroLoc) = 1;
-%             ExistsAgent = reshape([WS.Space(PartnerAgentInSpace).Status],size(PartnerAgent));
-            ExistsAgent = WS.Space.Status(PartnerAgentInSpace);
+            tnerAgentInSpace = R(tnerAgent);
+            zeroLoc = (tnerAgentInSpace == 0);
+            tnerAgentInSpace(zeroLoc) = 1;
+%             ExistsAgent = reshape([WS.Space(tnerAgentInSpace).Status],size(tnerAgent));
+            ExistsAgent = WS.Space.Status(tnerAgentInSpace);
             ExistsAgent(zeroLoc) = 0;
 
             catch E
@@ -742,17 +742,17 @@ classdef WorkSpace
         
       
 %             Approve = true;
-%             Parts = AllSlidingParts(WS);
-%             Parts = cat(1,Parts{:});
-%             while numel(Parts)>1
-%                 Exists = cellfun(@(x)any(ismember(x,Parts{1})),Parts);
+%             ts = AllSlidingts(WS);
+%             ts = cat(1,ts{:});
+%             while numel(ts)>1
+%                 Exists = cellfun(@(x)any(ismember(x,ts{1})),ts);
 %                 if ~any(Exists(2:end))
 %                     Approve = false;
 %                     break
 %                 end
-%                 Connect = {unique(cat(1,Parts{Exists}))};
-%                 Parts = [Parts(~Exists); {0}];
-%                 Parts(end) = Connect;
+%                 Connect = {unique(cat(1,ts{Exists}))};
+%                 ts = [ts(~Exists); {0}];
+%                 ts(end) = Connect;
 %             end
         
 

@@ -14,6 +14,8 @@ figure(2)
 path =table;
 % PlotWorkSpace(BasicWS,[]);
 FirstConfig = true;
+
+folderName = uigetdir;
 while true
 %     for ii = 1:size(Path,1)
 %         figure(ii)
@@ -49,8 +51,10 @@ end
 figure(2)
 Parts =  AllSlidingParts(WS);
 [~, Agent2move] = GetAgentFromUser(WS,1);
-figure(123);close(123);figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
+figure(123);close(123);ff = figure(123); PlotWorkSpace(WS,"Plot_FullWorkSpace_NoLattice",true,"Set_SpecificAgentInd",Agent2move)
 
+saveFigureAxes(ff, folderName)
+pause
 prompt = {'Enter axis:','Enter number of steps:'};
 dlgtitle = 'Input';
 dims = [1 35];
@@ -123,5 +127,54 @@ end
 % PlotWorkSpace(WS,[],Agent,10);
     
 
+end
+
+
+function saveFigureAxes(figureHandle, folderName)
+    % Check if the input is a valid figure handle
+    if ~ishandle(figureHandle) || ~strcmp(get(figureHandle, 'Type'), 'figure')
+        error('Input must be a valid figure handle.');
+    end
+
+    % Check if the folder exists
+    if ~exist(folderName, 'dir')
+        error('The specified folder does not exist.');
+    end
+
+    % Get the file name from the user using a UI text box
+    prompt = {'Enter the file name:'};
+    dlgtitle = 'Input';
+    dims = [1 35];
+    definput = {'MyFigure'};
+    fileName = inputdlg(prompt, dlgtitle, dims, definput);
+
+    % Check if the user canceled the operation
+    if isempty(fileName)
+        disp('User canceled the operation.');
+        return;
+    end
+
+    % Resize patch line widths to 2 if any patch objects are found
+    patches = findobj(figureHandle, 'Type', 'patch');
+    for i = 1:length(patches)
+        patches(i).LineWidth = 1;
+    end
+
+    % Construct the full file paths
+    pngFile = fullfile(folderName, [fileName{1}, '.png']);
+    figFile = fullfile(folderName, [fileName{1}, '.fig']);
+
+    % Save the axes to a PNG file
+    ax = findobj(figureHandle, 'Type', 'axes');
+    if ~isempty(ax)
+        exportgraphics(ax, pngFile, 'Resolution', 300);
+        disp(['Axes saved to PNG file: ', pngFile]);
+    else
+        disp('No axes found in the figure.');
+    end
+
+    % Save the figure to a FIG file
+    savefig(figureHandle, figFile);
+    disp(['Figure saved to FIG file: ', figFile]);
 end
 
